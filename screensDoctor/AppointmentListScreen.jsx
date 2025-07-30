@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+// Developed by Sami
+import React, { useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { AppointmentsContext } from '../contexts/AppointmentsContext';
 import ScreenWithDrawer from './ScreenWithDrawer';
 //sami
 const primary = '#00b29c';
@@ -11,32 +13,24 @@ const AppointmentListScreen = () => {
   const route = useRoute();
   const isFocused = useIsFocused();
 
-  const [appointments, setAppointments] = useState([]);
+  const { appointments, addOrUpdate, remove } = useContext(AppointmentsContext);
 
   // When returning from form, we may get params with the new / updated appointment
   useEffect(() => {
     if (isFocused && route.params?.savedAppointment) {
       const appointment = route.params.savedAppointment;
-      setAppointments((prev) => {
-        // if id already exists, update, else add
-        const index = prev.findIndex((a) => a.id === appointment.id);
-        if (index !== -1) {
-          const updated = [...prev];
-          updated[index] = appointment;
-          return updated;
-        }
-        return [...prev, appointment];
-      });
+      addOrUpdate(appointment);
       // clear params so useEffect won't loop
       navigation.setParams({ savedAppointment: undefined });
     }
   }, [isFocused, route.params, navigation]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('AppointmentForm', { appointment: item })}
-    >
+    <View style={styles.card}>
+      <TouchableOpacity
+        style={{flex:1}}
+        onPress={() => navigation.navigate('AppointmentForm', { appointment: item })}
+      >
       <View style={styles.cardContent}>
         <Ionicons name="calendar" size={24} color={primary} style={styles.icon} />
         <View>
@@ -44,7 +38,11 @@ const AppointmentListScreen = () => {
           <Text style={styles.subtitle}>{`${item.date}  |  ${item.time}`}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+          </TouchableOpacity>
+      <TouchableOpacity style={styles.cancelBtn} onPress={() => remove(item.id)}>
+        <Ionicons name="close" size={20} color="#f44336" />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -94,6 +92,9 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#555',
+  },
+  cancelBtn: {
+    padding: 8,
   },
   emptyContainer: {
     flex: 1,

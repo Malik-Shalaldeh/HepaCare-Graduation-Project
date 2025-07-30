@@ -1,17 +1,19 @@
 //sami
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenWithDrawer from './ScreenWithDrawer';
+import { AppointmentsContext } from '../contexts/AppointmentsContext';
 
 const primary = '#00b29c';
 
 const AppointmentFormScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { addOrUpdate } = useContext(AppointmentsContext);
 
   const editingAppointment = route.params?.appointment;
 
@@ -36,13 +38,15 @@ const AppointmentFormScreen = () => {
 
     const savedAppointment = {
       id: editingAppointment?.id || Date.now(),
-      patient: patient.trim(),
+      patient: patient,
       notes: notes.trim(),
       date: date.toLocaleDateString(),
       time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    navigation.navigate('AppointmentList', { savedAppointment });
+    // Save directly to context
+    addOrUpdate(savedAppointment);
+    navigation.goBack();
   };
 
   return (

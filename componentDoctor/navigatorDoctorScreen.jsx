@@ -16,6 +16,7 @@ import Settings from '../screensDoctor/Settings';
 import TestsStack from './TestsStack';
 import PatientsStack from './PatientsStack';
 import MedicationsStackScreen from './medicationStack';
+import AppointmentsStack from './AppointmentsStack';
 import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
 import ChatScreen from '../screensDoctor/ChatScreen';
 import Dashboard from '../screensDoctor/Dashboard';
@@ -140,6 +141,15 @@ function NavigatorDoctor() {
           options={{
             drawerIcon: ({ size, color }) => (
               <Ionicons name="people-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="إدارة المواعيد"
+          component={AppointmentsStack}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="calendar-outline" size={size} color={color} />
             ),
           }}
         />
