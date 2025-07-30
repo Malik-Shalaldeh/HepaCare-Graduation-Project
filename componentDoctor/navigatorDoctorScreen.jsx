@@ -1,0 +1,232 @@
+import React from 'react';
+import { StatusBar, Alert, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem
+} from '@react-navigation/drawer';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import Visits from '../screensDoctor/Visits';
+import HistoryVisits from '../screensDoctor/HistoryVisits';
+import Settings from '../screensDoctor/Settings';
+import TestsStack from './TestsStack';
+import PatientsStack from './PatientsStack';
+import MedicationsStackScreen from './medicationStack';
+import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
+import ChatScreen from '../screensDoctor/ChatScreen';
+import Dashboard from '../screensDoctor/Dashboard';
+import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
+import PrivacyPolicyScreen from '../screensDoctor/PolicyScreen';
+import ResetPasswordScreen from '../screensDoctor/ResetPasswordScreen';
+import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
+import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
+import PatientChartScreen from '../screensDoctor/PatientChartScreen';
+
+const primary = '#00b29c';
+
+function CustomDrawerContent(props) {
+  const navigation = useNavigation();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'تسجيل الخروج',
+      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'تسجيل خروج',
+          onPress: () => navigation.replace('Login'),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem
+        label="تسجيل الخروج"
+        onPress={handleLogout}
+        icon={({ size, color }) => (
+          <Ionicons name="log-out-outline" size={size} color={color} />
+        )}
+      />
+    </DrawerContentScrollView>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="لوحة التحكم"
+      screenOptions={({ route }) => ({
+        headerShown: true,
+        tabBarIcon: ({ color, size }) => {
+          const icons = {
+            المرضى: 'people',
+            'لوحة التحكم': 'home',
+            الزيارات: 'calendar',
+            الأدوية: 'medkit',
+            الرسائل: 'chatbubble-outline',
+          };
+          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#2196f3',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: Platform.OS === 'android' ? 35 : 20,
+          left: 16,
+          right: 16,
+          elevation: 6,
+          backgroundColor: '#fff',
+          borderRadius: 16,
+          height: 60,
+          paddingBottom: Platform.OS === 'android' ? 20 : 20,
+        },
+      })}
+    >
+      <Tab.Screen name="الزيارات" component={Visits} />
+      <Tab.Screen
+        name="الأدوية"
+        component={MedicationsStackScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen name="لوحة التحكم" component={Dashboard} />
+      <Tab.Screen name="الرسائل" component={ChatScreen} />
+    </Tab.Navigator>
+  );
+}
+
+const Drawer = createDrawerNavigator();
+function NavigatorDoctor() {
+  return (
+    <>
+      <StatusBar
+        backgroundColor={primary}
+        barStyle="light-content"
+        translucent={false}
+      />
+      <Drawer.Navigator
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        initialRouteName="MainTabs"
+        screenOptions={{
+          headerShown: true,
+          drawerActiveTintColor: primary,
+          drawerLabelStyle: { fontSize: 16 },
+          drawerStyle: { backgroundColor: '#fff' },
+        }}
+      >
+        <Drawer.Screen
+          name="MainTabs"
+          component={MainTabs}
+          options={{
+            drawerLabel: () => null,
+            title: null,
+            drawerIcon: () => null,
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="المرضى"
+          component={PatientsStack}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="people-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="الفحوصات"
+          component={TestsStack}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="analytics-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="المحتوى التثقيفي"
+          component={EducationalContentScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="book-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+         <Drawer.Screen
+          name="سياسة التطبيق"
+          component={PrivacyPolicyScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="document-text-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="الإعدادات"
+          component={Settings}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="settings-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="تقييم الزيارة"
+          component={EvaluationVisitScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+        
+        <Drawer.Screen
+          name="إضافة مريض"
+          component={AddPatientsScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="تتبع الأعراض"
+          component={SymptomTrackingScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+
+        <Drawer.Screen
+        name="ResetPassword"
+        component={ResetPasswordScreen}
+        options={{
+          drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
+          headerShown: false,             // يخفي العنوان العلوي
+       }}
+      />
+
+        <Drawer.Screen
+          name="سجل الزيارات"
+          component={HistoryVisits}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+        
+      </Drawer.Navigator>
+    </>
+  );
+}
+
+export default NavigatorDoctor;
