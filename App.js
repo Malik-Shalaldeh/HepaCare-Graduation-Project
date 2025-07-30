@@ -7,6 +7,7 @@ import NavigatorPatient from './componentPaitent/PatientDrawerNavigator';
 import NavigatorDoctor from './componentDoctor/navigatorDoctorScreen';
 import { VisitDataProvider } from './contexts/VisitDataContext';
 import { AppointmentsProvider } from './contexts/AppointmentsContext';
+import { EducationalContentProvider } from './contexts/EducationalContentContext';
 
 
 
@@ -16,13 +17,15 @@ export default function App() {
   return (
     <VisitDataProvider>
       <AppointmentsProvider>
-        <NavigationContainer>
+        <EducationalContentProvider>
+          <NavigationContainer>
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Doctor" component={NavigatorDoctor} />
           <Stack.Screen name="Patient" component={NavigatorPatient} />
         </Stack.Navigator>
-        </NavigationContainer>
+          </NavigationContainer>
+        </EducationalContentProvider>
       </AppointmentsProvider>
     </VisitDataProvider>
   );

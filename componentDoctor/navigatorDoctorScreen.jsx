@@ -17,7 +17,7 @@ import TestsStack from './TestsStack';
 import PatientsStack from './PatientsStack';
 import MedicationsStackScreen from './medicationStack';
 import AppointmentsStack from './AppointmentsStack';
-import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
+import EducationalContentStack from './EducationalContentStack';
 import ChatScreen from '../screensDoctor/ChatScreen';
 import Dashboard from '../screensDoctor/Dashboard';
 import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
@@ -164,8 +164,9 @@ function NavigatorDoctor() {
         />
         <Drawer.Screen
           name="المحتوى التثقيفي"
-          component={EducationalContentScreen}
+          component={EducationalContentStack}
           options={{
+            headerShown: false,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="book-outline" size={size} color={color} />
             ),
