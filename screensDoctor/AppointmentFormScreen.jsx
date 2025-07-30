@@ -1,10 +1,12 @@
+//sami
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenWithDrawer from './ScreenWithDrawer';
-//sami
+
 const primary = '#00b29c';
 
 const AppointmentFormScreen = () => {
@@ -13,7 +15,16 @@ const AppointmentFormScreen = () => {
 
   const editingAppointment = route.params?.appointment;
 
-  const [patient, setPatient] = useState(editingAppointment?.patient || '');
+//زهقت 
+
+  const [open, setOpen] = useState(false);
+  const [patient, setPatient] = useState(editingAppointment?.patient || null);
+  const [patientsItems, setPatientsItems] = useState([
+    // TODO: replace with dynamic data from backend
+    { label: 'المريض 1', value: 'المريض 1' },
+    { label: 'المريض 2', value: 'المريض 2' },
+    { label: 'المريض 3', value: 'المريض 3' },
+  ]);
   const [notes, setNotes] = useState(editingAppointment?.notes || '');
   const [date, setDate] = useState(editingAppointment ? new Date(editingAppointment.date) : new Date());
   const [time, setTime] = useState(editingAppointment ? new Date(`${editingAppointment.date} ${editingAppointment.time}`) : new Date());
@@ -21,7 +32,7 @@ const AppointmentFormScreen = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const saveAppointment = () => {
-    if (!patient.trim()) return;
+    if (!patient) return;
 
     const savedAppointment = {
       id: editingAppointment?.id || Date.now(),
@@ -38,11 +49,20 @@ const AppointmentFormScreen = () => {
     <ScreenWithDrawer title="موعد جديد">
       <View style={styles.container}>
         <Text style={styles.label}>اسم المريض</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="اكتب اسم المريض"
+        <DropDownPicker
+          open={open}
           value={patient}
-          onChangeText={setPatient}
+          items={patientsItems}
+          setOpen={setOpen}
+          setValue={setPatient}
+          setItems={setPatientsItems}
+          placeholder="اختر اسم المريض"
+          searchable={true}
+          searchPlaceholder="ابحث عن مريض"
+          zIndex={3000}
+          zIndexInverse={1000}
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownContainer}
         />
 
         <Text style={styles.label}>التاريخ</Text>
@@ -153,6 +173,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 16,
+    backgroundColor: '#fff',
+  },
+  dropdownContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginBottom: 16,
   },
   backText: {
     color: '#333',
