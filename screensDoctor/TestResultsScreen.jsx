@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'; 
 
@@ -12,6 +12,7 @@ const sampleResults = [
     result: '45 U/L',
     evaluation: 'مرتفع قليلاً',
     doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
+    dat: '10/4/2025'
   },
   {
     id: '2',
@@ -21,6 +22,7 @@ const sampleResults = [
     result: '32 U/L',
     evaluation: 'طبيعي',
     doctorNote: 'استمر على النظام الغذائي.',
+    dat: '5/4/2020'
   },
   {
     id: '3',
@@ -30,6 +32,7 @@ const sampleResults = [
     result: '1.2 mg/dL',
     evaluation: 'طبيعي',
     doctorNote: 'نتائج ممتازة.',
+    dat: '3/8/2015'
   },
 ];
 
@@ -38,14 +41,19 @@ const TestResultsScreen = () => {
   const [filteredResults, setFilteredResults] = useState([]);
   const navigation = useNavigation();
 
-  // 👇 لإخفاء الهيدر (العنوان العلوي)
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
   const handleSearch = () => {
+    const query = searchInput.trim().toLowerCase();
+    if (!query) {
+      setFilteredResults([]);
+      return;
+    }
     const results = sampleResults.filter(item =>
-      item.patientId === searchInput.trim()
+      item.patientId.includes(query) ||
+      item.name.toLowerCase().includes(query)
     );
     setFilteredResults(results);
   };
@@ -57,40 +65,47 @@ const TestResultsScreen = () => {
       <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
       <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
       <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
+      <Text style={styles.note}>📅 تاريخ الفحص: {item.dat}</Text>
+
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+      <Text style={styles.btn}>فتح ملف الفحص</Text>
+      </TouchableOpacity>
+
     </View>
   );
 
   return (
     <View style={styles.container}>
-     {/* زر الرجوع */}
-     <TouchableOpacity style={styles.backButton} onPress={()=>navigation.goBack()}>
-       <Ionicons name='arrow-back' size={24} color={'#000'} />
-     </TouchableOpacity>
-         
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name='arrow-back' size={24} color='#000' />
+      </TouchableOpacity>
+      
       <Text style={styles.header}>🔍 ابحث عن فحوصات المريض</Text>
+      
       <TextInput 
-       style={styles.input}
-       placeholder='...ادخل رقم المريض'
-       onChangeText={(newtext)=>setSearchInput(newtext)}
-       value={searchInput}
-        keyboardType="numeric"
+        style={styles.input}
+        placeholder='...ادخل اسم أو رقم المريض'
+        onChangeText={setSearchInput}
+        value={searchInput}
+        autoCapitalize="none"
       />
       
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch} >
-        <Ionicons name='search' size={20} color={'#fff'}/>
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <Ionicons name='search' size={20} color='#fff' />
         <Text style={styles.searchButtonText}>بحث</Text>
       </TouchableOpacity>
+      
 
-    <FlatList 
-     data={filteredResults}
-     renderItem={renderItem}
-     keyExtractor={item => item.id}
-     ListEmptyComponent={
-      filteredResults.length ===0 && searchInput !== ''?(
-        <Text style={styles.emptyText}>لا يوجد نتائج</Text>
-      ) : null
-     }
-    />
+      <FlatList 
+        data={filteredResults}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        ListEmptyComponent={
+          filteredResults.length === 0 && searchInput.trim() !== '' ? (
+            <Text style={styles.emptyText}>لا يوجد نتائج</Text>
+          ) : null
+        }
+      />
     </View>
   );
 };
@@ -101,12 +116,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F6F8',
     paddingHorizontal: 20,
     paddingTop: 30,
+    paddingBottom: 30,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   header: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12,
     color: '#2C3E50',
+    textAlign: 'right',
   },
   input: {
     backgroundColor: '#fff',
@@ -116,6 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: '#ddd',
     borderWidth: 1,
+    textAlign: 'right',
   },
   searchButton: {
     flexDirection: 'row',
@@ -133,11 +156,19 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontWeight: 'bold',
   },
+
+  btn : {
+   color: '#fff',
+    fontSize: 14,
+    marginLeft: 8,
+    fontWeight: 'bold',
+
+  },
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -149,36 +180,37 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 6,
     color: '#34495E',
+    textAlign: 'right',
   },
   test: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
+    textAlign: 'right',
   },
   result: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
+    textAlign: 'right',
   },
   evaluation: {
     fontSize: 16,
     color: '#27ae60',
     marginBottom: 4,
+    textAlign: 'right',
   },
   note: {
     fontSize: 15,
     color: '#7f8c8d',
+    textAlign: 'right',
+    marginBottom: 2,
   },
   emptyText: {
     textAlign: 'center',
     color: '#aaa',
     fontSize: 16,
     marginTop: 20,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
   },
 });
 

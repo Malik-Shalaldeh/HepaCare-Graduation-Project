@@ -11,6 +11,7 @@ const patientResults = [
     result: '45 U/L',
     evaluation: 'مرتفع قليلاً',
     doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
+      dat :'3/8/2015'
   },
   {
     id: '3',
@@ -20,6 +21,7 @@ const patientResults = [
     result: '1.2 mg/dL',
     evaluation: 'طبيعي',
     doctorNote: 'نتائج ممتازة.',
+    dat :'3/8/2015'
   },
 ];
 
@@ -28,11 +30,12 @@ const TestResultsScreen = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
-      <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
-      <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
-      <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
-      <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
+     <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
+           <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
+           <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
+           <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
+           <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
+           <Text style={styles.note}>📅 تاريخ الفحص {item.dat}</Text>
     </View>
   );
 

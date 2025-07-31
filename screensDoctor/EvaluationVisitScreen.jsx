@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -22,23 +22,21 @@ const EvaluationVisitScreen = () => {
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
   const { addVisit } = useVisitData();
-  const scrollRef = useRef();
 
   // إذا لم يأتِ patientId نرجع للخلف
   useEffect(() => {
     if (!patientId) {
       navigation.goBack();
     }
-  }, [patientId]);
+  }, [patientId, navigation]);
 
-  // عند كل مرة تظهر فيها الشاشة، نفرغ الحقول ونرجّع لفوق
+  // عند كل مرة تظهر فيها الشاشة نفرّغ الحقول
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setCondition('');
       setAdherence('');
       setNotes('');
       setPsychosocial('');
-      scrollRef.current?.scrollTo({ y: 0, animated: false });
     });
     return unsubscribe;
   }, [navigation]);
@@ -67,12 +65,11 @@ const EvaluationVisitScreen = () => {
     };
     addVisit(selectedPatient.id, evaluation);
 
-    // فرغ الحقول وأعد الشاشة لأعلى
+    // فرغ الحقول
     setCondition('');
     setAdherence('');
     setNotes('');
     setPsychosocial('');
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
 
     Alert.alert('✅ تم حفظ التقييم للمريض: ' + selectedPatient.name);
   };
@@ -111,10 +108,7 @@ const EvaluationVisitScreen = () => {
         barStyle="dark-content"
         translucent={false}
       />
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
