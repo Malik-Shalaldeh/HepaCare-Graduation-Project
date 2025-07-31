@@ -6,19 +6,21 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const primary = '#00b29c';
 
-const ScreenWithDrawer = ({ title, children }) => {
+const ScreenWithDrawer = ({ title, children, showDrawerIcon = true }) => {
   const navigation = useNavigation();
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity 
-          onPress={() => navigation.toggleDrawer()}
-          style={{ marginLeft: 15 }}
-        >
-          <Ionicons name='menu' size={28} color="#fff" />
-        </TouchableOpacity>
-      ),
+      headerLeft: showDrawerIcon
+        ? () => (
+            <TouchableOpacity 
+              onPress={() => navigation.toggleDrawer()}
+              style={{ marginLeft: 15 }}
+            >
+              <Ionicons name='menu' size={28} color="#fff" />
+            </TouchableOpacity>
+          )
+        : undefined,
       headerTitleAlign: 'center',
       headerTitle: title,
       headerStyle: {
@@ -31,7 +33,7 @@ const ScreenWithDrawer = ({ title, children }) => {
         fontWeight: 'bold',
       },
     });
-  }, [navigation, title]);
+  }, [navigation, title, showDrawerIcon]);
 
   return (
     <View style={styles.container}>

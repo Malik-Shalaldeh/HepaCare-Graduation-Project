@@ -50,8 +50,9 @@ const AppointmentFormScreen = () => {
   };
 
   return (
-    <ScreenWithDrawer title="موعد جديد">
+    <ScreenWithDrawer title="" showDrawerIcon={false}>
       <View style={styles.container}>
+        <Text style={styles.screenTitle}>موعد جديد</Text>
         <Text style={styles.label}>اسم المريض</Text>
         <DropDownPicker
           open={open}
@@ -190,6 +191,14 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     backgroundColor: '#fff',
+    marginBottom: 16,
+    marginTop:20
+  },
+  screenTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
     marginBottom: 16,
   },
   backText: {

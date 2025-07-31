@@ -1,4 +1,4 @@
-// Developed by Sami
+//  Sami
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -126,6 +126,7 @@ const EducationalContentFormScreen = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    marginTop:40
   },
   label: {
     fontSize: 14,

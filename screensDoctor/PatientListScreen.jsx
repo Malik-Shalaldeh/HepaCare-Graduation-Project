@@ -11,7 +11,6 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  Modal,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -36,13 +35,6 @@ const PatientListScreen = () => {
   const [patients, setPatients] = useState(INITIAL_PATIENTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPatients, setFilteredPatients] = useState(INITIAL_PATIENTS);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newPatient, setNewPatient] = useState({
-    name: '',
-    nationalId: '',
-    age: '',
-    lastVisit: new Date().toISOString().split('T')[0]
-  });
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -80,6 +72,22 @@ const PatientListScreen = () => {
             <Text style={styles.detailValue}>{formatDate(item.lastVisit)}</Text>
             <Text style={styles.detailLabel}>آخر زيارة:</Text>
           </View>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.otherConditions || 'غير محدد'}</Text>
+            <Text style={styles.detailLabel}>الأمراض الأخرى:</Text>
+          </View>
+          {item.phone && (
+            <View style={styles.detailItem}>
+              <Text style={styles.detailValue}>{item.phone}</Text>
+              <Text style={styles.detailLabel}>رقم الهاتف:</Text>
+            </View>
+          )}
+          {item.address && (
+            <View style={styles.detailItem}>
+              <Text style={styles.detailValue}>{item.address}</Text>
+              <Text style={styles.detailLabel}>العنوان:</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -166,74 +174,6 @@ const PatientListScreen = () => {
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => setModalVisible(true)}
-      >
-        <Ionicons name="add" size={24} color="#fff" />
-      </TouchableOpacity>
-
-      <Modal
-        animationType="slide"
-        transparent
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalContainer}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>إضافة مريض جديد</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-            <ScrollView style={styles.formContainer}>
-              {['name', 'nationalId', 'age'].map((field, idx) => (
-                <View key={idx} style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>
-                    {field === 'name' ? 'الاسم' : field === 'nationalId' ? 'رقم الهوية' : 'العمر'}
-                  </Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder={`أدخل ${field === 'name' ? 'اسم المريض' : field === 'nationalId' ? 'رقم الهوية' : 'العمر'}`}
-                    keyboardType={field === 'age' ? 'numeric' : 'default'}
-                    value={newPatient[field]}
-                    onChangeText={(text) =>
-                      setNewPatient({ ...newPatient, [field]: text })
-                    }
-                  />
-                </View>
-              ))}
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => {
-                  if (newPatient.name && newPatient.nationalId && newPatient.age) {
-                    const newPatientWithId = {
-                      ...newPatient,
-                      id: Date.now().toString(),
-                      age: parseInt(newPatient.age, 10),
-                    };
-                    setPatients([newPatientWithId, ...patients]);
-                    setFilteredPatients([newPatientWithId, ...patients]);
-                    setNewPatient({
-                      name: '',
-                      nationalId: '',
-                      age: '',
-                      lastVisit: new Date().toISOString().split('T')[0],
-                    });
-                    setModalVisible(false);
-                  }
-                }}
-              >
-                <Text style={styles.addButtonText}>إضافة المريض</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
     </SafeAreaView>
   );
 };

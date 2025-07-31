@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   StyleSheet,
@@ -50,6 +52,13 @@ const ChatScreen = () => {
   // ارتفاع صندوق الإدخال (لا نحتاجه الآن في التعويض)
   const [inputHeight, setInputHeight] = useState(0);
 
+  // الحصول على حواف الجهاز الآمنة وارتفاع شريط التبويبات
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+  // تعويض الإزاحة الإضافية للـ TabBar لأننا جعلناه position: absolute مع مسافة من الأسفل
+  const tabBarOffset = Platform.OS === 'android' ? 35 : 20;
+  const bottomSpace = insets.bottom + tabBarHeight + tabBarOffset;
+
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -57,6 +66,23 @@ const ChatScreen = () => {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
+
+  // إخفاء شريط التبويبات عند فتح لوحة المفاتيح وإظهاره عند الإغلاق
+  useEffect(() => {
+    const parentNav = navigation.getParent();
+    if (!parentNav) return;
+
+    const hideTabBar = () => parentNav.setOptions({ tabBarStyle: { display: 'none' } });
+    const showTabBar = () => parentNav.setOptions({ tabBarStyle: undefined });
+
+    const showSub = Keyboard.addListener('keyboardDidShow', hideTabBar);
+    const hideSub = Keyboard.addListener('keyboardDidHide', showTabBar);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [navigation]);
 
   const sendMessage = () => {
     if (inputText.trim() === '') return;
@@ -93,8 +119,8 @@ const ChatScreen = () => {
     </TouchableOpacity>
   );
 
-  // فقط ارتفاع الهيدر، بدون inputHeight
-  const totalOffset = headerHeight+30;
+  // تعويض ارتفاع الهيدر + المساحة السفلية (حافة آمنة + TabBar)
+  const totalOffset = Platform.OS === 'ios' ? headerHeight + bottomSpace : 0;
 
   // Handle back button press
   const handleBackPress = () => {
@@ -153,7 +179,7 @@ const ChatScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        style={styles.keyboardContainer}
+        style={[styles.keyboardContainer, { paddingBottom: bottomSpace }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={totalOffset}
       >
