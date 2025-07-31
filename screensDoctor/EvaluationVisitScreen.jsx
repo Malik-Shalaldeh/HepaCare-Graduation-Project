@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
+  SafeAreaView,
+  ScrollView,
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   StyleSheet,
   Alert,
-  SafeAreaView,
   StatusBar,
   Platform,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVisitData } from '../contexts/VisitDataContext';
-
-
 
 const primary = '#00b29c';
 
@@ -24,25 +22,33 @@ const EvaluationVisitScreen = () => {
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
   const { addVisit } = useVisitData();
+  const scrollRef = useRef();
 
-  // الحالة – حدد المريض من الباراميترز
-  const [selectedPatient, setSelectedPatient] = useState(
-    patientId ? { id: patientId, name: patientName } : null
-  );
-
+  // إذا لم يأتِ patientId نرجع للخلف
   useEffect(() => {
-    if (patientId && !selectedPatient) {
-      setSelectedPatient({ id: patientId, name: patientName });
+    if (!patientId) {
+      navigation.goBack();
     }
-  }, [patientId, patientName]);
+  }, [patientId]);
 
-  // بيانات التقييم فقط
+  // عند كل مرة تظهر فيها الشاشة، نفرغ الحقول ونرجّع لفوق
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setCondition('');
+      setAdherence('');
+      setNotes('');
+      setPsychosocial('');
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const selectedPatient = { id: patientId, name: patientName };
+
   const [condition, setCondition] = useState('');
   const [adherence, setAdherence] = useState('');
   const [notes, setNotes] = useState('');
   const [psychosocial, setPsychosocial] = useState('');
-
-  
 
   const handleSave = () => {
     if (!condition || !adherence) {
@@ -50,7 +56,7 @@ const EvaluationVisitScreen = () => {
       return;
     }
     const evaluation = {
-      id: Date.now().toString(), // Generate unique ID
+      id: Date.now().toString(),
       patientId: selectedPatient.id,
       patientName: selectedPatient.name,
       condition,
@@ -58,17 +64,17 @@ const EvaluationVisitScreen = () => {
       notes,
       psychosocial,
       date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      summary: `الحالة: ${condition} | الالتزام: ${adherence}`,
-      instructions: 'متابعة الدواء وفق الجدول المحدد',
     };
-    
-    // Save to context
     addVisit(selectedPatient.id, evaluation);
-    
-    console.log('✅ تم الحفظ:', evaluation);
+
+    // فرغ الحقول وأعد الشاشة لأعلى
+    setCondition('');
+    setAdherence('');
+    setNotes('');
+    setPsychosocial('');
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+
     Alert.alert('✅ تم حفظ التقييم للمريض: ' + selectedPatient.name);
-    setSelectedPatient(null);
   };
 
   const renderOptionGroup = (label, options, selected, onSelect) => (
@@ -98,19 +104,6 @@ const EvaluationVisitScreen = () => {
     </View>
   );
 
-  // في حال عدم تمرير مريض، نطلب من المستخدم العودة
-  if (!selectedPatient) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar backgroundColor={primary} barStyle="dark-content" />
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={26} color={primary} />
-        </TouchableOpacity>
-        <Text style={styles.noResult}>لم يتم اختيار مريض. يرجى العودة واختيار مريض أولاً.</Text>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -118,16 +111,18 @@ const EvaluationVisitScreen = () => {
         barStyle="dark-content"
         translucent={false}
       />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.contentContainer}
+      >
         <TouchableOpacity
-          onPress={() =>setSelectedPatient(null)}
+          onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={26} color={primary} />
         </TouchableOpacity>
 
         <Text style={styles.title}>تقييم زيارة المريض 🩺</Text>
-
         <Text style={styles.patientInfo}>
           المريض: {selectedPatient.name} ({selectedPatient.id})
         </Text>
@@ -162,14 +157,13 @@ const EvaluationVisitScreen = () => {
           value={psychosocial}
           onChangeText={setPsychosocial}
         />
+
         <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
-
-
 };
 
 export default EvaluationVisitScreen;
@@ -186,8 +180,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     alignSelf: 'flex-start',
-    marginBottom: 10,
-    margin: 20,
+    marginVertical: 20,
+    marginHorizontal: 16,
   },
   title: {
     fontSize: 22,
@@ -195,32 +189,6 @@ const styles = StyleSheet.create({
     color: primary,
     textAlign: 'center',
     marginBottom: 20,
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-    marginBottom: 20,
-    marginHorizontal: 25,
-  },
-  resultItem: {
-    backgroundColor: '#f1f9f9',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  resultText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'right',
-  },
-  noResult: {
-    textAlign: 'center',
-    marginTop: 10,
-    color: '#777',
   },
   patientInfo: {
     fontSize: 16,
@@ -237,7 +205,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   textInput: {
-    backgroundColor: '#f1f9f1',
+    backgroundColor: '#f1f1f1',
     borderRadius: 10,
     padding: 10,
     minHeight: 80,
@@ -279,7 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   buttonText: {
     color: '#fff',

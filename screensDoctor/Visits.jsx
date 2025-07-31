@@ -1,14 +1,22 @@
 // By sami: شاشة الزيارات الأصلية مع زر إضافي لسجل الزيارات
 // By sami: واجهة الزيارات الجديدة – تبدأ بالبحث ثم تظهر الخيارات
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const primary = '#00b29c';
 
-// بيانات المرضى (يُستحسن لاحقاً جلبها من نفس المصدر المركزي)
 const patientsData = [
   { id: '1', name: 'مالك شلالدة' },
   { id: '2', name: 'عبد الجندي' },
@@ -25,52 +33,61 @@ const Visits = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  // ترشيح المرضى بناءً على البحث
+  // تأكد أن selectedPatient يبدأ null عند دخول الشاشة
+  useEffect(() => {
+    setSelectedPatient(null);
+  }, []);
+
   const filteredPatients = patientsData.filter(p =>
     p.name.toLowerCase().includes(searchText.toLowerCase()) ||
     p.id.includes(searchText)
   );
 
-
   return (
     <ScreenWithDrawer title="الزيارات">
-      <SafeAreaView style={{ flex:1 }}>
-        {/* حقل البحث */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="ابحث عن المريض..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-        </View>
+      <SafeAreaView style={{ flex: 1 }}>
+        {!selectedPatient ? (
+          <>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="ابحث عن المريض..."
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+              <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+            </View>
 
-        {/* قائمة المرضى */}
-        {!selectedPatient && (
-          <FlatList
-            data={filteredPatients}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.resultItem}
-                onPress={() => setSelectedPatient(item)}
-              >
-                <Text style={styles.resultText}>{item.name}</Text>
-              </TouchableOpacity>
+            {searchText.trim().length > 0 && (
+              <FlatList
+                data={filteredPatients}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.resultItem}
+                    onPress={() => setSelectedPatient(item)}
+                  >
+                    <Text style={styles.resultText}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  filteredPatients.length === 0 ? (
+                    <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
+                  ) : null
+                }
+                contentContainerStyle={{ paddingBottom: 10 }}
+              />
             )}
-            ListEmptyComponent={
-              searchText.trim().length > 0 && filteredPatients.length === 0 ? (
-                <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
-              ) : null
-            }
-            contentContainerStyle={{ paddingBottom: 10 }}
-          />
-        )}
+          </>
+        ) : (
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setSelectedPatient(null)}
+            >
+              <Ionicons name="arrow-back" size={26} color={primary} />
+            </TouchableOpacity>
 
-        {/* الأزرار بعد اختيار المريض */}
-        {selectedPatient && (
-          <View style={{ marginTop: 20 }}>
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('تقييم الزيارة', {
@@ -79,7 +96,7 @@ const Visits = () => {
               })}
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="document-text-outline" size={24} color="#fff" style={styles.icon} />
+                <Ionicons name="document-text-outline" size={24} color="#fff" />
                 <Text style={styles.buttonText}>تقييم زيارة المريض</Text>
               </View>
             </TouchableOpacity>
@@ -92,19 +109,20 @@ const Visits = () => {
               })}
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="calendar-outline" size={24} color="#fff" style={styles.icon} />
+                <Ionicons name="calendar-outline" size={24} color="#fff" />
                 <Text style={styles.buttonText}>عرض سجل الزيارات</Text>
               </View>
             </TouchableOpacity>
-          </View>
+          </ScrollView>
         )}
       </SafeAreaView>
     </ScreenWithDrawer>
   );
 };
 
+export default Visits;
+
 const styles = StyleSheet.create({
-  // حقل البحث
   searchContainer: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -129,26 +147,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderColor: '#ccc',
   },
-  resultText: { textAlign:'right', fontSize: 16 },
-  noResults: { textAlign:'center', marginTop: 20, color:'#666' },
-
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
+  resultText: {
+    textAlign: 'right',
+    fontSize: 16,
+  },
+  noResults: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#666',
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingTop: 10,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 20,
   },
   button: {
     backgroundColor: primary,
     padding: 15,
     borderRadius: 14,
-    marginTop: 10,
     marginBottom: 20,
   },
   buttonContent: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
   },
   buttonText: {
@@ -157,5 +182,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default Visits;
