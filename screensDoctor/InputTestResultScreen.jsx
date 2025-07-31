@@ -49,9 +49,8 @@ export default function InputTestResultScreen() {
 
   const [selectedTest, setSelectedTest] = useState('');
   const [file, setFile] = useState(null);
-  const [resultValue, setResultValue] = useState('');      // قيمة الفحص الرقمية
-  const [date, setDate] = useState(new Date());             // التاريخ المؤكد
-  const [tempDate, setTempDate] = useState(new Date());     // التاريخ المؤقت أثناء الاختيار
+  const [resultValue, setResultValue] = useState('');
+  const [date, setDate] = useState(new Date());           // التاريخ المؤكد
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isNormal, setIsNormal] = useState(true);
   const [note, setNote] = useState('');
@@ -95,7 +94,6 @@ export default function InputTestResultScreen() {
     setFile(null);
     setResultValue('');
     setDate(new Date());
-    setTempDate(new Date());
     setShowDatePicker(false);
     setIsNormal(true);
     setNote('');
@@ -109,7 +107,7 @@ export default function InputTestResultScreen() {
     return `${day}/${month}/${year}`;
   };
 
-  // شاشة البحث عن المرضى (FlatList داخل View لتجنب التحذير)
+  // شاشة البحث عن المرضى
   if (!selectedPatient) {
     return (
       <View style={styles.container}>
@@ -193,23 +191,19 @@ export default function InputTestResultScreen() {
               </TouchableOpacity>
             </View>
             {showDatePicker && (
-              <>
-                <DateTimePicker
-                  value={tempDate}
-                  mode="date"
-                  display="default"
-                  onChange={(e, d) => d && setTempDate(d)}
-                />
-                <TouchableOpacity
-                  style={styles.confirmButton}
-                  onPress={() => {
-                    setDate(tempDate);
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  if (Platform.OS !== 'ios') {
                     setShowDatePicker(false);
-                  }}
-                >
-                  <Text style={styles.confirmButtonText}>تم</Text>
-                </TouchableOpacity>
-              </>
+                  }
+                  if (selectedDate) {
+                    setDate(selectedDate);
+                  }
+                }}
+              />
             )}
 
             {/* النتيجة الرقمية */}
@@ -277,7 +271,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F4F6F8',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 30,
+    paddingTop: Platform.OS === 'android'
+      ? StatusBar.currentHeight + 10
+      : 30,
+    paddingBottom: Platform.OS === 'android'
+      ? 20  // يمنع تداخل المحتوى مع أزرار نظام Android السفلية
+      : 30,
   },
   backButton: {
     marginBottom: 15,
@@ -388,18 +387,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   dateButtonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  confirmButton: {
-    alignSelf: 'flex-end',
-    marginTop: 4,
-    backgroundColor: '#27ae60',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  confirmButtonText: {
     color: '#fff',
     fontSize: 14,
   },
