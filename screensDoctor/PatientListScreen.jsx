@@ -88,6 +88,14 @@ const PatientListScreen = () => {
               <Text style={styles.detailLabel}>العنوان:</Text>
             </View>
           )}
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.symptoms && item.symptoms.length > 0 ? item.symptoms.join('، ') : 'غير محدد'}</Text>
+            <Text style={styles.detailLabel}>الأعراض:</Text>
+          </View>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.medications && item.medications.length > 0 ? item.medications.join('، ') : 'غير محدد'}</Text>
+            <Text style={styles.detailLabel}>الأدوية:</Text>
+          </View>
         </View>
       </View>
 
