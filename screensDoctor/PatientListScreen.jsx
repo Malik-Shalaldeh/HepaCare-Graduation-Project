@@ -98,7 +98,7 @@ const PatientListScreen = () => {
           <Ionicons name="chatbubble-ellipses-outline" size={22} color="#00b29c" />
         </TouchableOpacity>
 
-        {/* زر فتح الملف الطبي */}
+        {/* زر  حالة المريض الشارت */}
         <TouchableOpacity
           style={styles.medicalFileButton}
           onPress={() =>

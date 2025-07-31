@@ -1,5 +1,5 @@
 // PatientChartScreen.js
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -33,6 +33,7 @@ const DATA = {
     { date:'2025-08-01', ALT:55, AST:50, Bilirubin:1.3, INR:1.2, Platelets:150, FIB4:1.5, APRI:0.7 },
   ],
 };
+
 
 const COLORS = ['#D32F2F','#1976D2','#388E3C','#FBC02D','#7B1FA2','#00796B','#F57C00'];
 const { width } = Dimensions.get('window');
