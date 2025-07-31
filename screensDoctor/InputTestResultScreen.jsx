@@ -10,6 +10,7 @@ import {
   StatusBar,
   Switch,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -20,12 +21,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 export default function InputTestResultScreen() {
   const navigation = useNavigation();
 
-  // لإخفاء الهيدر الأصلي
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  // بيانات المرضى (يمكن استبدالها باستدعاء API)
   const patientsList = [
     { id: '1001', name: 'أحمد خالد' },
     { id: '1002', name: 'سارة محمود' },
@@ -42,7 +41,6 @@ export default function InputTestResultScreen() {
     'HBCAB**',
   ];
 
-  // حالات الواجهة
   const [searchInput, setSearchInput] = useState('');
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -50,12 +48,11 @@ export default function InputTestResultScreen() {
   const [selectedTest, setSelectedTest] = useState('');
   const [file, setFile] = useState(null);
   const [resultValue, setResultValue] = useState('');
-  const [date, setDate] = useState(new Date());           // التاريخ المؤكد
+  const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isNormal, setIsNormal] = useState(true);
   const [note, setNote] = useState('');
 
-  // بحث عن المريض
   const handlePatientSearch = () => {
     const results = patientsList.filter(p =>
       p.id === searchInput.trim() ||
@@ -64,7 +61,6 @@ export default function InputTestResultScreen() {
     setFilteredPatients(results);
   };
 
-  // اختيار ملف الفحص
   const pickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
     if (result.type === 'success') {
@@ -72,21 +68,7 @@ export default function InputTestResultScreen() {
     }
   };
 
-  // حفظ النتيجة (يمكن تعديلها لإرسال البيانات إلى الخادم)
-  const handleSave = () => {
-    const payload = {
-      patient: selectedPatient,
-      test: selectedTest,
-      date,
-      resultValue,
-      file,
-      evaluation: isNormal ? 'طبيعي' : 'غير طبيعي',
-      note,
-    };
-    console.log('Saving:', payload);
-    // TODO: إرسال payload إلى الـ API
-
-    // إعادة تهيئة الشاشة
+  const resetState = () => {
     setSelectedPatient(null);
     setSearchInput('');
     setFilteredPatients([]);
@@ -99,7 +81,28 @@ export default function InputTestResultScreen() {
     setNote('');
   };
 
-  // تنسيق التاريخ للعرض
+  const handleSave = () => {
+    // يمكنك هنا إرسال البيانات إلى الـ API...
+    Alert.alert(
+      'تم الحفظ',
+      'تم حفظ نتائج الفحص بنجاح',
+      [
+        {
+          text: 'عرض النتائج',
+          onPress: () => {
+            resetState();
+            navigation.navigate('TestResultsScreen');
+          }
+        },
+        {
+          text: 'حسناً',
+          onPress: resetState,
+        }
+      ],
+      { cancelable: false }
+    );
+  };
+
   const formatDate = d => {
     const day = d.getDate().toString().padStart(2, '0');
     const month = (d.getMonth() + 1).toString().padStart(2, '0');
@@ -107,41 +110,38 @@ export default function InputTestResultScreen() {
     return `${day}/${month}/${year}`;
   };
 
-  // شاشة البحث عن المرضى
   if (!selectedPatient) {
     return (
       <View style={styles.container}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-
         <Text style={styles.header}>🩺 إدخال نتائج الفحص</Text>
-
         <TextInput
-          style={styles.input}
+          style={[styles.input, styles.rtlText]}
           placeholder="...ابحث برقم أو اسم المريض"
           value={searchInput}
           onChangeText={setSearchInput}
+          textAlign="right"
         />
         <TouchableOpacity style={styles.searchButton} onPress={handlePatientSearch}>
           <Ionicons name="search" size={20} color="#fff" />
-          <Text style={styles.searchButtonText}>بحث</Text>
+          <Text style={[styles.searchButtonText, styles.rtlText]}>بحث</Text>
         </TouchableOpacity>
-
         <FlatList
           data={filteredPatients}
           keyExtractor={item => item.id}
           style={{ marginTop: 10 }}
           ListEmptyComponent={() =>
-            searchInput !== '' ? <Text style={styles.emptyText}>لا يوجد مرضى</Text> : null
+            searchInput !== '' ? <Text style={[styles.emptyText, styles.rtlText]}>لا يوجد مرضى</Text> : null
           }
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.card}
               onPress={() => setSelectedPatient(item)}
             >
-              <Text style={styles.name}>👤 {item.name}</Text>
-              <Text style={styles.subInfo}>رقم: {item.id}</Text>
+              <Text style={[styles.name, styles.rtlText]}>👤 {item.name}</Text>
+              <Text style={[styles.subInfo, styles.rtlText]}>رقم: {item.id}</Text>
             </TouchableOpacity>
           )}
         />
@@ -149,22 +149,21 @@ export default function InputTestResultScreen() {
     );
   }
 
-  // شاشة إدخال تفاصيل نتيجة الفحص
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <TouchableOpacity style={styles.backButton} onPress={() => setSelectedPatient(null)}>
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
-
       <Text style={styles.header}>🩺 إدخال نتائج الفحص</Text>
-
       <View style={styles.card}>
-        <Text style={styles.name}>
+        <Text style={[styles.name, styles.rtlText]}>
           👤 {selectedPatient.name} (#{selectedPatient.id})
         </Text>
 
-        {/* اختيار اسم الفحص */}
-        <Text style={styles.label}>اختر اسم الفحص:</Text>
+        <Text style={[styles.label, styles.rtlText]}>اختر اسم الفحص:</Text>
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={selectedTest}
@@ -179,15 +178,14 @@ export default function InputTestResultScreen() {
 
         {selectedTest !== '' && (
           <>
-            {/* اختيار التاريخ */}
-            <Text style={styles.label}>تاريخ الفحص:</Text>
+            <Text style={[styles.label, styles.rtlText]}>تاريخ الفحص:</Text>
             <View style={styles.dateRow}>
-              <Text style={styles.dateText}>{formatDate(date)}</Text>
+              <Text style={[styles.dateText, styles.rtlText]}>{formatDate(date)}</Text>
               <TouchableOpacity
                 style={styles.dateButton}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={styles.dateButtonText}>اختر التاريخ</Text>
+                <Text style={[styles.dateButtonText, styles.rtlText]}>اختر التاريخ</Text>
               </TouchableOpacity>
             </View>
             {showDatePicker && (
@@ -195,68 +193,61 @@ export default function InputTestResultScreen() {
                 value={date}
                 mode="date"
                 display="default"
-                onChange={(event, selectedDate) => {
-                  if (Platform.OS !== 'ios') {
-                    setShowDatePicker(false);
-                  }
-                  if (selectedDate) {
-                    setDate(selectedDate);
-                  }
+                onChange={(e, selectedDate) => {
+                  if (Platform.OS !== 'ios') setShowDatePicker(false);
+                  if (selectedDate) setDate(selectedDate);
                 }}
               />
             )}
 
-            {/* النتيجة الرقمية */}
-            <Text style={styles.label}>النتيجة الرقمية:</Text>
+            <Text style={[styles.label, styles.rtlText]}>النتيجة الرقمية:</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, styles.rtlText]}
               placeholder="ادخل قيمة الفحص"
               keyboardType="numeric"
               value={resultValue}
               onChangeText={setResultValue}
+              textAlign="right"
             />
 
-            {/* رفع الملف */}
-            <Text style={styles.label}>رفع ملف الفحص:</Text>
+            <Text style={[styles.label, styles.rtlText]}>رفع ملف الفحص:</Text>
             <TouchableOpacity style={styles.uploadButton} onPress={pickDocument}>
               <Ionicons name="cloud-upload-outline" size={20} color="#2980B9" />
-              <Text style={styles.uploadText}>
+              <Text style={[styles.uploadText, styles.rtlText]}>
                 {file ? file.name : 'اضغط لرفع الملف'}
               </Text>
             </TouchableOpacity>
 
-            {/* تقييم الفحص */}
-            <Text style={styles.label}>تقييم الفحص:</Text>
+            <Text style={[styles.label, styles.rtlText]}>تقييم الفحص:</Text>
             <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>
+              <Text style={[styles.switchLabel, styles.rtlText]}>
                 {isNormal ? 'طبيعي' : 'غير طبيعي'}
               </Text>
               <Switch value={isNormal} onValueChange={setIsNormal} />
             </View>
 
-            {/* ملاحظات الطبيب */}
-            <Text style={styles.label}>ملاحظات الطبيب:</Text>
+            <Text style={[styles.label, styles.rtlText]}>ملاحظات الطبيب:</Text>
             <TextInput
-              style={[styles.input, { height: 80 }]}
+              style={[styles.input, { height: 80 }, styles.rtlText]}
               placeholder="اكتب ملاحظاتك هنا"
               multiline
               value={note}
               onChangeText={setNote}
+              textAlign="right"
             />
 
-            {/* أزرار الحفظ والإلغاء */}
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.searchButton, { backgroundColor: '#27ae60' }]}
                 onPress={handleSave}
               >
-                <Text style={styles.searchButtonText}>حفظ</Text>
+                <Text style={[styles.searchButtonText, styles.rtlText]}>حفظ</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.searchButton, { backgroundColor: '#c0392b' }]}
                 onPress={() => setSelectedPatient(null)}
               >
-                <Text style={styles.searchButtonText}>إلغاء</Text>
+                <Text style={[styles.searchButtonText, styles.rtlText]}>إلغاء</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -275,8 +266,11 @@ const styles = StyleSheet.create({
       ? StatusBar.currentHeight + 10
       : 30,
     paddingBottom: Platform.OS === 'android'
-      ? 20  // يمنع تداخل المحتوى مع أزرار نظام Android السفلية
-      : 30,
+      ? 40  // يمنع تداخل المحتوى مع أزرار نظام Android السفلية
+      : 20,
+  },
+  contentContainer: {
+    paddingBottom: Platform.OS === 'android' ? 40 : 20,
   },
   backButton: {
     marginBottom: 15,
@@ -286,6 +280,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#2C3E50',
+    textAlign: 'right',
+  },
+  rtlText: {
+    writingDirection: 'rtl',
+    textAlign: 'right',
   },
   input: {
     backgroundColor: '#fff',
@@ -304,6 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     alignSelf: 'flex-start',
+    marginBottom: 10,
   },
   searchButtonText: {
     color: '#fff',
@@ -312,10 +312,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   emptyText: {
-    textAlign: 'center',
-    color: '#aaa',
     fontSize: 16,
-    marginTop: 20,
+    color: '#aaa',
   },
   card: {
     backgroundColor: '#fff',
@@ -356,6 +354,7 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#eef6fb',
     borderRadius: 12,
+    marginBottom: 10,
   },
   uploadText: {
     marginLeft: 8,
