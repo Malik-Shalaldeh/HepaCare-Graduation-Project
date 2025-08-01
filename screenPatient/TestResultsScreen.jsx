@@ -4,16 +4,6 @@ import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 
 const patientResults = [
   {
-    id: '1',
-    patientId: '1001',
-    name: 'أحمد خالد',
-    test: 'تحليل كبد ALT',
-    result: '45 U/L',
-    evaluation: 'مرتفع قليلاً',
-    doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
-      dat :'3/8/2015'
-  },
-  {
     id: '3',
     patientId: '1001',
     name: 'أحمد خالد',
@@ -21,6 +11,17 @@ const patientResults = [
     result: '1.2 mg/dL',
     evaluation: 'طبيعي',
     doctorNote: 'نتائج ممتازة.',
+    dat :'15/10/2025'
+   
+  },
+  {
+    id: '1',
+    patientId: '1001',
+    name: 'أحمد خالد',
+    test: 'تحليل كبد ALT',
+    result: '45 U/L',
+    evaluation: 'مرتفع قليلاً',
+    doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
     dat :'3/8/2015'
   },
 ];
@@ -71,6 +72,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 12,
     color: '#2C3E50',
+    textAlign:'right'
+
   },
   card: {
     backgroundColor: '#fff',
@@ -88,25 +91,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 6,
     color: '#34495E',
+    textAlign:'right'
+
   },
   test: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
+    textAlign:'right'
+
   },
   result: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
+    textAlign:'right'
+
   },
   evaluation: {
     fontSize: 16,
     color: '#27ae60',
     marginBottom: 4,
+    textAlign:'right'
+
   },
   note: {
     fontSize: 15,
     color: '#7f8c8d',
+    textAlign:'right'
+
   },
   emptyText: {
     textAlign: 'center',

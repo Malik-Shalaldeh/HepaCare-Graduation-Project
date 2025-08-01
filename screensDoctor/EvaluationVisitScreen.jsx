@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -19,6 +19,7 @@ const primary = '#00b29c';
 
 const EvaluationVisitScreen = () => {
   const navigation = useNavigation();
+  
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
   const { addVisit } = useVisitData();

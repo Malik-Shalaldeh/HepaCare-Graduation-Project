@@ -22,10 +22,9 @@ import ChatScreen from '../screensDoctor/ChatScreen';
 import Dashboard from '../screensDoctor/Dashboard';
 import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
 import PrivacyPolicyScreen from '../screensDoctor/PolicyScreen';
-import ResetPasswordScreen from '../screensDoctor/ResetPasswordScreen';
 import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
 import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
-import PatientChartScreen from '../screensDoctor/PatientChartScreen';
+import ChangePasswordScreen from '../Login/restPassword';
 
 const primary = '#00b29c';
 
@@ -218,8 +217,8 @@ function NavigatorDoctor() {
         />
 
         <Drawer.Screen
-        name="ResetPassword"
-        component={ResetPasswordScreen}
+        name="اعادة تعيين كلمة المرور"
+        component={ChangePasswordScreen}
         options={{
           drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
           headerShown: false,             // يخفي العنوان العلوي

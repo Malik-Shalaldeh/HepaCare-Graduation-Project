@@ -9,14 +9,13 @@ import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import TestResultsScreen from '../screenPatient/TestResultsScreen';
 import SymptomsScreen from '../screenPatient/SymptomsScreen';
 import PatientMedications from '../screenPatient/PatientMedications';
-import MyMedicationsScreen from '../screenPatient/MyMedicationsScreen';
-import AvailableMedicationsScreen from '../screenPatient/AvailableMedicationsScreen';
 import PatientDashboard from '../screenPatient/PatientDashboard';
 import ChatScreen from '../screensDoctor/ChatScreen';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ChangePasswordScreen from '../Login/restPassword';
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,7 +29,7 @@ const BottomTabs = () => {
           tabBarIcon: ({ color, size }) => {
             if (route.name === 'DashboardTab') 
             {
-              return <Icon name="dashboard" size={size} color={color} />;
+              return <Ionicons name="home-outline" size={size} color={color} />;
             }
             else if (route.name === 'MessagesTab') 
             {
@@ -38,7 +37,7 @@ const BottomTabs = () => {
             } 
             else if (route.name === 'MedicationsTab') 
             {
-              return <FontAwesome name="medkit" size={size} color={color} />;
+              return <Ionicons name="medkit" size={size} color={color} />;
             }
             else if (route.name === 'TestResultsTab')
             {
@@ -158,6 +157,16 @@ const NavigatorPatient = () => {
           drawerIcon: ({ color, size }) => <Ionicons name="alert-circle-outline" size={size} color={color} />,
         }}
       />
+
+      <Drawer.Screen
+        name="اعادة تعيين كلمة المرور"
+        component={ChangePasswordScreen}
+        options={{
+          title: 'اعادة تعيين كلمة المرور' ,
+          drawerIcon: ({ color, size }) => <Ionicons name="key-outline" size={size} color={color} />,
+        }}
+      />
+
     </Drawer.Navigator>
   );
 };

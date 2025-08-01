@@ -9,7 +9,7 @@ export default function SettingsScreen({ navigation }) {
       <TouchableOpacity
         style={styles.item}
         onPress={() => {
-          navigation.navigate('ResetPassword');
+          navigation.navigate('اعادة تعيين كلمة المرور');
         }}
       >
         <Ionicons name="key-outline" size={28} color={primary} />
