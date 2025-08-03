@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +22,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right']}>
       <Tab.Navigator
         initialRouteName="DashboardTab"
         screenOptions={({ route }) => ({
@@ -47,13 +47,13 @@ const BottomTabs = () => {
           tabBarActiveTintColor: '#2196f3',
           tabBarInactiveTintColor: 'gray',
           headerShown: true,
-          tabBarStyle: { height: 70 },
+          tabBarStyle: { height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 },
         })}
       >
         <Tab.Screen 
-        name="MessagesTab" 
-        component={ChatScreen} 
-        options={{ title: 'الرسائل' }} 
+        name="TestResultsTab" 
+        component={TestResultsScreen} 
+        options={{ title: 'الفحوصات' }} 
         />
 
         <Tab.Screen 
@@ -68,12 +68,12 @@ const BottomTabs = () => {
         options={{ title: 'لوحة التحكم' }} 
         />
 
-        <Tab.Screen 
-        name="TestResultsTab" 
-        component={TestResultsScreen} 
-        options={{ title: 'الفحوصات' }} 
-        />
 
+      <Tab.Screen 
+      name="MessagesTab" 
+      component={ChatScreen} 
+      options={{ title: 'الرسائل' }} 
+      />
       </Tab.Navigator>
     </SafeAreaView>
   );
