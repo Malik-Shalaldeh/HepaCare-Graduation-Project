@@ -130,7 +130,7 @@ const NavigatorPatient = () => {
         options={{
           title: 'الرئيسية',
           headerShown: false,
-          drawerIcon: ({ color, size }) => <Icon name="home" size={size} color={color} />,
+          drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Drawer.Screen
@@ -146,7 +146,7 @@ const NavigatorPatient = () => {
         component={FeedbackScreen}
         options={{
           title: 'تقييم جودة الخدمات',
-          drawerIcon: ({ color, size }) => <FontAwesome name="star" size={size} color={color} />,
+          drawerIcon: ({ color, size }) => <Ionicons name="thumbs-up-outline" size={size} color={color} />,
         }}
       />
       <Drawer.Screen
