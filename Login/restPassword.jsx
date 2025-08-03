@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: 'right',
     fontWeight: '600',
+    marginHorizontal:15
   },
   inputContainer: {
     flexDirection: 'row-reverse',
@@ -163,6 +164,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     marginBottom: 20,
+    marginHorizontal:15
   },
   input: {
     flex: 1,
@@ -181,11 +183,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
+    marginHorizontal:15
+
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    
   },
 });
 
