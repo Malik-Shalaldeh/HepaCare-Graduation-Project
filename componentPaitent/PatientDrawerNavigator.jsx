@@ -7,13 +7,9 @@ import { useNavigation } from '@react-navigation/native';
 import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
 import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import TestResultsScreen from '../screenPatient/TestResultsScreen';
-import SymptomsScreen from '../screenPatient/SymptomsScreen';
 import PatientMedications from '../screenPatient/PatientMedications';
 import PatientDashboard from '../screenPatient/PatientDashboard';
 import ChatScreen from '../screensDoctor/ChatScreen';
-
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ChangePasswordScreen from '../Login/restPassword';
 
@@ -47,7 +43,7 @@ const BottomTabs = () => {
           tabBarActiveTintColor: '#2196f3',
           tabBarInactiveTintColor: 'gray',
           headerShown: true,
-          tabBarStyle: { height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : -5 },
+          tabBarStyle: { height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 },
         })}
       >
         <Tab.Screen 
