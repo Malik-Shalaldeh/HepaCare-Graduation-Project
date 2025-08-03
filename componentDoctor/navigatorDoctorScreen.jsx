@@ -80,16 +80,9 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#2196f3',
         tabBarInactiveTintColor: 'gray',
+        headerShown: true,
         tabBarStyle: {
-          position: 'absolute',
-          bottom: Platform.OS === 'android' ? 35 : 20,
-          left: 16,
-          right: 16,
-          elevation: 6,
-          backgroundColor: '#fff',
-          borderRadius: 16,
-          height: 60,
-          paddingBottom: Platform.OS === 'android' ? 20 : 20,
+          height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 
         },
       })}
     >

@@ -150,15 +150,6 @@ const NavigatorPatient = () => {
         }}
       />
       <Drawer.Screen
-        name="Symptoms"
-        component={SymptomsScreen}
-        options={{
-          title: 'إضافة الأعراض',
-          drawerIcon: ({ color, size }) => <Ionicons name="alert-circle-outline" size={size} color={color} />,
-        }}
-      />
-
-      <Drawer.Screen
         name="اعادة تعيين كلمة المرور"
         component={ChangePasswordScreen}
         options={{

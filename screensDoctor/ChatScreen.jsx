@@ -176,55 +176,60 @@ const ChatScreen = () => {
     );
   }
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={[styles.keyboardContainer, { paddingBottom: bottomSpace }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={totalOffset}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.innerContainer}>
-            {/* 1. الهيدر */}
-            <View
-              style={styles.headerWrapper}
-              onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
-            >
-              <ChatHeader
-                patientName={selectedPatient?.name || '---'}
-                patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
-                onBack={handleBackPress}
-              />
-            </View>
-
-            {/* 2. قائمة الرسائل */}
-            <View style={styles.messagesContainer}>
-              <FlatList
-                ref={flatListRef}
-                data={messages}
-                renderItem={renderMessage}
-                keyExtractor={item => item.id}
-                contentContainerStyle={styles.flatListContent}
-                keyboardShouldPersistTaps="handled"
-              />
-            </View>
-
-            {/* 3. صندوق الإدخال */}
-            <View
-              style={styles.inputWrapper}
-              onLayout={e => setInputHeight(e.nativeEvent.layout.height)}
-            >
-              <MessageInput
-                inputText={inputText}
-                setInputText={setInputText}
-                sendMessage={sendMessage}
-              />
-            </View>
+return (
+  <SafeAreaView style={styles.safeArea}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.innerContainer}>
+          {/* 1. الهيدر */}
+          <View
+            style={styles.headerWrapper}
+            onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+          >
+            <ChatHeader
+              patientName={selectedPatient?.name || '---'}
+              patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
+              onBack={handleBackPress}
+            />
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+
+          {/* 2. قائمة الرسائل */}
+          <View style={styles.messagesContainer}>
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              renderItem={renderMessage}
+              keyExtractor={item => item.id}
+              contentContainerStyle={[
+                styles.flatListContent,
+                { paddingBottom: tabBarHeight + insets.bottom }
+              ]}
+              keyboardShouldPersistTaps="handled"
+            />
+          </View>
+
+          {/* 3. صندوق الإدخال */}
+          <View
+            style={styles.inputWrapper}
+            onLayout={e => setInputHeight(e.nativeEvent.layout.height)}
+          >
+            <MessageInput
+              inputText={inputText}
+              setInputText={setInputText}
+              sendMessage={sendMessage}
+            />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
+);
+
+
 };
 
 const styles = StyleSheet.create({
