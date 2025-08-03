@@ -47,7 +47,7 @@ const BottomTabs = () => {
           tabBarActiveTintColor: '#2196f3',
           tabBarInactiveTintColor: 'gray',
           headerShown: true,
-          tabBarStyle: { height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 },
+          tabBarStyle: { height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : -5 },
         })}
       >
         <Tab.Screen 
