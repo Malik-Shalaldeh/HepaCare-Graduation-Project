@@ -84,6 +84,7 @@ function MainTabs() {
         tabBarStyle: {
           height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 
         },
+        tabBarHideOnKeyboard: true, // بنخفي البار السفلي أول ما يطلع الكيبورد
       })}
     >
       <Tab.Screen name="الزيارات" component={Visits} />

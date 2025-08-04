@@ -47,17 +47,19 @@ const ChatScreen = () => {
   const { patient, fromPatientCard } = route.params || {};
   const initialPatient = patient || null;
   const [selectedPatient, setSelectedPatient] = useState(initialPatient);
-  // ارتفاع هيدر الشاشة
+  // ارتفاع الهيدر
   const [headerHeight, setHeaderHeight] = useState(0);
-  // ارتفاع صندوق الإدخال (لا نحتاجه الآن في التعويض)
+  // ارتفاع بوكس الكتابة (مش مهم هسه للتعويض)
   const [inputHeight, setInputHeight] = useState(0);
 
   // الحصول على حواف الجهاز الآمنة وارتفاع شريط التبويبات
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  // تعويض الإزاحة الإضافية للـ TabBar لأننا جعلناه position: absolute مع مسافة من الأسفل
+  // بنعوض المسافة اللي خليّنا فيها التاب بار ثابت تحت
   const tabBarOffset = Platform.OS === 'android' ? 35 : 20;
   const bottomSpace = insets.bottom + tabBarHeight + tabBarOffset;
+// اوفست تحت لنعوض المسافة اللي بتروح لما التاب بار تحت يختفي
+const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
 
   const flatListRef = useRef(null);
 
@@ -67,7 +69,7 @@ const ChatScreen = () => {
     }
   }, [messages]);
 
-  // إخفاء شريط التبويبات عند فتح لوحة المفاتيح وإظهاره عند الإغلاق
+  // بنخفي التابات لما يطلع الكيبورد وبرجعهم لما يسكر
   useEffect(() => {
     const parentNav = navigation.getParent();
     if (!parentNav) return;
@@ -99,7 +101,7 @@ const ChatScreen = () => {
 
   const renderMessage = ({ item }) => <MessageBubble message={item} />;
 
-  // Render a single patient row when searching
+  // بنرندر صف مريض واحد بالبحث
   const renderPatientItem = ({ item }) => (
     <TouchableOpacity
       style={styles.patientItem}
@@ -119,7 +121,7 @@ const ChatScreen = () => {
     </TouchableOpacity>
   );
 
-  // تعويض ارتفاع الهيدر + المساحة السفلية (حافة آمنة + TabBar)
+  // منعوض ارتفاع الهيدر والمسافة اللي تحت (الحافة الآمنة + التاب بار)
   const totalOffset = Platform.OS === 'ios' ? headerHeight + bottomSpace : 0;
 
   // Handle back button press
@@ -181,7 +183,7 @@ return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      keyboardVerticalOffset={keyboardOffset}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.innerContainer}>
