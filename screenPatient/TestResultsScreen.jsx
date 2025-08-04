@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 
 const patientResults = [
@@ -27,11 +26,10 @@ const patientResults = [
 ];
 
 const TestResultsScreen = () => {
-  const navigation = useNavigation();
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-     <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
+           <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
            <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
            <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
            <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
@@ -51,8 +49,9 @@ return (
         renderItem={renderItem}
         keyExtractor={item => item.id}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>لا توجد فحوصات متاحة لهذا المريض.</Text>
+        <Text style={styles.emptyText}>لا توجد فحوصات متاحة لهذا المريض.</Text>
         }
+
       />
     </View>
   </ScreenWithDrawer>

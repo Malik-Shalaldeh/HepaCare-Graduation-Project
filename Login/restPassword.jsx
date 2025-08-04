@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 

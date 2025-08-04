@@ -1,7 +1,6 @@
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, SafeAreaView } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
 import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
@@ -18,7 +17,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom', 'left', 'right']}>
       <Tab.Navigator
         initialRouteName="DashboardTab"
         screenOptions={({ route }) => ({
@@ -70,6 +69,7 @@ const BottomTabs = () => {
       component={ChatScreen} 
       options={{ title: 'الرسائل' }} 
       />
+      
       </Tab.Navigator>
     </SafeAreaView>
   );

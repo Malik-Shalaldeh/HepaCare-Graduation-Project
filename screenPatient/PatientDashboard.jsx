@@ -1,16 +1,12 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-import { useNavigation } from '@react-navigation/native';
 
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
 
-const { width } = Dimensions.get('window');
-
 const PatientDashboard = () => {
-  const navigation = useNavigation();
 
   const today = new Date();
   const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
@@ -39,7 +35,7 @@ const PatientDashboard = () => {
         <View style={styles.motivationBox}>
           <Ionicons name="heart-circle-outline" size={50} color="#E74C3C" style={{ marginBottom: 10 }} />
           <Text style={styles.motivationText}>
-            صحتك أمانة... تابع أدويتك وفحوصاتك بانتظام لتحمي كبدك ونحافظ على عافيتك 💙
+            صحتك أمانة... تابع أدويتك وفحوصاتك بانتظام لتحمي كبدك ونحافظ على عافيتك 
           </Text>
         </View>
 
@@ -73,7 +69,7 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    marginEnd: 12,
+    marginRight: 12,
   },
 
   title: {
