@@ -60,10 +60,6 @@ function CustomDrawerContent(props) {
 const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: '#fff' }}
-      edges={['bottom', 'left', 'right']}
-    >
       <Tab.Navigator
         initialRouteName="لوحة التحكم"
         screenOptions={({ route }) => ({
@@ -80,18 +76,10 @@ function MainTabs() {
           tabBarActiveTintColor: primary,
           tabBarInactiveTintColor: 'gray',
           tabBarStyle: {
-            height: 90,
-            paddingBottom: Platform.OS === 'ios' ? 20 : 5,
-            paddingTop: 10,
-            backgroundColor: '#fff',
-            borderTopWidth: 0,
-            elevation: 10,
-            shadowColor: '#000',
-            shadowOpacity: 0.05,
-            shadowRadius: 5,
-            shadowOffset: { width: 0, height: -3 },
+            height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 
           },
-          tabBarHideOnKeyboard: true,
+          tabBarHideOnKeyboard: true, // بنخفي البار السفلي أول ما يطلع الكيبورد
+
         })}
       >
         <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
@@ -103,7 +91,7 @@ function MainTabs() {
         <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
         <Tab.Screen name="الرسائل" component={ChatScreen} />
       </Tab.Navigator>
-    </SafeAreaView>
+   
   );
 }
 
