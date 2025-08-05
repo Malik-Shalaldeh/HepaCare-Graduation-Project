@@ -1,5 +1,8 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
+
+
+const primary = '#00b29c';
 
 const patientResults = [
   {
@@ -10,8 +13,7 @@ const patientResults = [
     result: '1.2 mg/dL',
     evaluation: 'طبيعي',
     doctorNote: 'نتائج ممتازة.',
-    dat :'15/10/2025'
-   
+    dat: '15/10/2025',
   },
   {
     id: '1',
@@ -21,42 +23,40 @@ const patientResults = [
     result: '45 U/L',
     evaluation: 'مرتفع قليلاً',
     doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
-    dat :'3/8/2015'
+    dat: '3/8/2015',
   },
 ];
 
 const TestResultsScreen = () => {
-
+  
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-           <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
-           <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
-           <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
-           <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
-           <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
-           <Text style={styles.note}>📅 تاريخ الفحص {item.dat}</Text>
+      <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
+      <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
+      <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
+      <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
+      <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
+      <Text style={styles.note}>📅 تاريخ الفحص: {item.dat}</Text>
     </View>
   );
 
-return (
-  <ScreenWithDrawer>
-    <View style={styles.container}>
-
-      <Text style={styles.header}>🧾 الفحوصات </Text>
-
-      <FlatList 
-        data={patientResults}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        ListEmptyComponent={
-        <Text style={styles.emptyText}>لا توجد فحوصات متاحة لهذا المريض.</Text>
-        }
-
-      />
-    </View>
-  </ScreenWithDrawer>
-);
-
+  return (
+    <ScreenWithDrawer>
+      <View style={styles.container}>
+        <Text style={styles.header}>🧾 فحوصاتي</Text>
+        <FlatList
+          data={patientResults}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              لا توجد فحوصات متاحة لهذا المريض.
+            </Text>
+          }
+        />
+      </View>
+    </ScreenWithDrawer>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -71,14 +71,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 12,
     color: '#2C3E50',
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
+    borderLeftWidth: 6,
+    borderLeftColor: primary,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -90,35 +91,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 6,
     color: '#34495E',
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   test: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   result: {
     fontSize: 16,
     color: '#2C3E50',
     marginBottom: 4,
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   evaluation: {
     fontSize: 16,
     color: '#27ae60',
     marginBottom: 4,
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   note: {
     fontSize: 15,
     color: '#7f8c8d',
-    textAlign:'right'
-
+    textAlign: 'right',
   },
   emptyText: {
     textAlign: 'center',
@@ -126,7 +122,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
   },
-
 });
 
 export default TestResultsScreen;

@@ -50,7 +50,7 @@ export default function AvailableMedicationsScreen() {
               <Ionicons name="arrow-back" size={24} color="#ffffff" />
             </TouchableOpacity>
             <Ionicons name="medkit-outline" size={36} color="#ffffff" style={{ marginBottom: 8 }} />
-            <Text style={styles.headerTitle}>الأدوية المتوفرة بالصحة</Text>
+            <Text style={styles.headerTitle}>الأدوية المتوفرة</Text>
           </View>
 
           {/* Medication List */}
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 20,
+  
   },
   headerTitle: {
     fontSize: 22,
