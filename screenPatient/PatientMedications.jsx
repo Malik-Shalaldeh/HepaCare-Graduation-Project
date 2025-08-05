@@ -10,7 +10,7 @@ const PatientMedications = ({ navigation }) => {
       {/* ✅ زر "الأدوية التي أتناولها" */}
       <TouchableOpacity
         style={styles.Button}
-        onPress={() => navigation.navigate('MyMedications')}
+        onPress={() => navigation.navigate('الأدوية التي أتناولها')}
       >
         <View style={styles.ButtonContent}>
           <Ionicons name="medkit-outline" size={24} color="#fff" style={styles.icon} />
@@ -21,7 +21,7 @@ const PatientMedications = ({ navigation }) => {
       {/* ✅ زر "الأدوية المتوفرة في وزارة الصحة" */}
       <TouchableOpacity
       style={{...styles.Button,backgroundColor:'#00796B'}}
-        onPress={() => navigation.navigate('AvailableMedications')}
+        onPress={() => navigation.navigate('الأدوية المتوفرة في الصحة')}
       >
         <View style={styles.ButtonContent}>
           <Ionicons name="list-outline" size={24} color="#fff" style={styles.icon} />

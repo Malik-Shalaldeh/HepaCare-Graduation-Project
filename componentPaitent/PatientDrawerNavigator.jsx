@@ -19,6 +19,8 @@ import ChatScreen from '../screensDoctor/ChatScreen';
 import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
 import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import ChangePasswordScreen from '../Login/restPassword';
+import AvailableMedicationsScreen from '../screenPatient/AvailableMedicationsScreen';
+import MyMedicationsScreen from '../screenPatient/MyMedicationsScreen';
 
 const primary = '#2196f3'; // اللون الرئيسي
 
@@ -86,7 +88,6 @@ function MainTabs() {
         <Tab.Screen
           name="الأدوية"
           component={PatientMedications}
-          options={{ headerShown: false }}
         />
         <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
         <Tab.Screen name="الرسائل" component={ChatScreen} />
@@ -154,6 +155,27 @@ function NavigatorPatient() {
             ),
           }}
         />
+
+        <Drawer.Screen
+          name="الأدوية التي أتناولها"
+          component={MyMedicationsScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+
+
+        <Drawer.Screen
+          name="الأدوية المتوفرة في الصحة"
+          component={AvailableMedicationsScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+
+
         <Drawer.Screen
           name="إعادة تعيين كلمة المرور"
           component={ChangePasswordScreen}
