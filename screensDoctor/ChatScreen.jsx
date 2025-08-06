@@ -72,12 +72,13 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
   // بنخفي التابات لما يطلع الكيبورد وبرجعهم لما يسكر
   useEffect(() => {
     const parentNav = navigation.getParent();
-    if (!parentNav) return;
-
-    const hideTabBar = () => parentNav.setOptions({ tabBarStyle: { display: 'none' } });
+    const keyboardWillShow = () => {
+      // Hide the bottom tab bar completely (including its reserved height)
+      parentNav.setOptions({ tabBarStyle: { display: 'none', height: 0 } });
+    };
     const showTabBar = () => parentNav.setOptions({ tabBarStyle: undefined });
 
-    const showSub = Keyboard.addListener('keyboardDidShow', hideTabBar);
+    const showSub = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
     const hideSub = Keyboard.addListener('keyboardDidHide', showTabBar);
 
     return () => {
@@ -180,24 +181,24 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
 
 return (
   <SafeAreaView style={styles.safeArea}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={keyboardOffset}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.innerContainer}>
-          {/* 1. الهيدر */}
-          <View
-            style={styles.headerWrapper}
-            onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
-          >
-            <ChatHeader
-              patientName={selectedPatient?.name || '---'}
-              patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
-              onBack={handleBackPress}
-            />
-          </View>
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior="padding" // use padding on both platforms to avoid extra blank space
+        keyboardVerticalOffset={keyboardOffset}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.innerContainer}>
+            {/* 1. الهيدر */}
+            <View
+              style={styles.headerWrapper}
+              onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+            >
+              <ChatHeader
+                patientName={selectedPatient?.name || '---'}
+                patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
+                onBack={handleBackPress}
+              />
+            </View>
 
           {/* 2. قائمة الرسائل */}
           <View style={styles.messagesContainer}>
@@ -225,7 +226,7 @@ return (
               sendMessage={sendMessage}
             />
           </View>
-        </View>
+      </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   </SafeAreaView>

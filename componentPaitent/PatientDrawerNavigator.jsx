@@ -15,7 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import TestResultsScreen from '../screenPatient/TestResultsScreen';
 import PatientMedications from '../screenPatient/PatientMedications';
 import PatientDashboard from '../screenPatient/PatientDashboard';
-import ChatScreen from '../screensDoctor/ChatScreen';
+import ChatScreen from '../screenPatient/chatScreenPatient';
 import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
 import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import ChangePasswordScreen from '../Login/restPassword';

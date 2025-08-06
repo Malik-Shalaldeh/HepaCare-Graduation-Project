@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   SafeAreaView,
   FlatList,
@@ -16,31 +16,44 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ENDPOINTS from '../samiendpoint';
 
 /*********************** Helper Components ************************/ 
 const ChatHeader = ({ doctorName, doctorAvatar, onBack }) => (
   <View style={headerStyles.container}>
-    <TouchableOpacity style={headerStyles.backBtn} onPress={onBack}>
-      <Ionicons name="arrow-back" size={24} color="#fff" />
-    </TouchableOpacity>
-    {doctorAvatar ? (
-      <Ionicons name="person-circle" size={34} color="#fff" style={{ marginHorizontal: 6 }} />
-    ) : null}
-    <Text style={headerStyles.title}>{doctorName || 'طبيبك'}</Text>
+    {onBack && (
+      <TouchableOpacity style={headerStyles.backBtn} onPress={onBack}>
+        <Ionicons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
+    )}
+    <View style={headerStyles.titleWrapper}>
+      <Text style={headerStyles.title}>{doctorName || 'الطبيب المشرف'}</Text>
+      <Text style={headerStyles.subtitle}>الرسائل</Text>
+      
+    </View>
+    {doctorAvatar && (
+      <Ionicons name="person-circle" size={40} color="#fff" style={{ marginHorizontal: 6 }} />
+    )}
   </View>
 );
+
+
 
 const headerStyles = StyleSheet.create({
   container: {
     flexDirection: 'row-reverse',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#00b29c',
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   backBtn: { marginLeft: 8 },
-  title: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  titleWrapper: { flex: 1, alignItems: 'center' },
+  title: { color: '#fff', fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
+  subtitle: { color: '#e8f6f3', fontSize: 12, marginTop: 2 },
 });
 
 const MessageBubble = ({ message }) => {
@@ -136,8 +149,15 @@ const ChatScreenPatient = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
+  // Hide default navigator header (removes top word "الرسائل")
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false, title: '' });
+  }, [navigation]);
+  const tabBarHeight = useBottomTabBarHeight();
+
   // doctor info can be passed via params or fetched from context/API
-  const { doctorId, doctorName = 'د. أحمد محمد', doctorAvatar } = route.params || {};
+  const { doctorId, doctorName: passedDoctorName, doctorAvatar } = route.params || {};
+  const displayDoctorName = passedDoctorName && passedDoctorName.trim() !== '' ? passedDoctorName : 'الطبيب المشرف';
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -179,7 +199,7 @@ const ChatScreenPatient = () => {
     setSending(true);
     try {
       // Send to backend
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'https://api.example.com'}/messages`, {
+      await fetch(ENDPOINTS.sendMessage, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ doctorId, text }),
@@ -196,13 +216,13 @@ const ChatScreenPatient = () => {
       <StatusBar barStyle="light-content" backgroundColor="#00b29c" />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : insets.top}
+        behavior="padding"
+        keyboardVerticalOffset={insets.top + tabBarHeight}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={styles.flex}>
           <View style={styles.flex}>
             {/* Header */}
-            <ChatHeader doctorName={doctorName} doctorAvatar={doctorAvatar} onBack={() => navigation.goBack()} />
+            <ChatHeader doctorName={displayDoctorName} doctorAvatar={doctorAvatar} />
 
             {/* Messages list */}
             <FlatList
