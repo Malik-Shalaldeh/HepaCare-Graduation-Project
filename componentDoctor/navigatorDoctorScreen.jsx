@@ -162,7 +162,7 @@ function NavigatorDoctor() {
           options={{
             headerTitle: 'المحتوى التثقيفي',
             headerTitleAlign: 'center',
-            headerShown: false,
+            headerShown: true,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="book-outline" size={size} color={color} />
             ),

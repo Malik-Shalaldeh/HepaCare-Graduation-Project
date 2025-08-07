@@ -268,8 +268,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#222', // أسود واضح
     lineHeight: 22,
+    writingDirection: 'rtl',
     textAlign: 'right',
-    paddingLeft: 28,
+    paddingRight: 28,
   },
 });
 

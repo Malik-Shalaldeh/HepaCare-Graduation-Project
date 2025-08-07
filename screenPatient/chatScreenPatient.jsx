@@ -216,8 +216,8 @@ const ChatScreenPatient = () => {
       <StatusBar barStyle="light-content" backgroundColor="#00b29c" />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior="padding"
-        keyboardVerticalOffset={insets.top + tabBarHeight}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={styles.flex}>
           <View style={styles.flex}>

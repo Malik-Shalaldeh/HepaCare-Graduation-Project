@@ -10,16 +10,7 @@ const EducationalContentStack = () => {
       <Stack.Screen 
         name="EducationalContentList" 
         component={EducationalContentScreen} 
-        options={{ 
-          title: 'المحتوى التثقيفي',
-          headerStyle: {
-            backgroundColor: '#00b29c',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

@@ -14,6 +14,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 
 import ChatHeader from '../componentDoctor/ChatHeader';
@@ -31,6 +32,7 @@ const INITIAL_MESSAGES = [
 const ChatScreen = () => {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   // Patient search state
   const [patients] = useState([
@@ -42,50 +44,64 @@ const ChatScreen = () => {
   const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
   );
+  
   const route = useRoute();
   const navigation = useNavigation();
   const { patient, fromPatientCard } = route.params || {};
   const initialPatient = patient || null;
   const [selectedPatient, setSelectedPatient] = useState(initialPatient);
-  // ارتفاع الهيدر
+  
   const [headerHeight, setHeaderHeight] = useState(0);
-  // ارتفاع بوكس الكتابة (مش مهم هسه للتعويض)
-  const [inputHeight, setInputHeight] = useState(0);
+  const [inputHeight, setInputHeight] = useState(60); // قيمة افتراضية
 
-  // الحصول على حواف الجهاز الآمنة وارتفاع شريط التبويبات
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  // بنعوض المسافة اللي خليّنا فيها التاب بار ثابت تحت
-  const tabBarOffset = Platform.OS === 'android' ? 35 : 20;
-  const bottomSpace = insets.bottom + tabBarHeight + tabBarOffset;
-// اوفست تحت لنعوض المسافة اللي بتروح لما التاب بار تحت يختفي
-const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
-
+  
   const flatListRef = useRef(null);
 
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
-    }
-  }, [messages]);
-
-  // بنخفي التابات لما يطلع الكيبورد وبرجعهم لما يسكر
+  // إدارة الكيبورد بشكل أفضل
   useEffect(() => {
     const parentNav = navigation.getParent();
-    const keyboardWillShow = () => {
-      // Hide the bottom tab bar completely (including its reserved height)
-      parentNav.setOptions({ tabBarStyle: { display: 'none', height: 0 } });
+    
+    const keyboardWillShow = (event) => {
+      setKeyboardHeight(event.endCoordinates.height);
+      parentNav?.setOptions({ 
+        tabBarStyle: { display: 'none' }
+      });
     };
-    const showTabBar = () => parentNav.setOptions({ tabBarStyle: undefined });
 
-    const showSub = Keyboard.addListener('keyboardDidShow', keyboardWillShow);
-    const hideSub = Keyboard.addListener('keyboardDidHide', showTabBar);
+    const keyboardWillHide = () => {
+      setKeyboardHeight(0);
+      parentNav?.setOptions({ 
+        tabBarStyle: undefined 
+      });
+    };
+
+    const showListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', 
+      keyboardWillShow
+    );
+    const hideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', 
+      keyboardWillHide
+    );
 
     return () => {
-      showSub.remove();
-      hideSub.remove();
+      showListener.remove();
+      hideListener.remove();
     };
   }, [navigation]);
+
+  // التمرير التلقائي عند إضافة رسائل جديدة
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (flatListRef.current && messages.length > 0) {
+        flatListRef.current.scrollToEnd({ animated: true });
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [messages]);
 
   const sendMessage = () => {
     if (inputText.trim() === '') return;
@@ -102,7 +118,6 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
 
   const renderMessage = ({ item }) => <MessageBubble message={item} />;
 
-  // بنرندر صف مريض واحد بالبحث
   const renderPatientItem = ({ item }) => (
     <TouchableOpacity
       style={styles.patientItem}
@@ -122,21 +137,15 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
     </TouchableOpacity>
   );
 
-  // منعوض ارتفاع الهيدر والمسافة اللي تحت (الحافة الآمنة + التاب بار)
-  const totalOffset = Platform.OS === 'ios' ? headerHeight + bottomSpace : 0;
-
-  // Handle back button press
   const handleBackPress = () => {
     if (fromPatientCard) {
-      // If came from patient card, go back to previous screen (patient details)
       navigation.goBack();
     } else {
-      // If in search mode, just clear the selected patient
       setSelectedPatient(null);
     }
   };
 
-  // If no patient is selected, display patient search UI
+  // شاشة البحث عن المرضى
   if (!selectedPatient) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -167,6 +176,7 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
                 style={styles.patientsList}
                 ListEmptyComponent={<Text style={styles.emptyText}>لم يتم العثور على مرضى</Text>}
                 showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
               />
             )}
 
@@ -179,60 +189,69 @@ const keyboardOffset = Platform.OS === 'ios' ? 0 : bottomSpace;
     );
   }
 
-return (
-  <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={styles.keyboardContainer}
-        behavior="padding" // use padding on both platforms to avoid extra blank space
-        keyboardVerticalOffset={keyboardOffset}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.innerContainer}>
-            {/* 1. الهيدر */}
-            <View
-              style={styles.headerWrapper}
-              onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
-            >
-              <ChatHeader
-                patientName={selectedPatient?.name || '---'}
-                patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
-                onBack={handleBackPress}
+  // حساب المساحات بشكل صحيح
+  const bottomPadding = keyboardHeight > 0
+    ? 0 // لا نحتاج padding إضافي عند ظهور الكيبورد
+    : insets.bottom;
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="#00b29c" />
+      
+      <View style={styles.container}>
+        {/* Header */}
+        <View
+          style={styles.headerWrapper}
+          onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+        >
+          <ChatHeader
+            patientName={selectedPatient?.name || '---'}
+            patientInitial={selectedPatient?.name?.charAt(0) || 'م'}
+            onBack={handleBackPress}
+          />
+        </View>
+
+        {/* Messages Container with proper KeyboardAvoidingView */}
+        <KeyboardAvoidingView
+          style={styles.messagesSection}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.messagesContent}>
+              {/* Messages List */}
+              <FlatList
+                ref={flatListRef}
+                data={messages}
+                renderItem={renderMessage}
+                keyExtractor={item => item.id}
+                contentContainerStyle={[styles.flatListContent, { paddingBottom: insets.bottom + 8 } ]}
+                keyboardShouldPersistTaps="handled"
+                
+
+
               />
+
+              {/* Input Section */}
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { paddingBottom: bottomPadding }
+                ]}
+                onLayout={e => setInputHeight(e.nativeEvent.layout.height)}
+              >
+                <MessageInput
+                  inputText={inputText}
+                  setInputText={setInputText}
+                  sendMessage={sendMessage}
+                />
+              </View>
             </View>
-
-          {/* 2. قائمة الرسائل */}
-          <View style={styles.messagesContainer}>
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={item => item.id}
-              contentContainerStyle={[
-                styles.flatListContent,
-                { paddingBottom: tabBarHeight + insets.bottom }
-              ]}
-              keyboardShouldPersistTaps="handled"
-            />
-          </View>
-
-          {/* 3. صندوق الإدخال */}
-          <View
-            style={styles.inputWrapper}
-            onLayout={e => setInputHeight(e.nativeEvent.layout.height)}
-          >
-            <MessageInput
-              inputText={inputText}
-              setInputText={setInputText}
-              sendMessage={sendMessage}
-            />
-          </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-  </SafeAreaView>
-);
-
-
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -240,26 +259,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  keyboardContainer: {
-    flex: 1,
-  },
-  innerContainer: {
+  container: {
     flex: 1,
   },
   headerWrapper: {
-    // ارتفاع ديناميكي يُحسب بواسطة onLayout
+    backgroundColor: '#fff',
+    zIndex: 1,
   },
-  messagesContainer: {
+  messagesSection: {
+    flex: 1,
+  },
+  messagesContent: {
+    flex: 1,
+  },
+  messagesList: {
     flex: 1,
   },
   flatListContent: {
     flexGrow: 1,
-    justifyContent: 'flex-end',
     paddingHorizontal: 15,
-    // قلّلنا paddingVertical ليصبح 5 نقاط فقط
     paddingVertical: 5,
-    // أو يمكنك الاستغناء نهائيًا عن paddingBottom:
-    // paddingBottom: 0,
   },
   inputWrapper: {
     backgroundColor: '#f9f9f9',
@@ -286,6 +305,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
+    zIndex: 1,
   },
   input: {
     borderWidth: 1,
@@ -301,7 +321,7 @@ const styles = StyleSheet.create({
     color: '#00b29c',
   },
   patientsList: {
-    maxHeight: 180,
+    maxHeight: 300,
   },
   patientItem: {
     backgroundColor: '#FFF',
@@ -314,6 +334,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E0F7F1',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   patientRow: {
     flexDirection: 'row-reverse',
@@ -331,15 +359,12 @@ const styles = StyleSheet.create({
     color: '#004d40',
     marginRight: 8,
   },
-  arrow: {
-    fontSize: 20,
-    color: '#00b29c',
-  },
   emptyText: {
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 20,
     color: '#00b29c',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '500',
   },
   noSelectionText: {
     textAlign: 'center',
