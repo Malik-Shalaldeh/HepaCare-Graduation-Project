@@ -13,6 +13,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // شاشاتك
 import TestResultsScreen from '../screenPatient/TestResultsScreen';
+import LabsScreen from '../screenPatient/LabsScreen'; // sami: شاشة المختبرات المعتمدة
+import PatientAppointmentsScreen from '../screenPatient/PatientAppointmentsScreen'; // sami: شاشة مواعيدي
 import PatientMedications from '../screenPatient/PatientMedications';
 import PatientDashboard from '../screenPatient/PatientDashboard';
 import ChatScreen from '../screenPatient/chatScreenPatient';
@@ -110,7 +112,7 @@ function NavigatorPatient() {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         initialRouteName="MainTabs"
         screenOptions={{
-          headerShown: false,
+          headerShown: true,
           drawerActiveTintColor: primary,
           drawerLabelStyle: { fontSize: 16 },
           drawerStyle: { backgroundColor: '#fff' },
@@ -123,6 +125,7 @@ function NavigatorPatient() {
           options={{
             drawerLabel: () => null,
             title: null,
+            headerShown: false,
             drawerIcon: () => null,
           }}
         />
@@ -175,6 +178,30 @@ function NavigatorPatient() {
           }}
         />
 
+
+        <Drawer.Screen
+          name="مواعيدي"
+          component={PatientAppointmentsScreen}
+          options={{
+            headerTitle: 'مواعيدي القادمة',
+            headerTitleAlign: 'center',
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="calendar-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+        <Drawer.Screen
+          name="المختبرات المعتمدة"
+          component={LabsScreen}
+          options={{
+            headerTitle: 'المختبرات المعتمدة من وزارة الصحة',
+            headerTitleAlign: 'center',
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="flask-outline" size={size} color={color} />
+            ),
+          }}
+        />
 
         <Drawer.Screen
           name="إعادة تعيين كلمة المرور"

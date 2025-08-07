@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import ScreenWithDrawer from './ScreenWithDrawer';
 
 const primary = '#00b29c';
@@ -98,16 +99,17 @@ const getTypeIcon = (type) => {
 };
 
 const EducationalContentScreen = () => {
+  const navigation = useNavigation();
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScreenWithDrawer title="المحتوى التثقيفي">
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+      <View style={styles.container}>
+
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
             <View style={styles.sectionHeaderContainer}>
               <Ionicons name="library" size={24} color={primary} />
               <Text style={styles.sectionHeader}>معلومات عن التهاب الكبد الوبائي B</Text>
             </View>
-            
             {LIBRARY_CONTENT.map((item) => (
               <View key={item.id} style={styles.card}>
                 <View style={styles.cardHeader}>
@@ -120,13 +122,11 @@ const EducationalContentScreen = () => {
               </View>
             ))}
           </View>
-
           <View style={styles.section}>
             <View style={styles.sectionHeaderContainer}>
               <Ionicons name="help-circle" size={24} color={primary} />
               <Text style={styles.sectionHeader}>الأسئلة الشائعة</Text>
             </View>
-            
             {FAQ_CONTENT.map((item) => (
               <View key={item.id} style={styles.faqCard}>
                 <View style={styles.questionContainer}>
@@ -138,7 +138,7 @@ const EducationalContentScreen = () => {
             ))}
           </View>
         </ScrollView>
-      </ScreenWithDrawer>
+      </View>
     </SafeAreaView>
   );
 };
@@ -149,6 +149,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#00b29c',
+    marginBottom: 16,
+    textAlign: 'center',
+    alignSelf: 'center',
     flex: 1,
   },
   section: {
@@ -166,7 +176,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
     marginLeft: 12,
   },
   card: {
@@ -200,13 +210,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
     flex: 1,
     lineHeight: 22,
   },
   cardContent: {
     fontSize: 14,
-    color: '#5a6c7d',
+    color: '#222', // أسود واضح
     lineHeight: 22,
     textAlign: 'right',
   },
@@ -239,13 +249,13 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
     flex: 1,
     lineHeight: 22,
   },
   answer: {
     fontSize: 14,
-    color: '#5a6c7d',
+    color: '#222', // أسود واضح
     lineHeight: 22,
     textAlign: 'right',
     paddingLeft: 28,

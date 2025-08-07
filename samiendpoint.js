@@ -18,6 +18,9 @@ const ENDPOINTS = {
   // Visits
   visits: `${BASE_URL}/visits`,
 
+  // Patient Appointments
+  patientAppointments: `${BASE_URL}/patients/appointments`,
+
   // TODO: add more endpoints as you implement new features
 };
 

@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Visits from '../screensDoctor/Visits';
+import LabsScreen from '../screensDoctor/LabsScreen'; // sami: شاشة المختبرات المعتمدة
 import HistoryVisits from '../screensDoctor/HistoryVisits';
 import Settings from '../screensDoctor/Settings';
 import TestsStack from './TestsStack';
@@ -159,6 +160,8 @@ function NavigatorDoctor() {
           name="المحتوى التثقيفي"
           component={EducationalContentStack}
           options={{
+            headerTitle: 'المحتوى التثقيفي',
+            headerTitleAlign: 'center',
             headerShown: false,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="book-outline" size={size} color={color} />
@@ -218,6 +221,16 @@ function NavigatorDoctor() {
           headerShown: false,             // يخفي العنوان العلوي
        }}
       />
+
+        <Drawer.Screen
+          name=" المختبرات المعتمدة"
+          component={LabsScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="flask-outline" size={size} color={color} />
+            ),
+          }}
+        />
 
         <Drawer.Screen
           name="سجل الزيارات"
