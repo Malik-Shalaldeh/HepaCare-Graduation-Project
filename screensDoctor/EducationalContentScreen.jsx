@@ -101,7 +101,13 @@ const getTypeIcon = (type) => {
 const EducationalContentScreen = () => {
   const navigation = useNavigation();
   return (
+    <ScreenWithDrawer>
+      
     <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+
+     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color={primary} />
+              </TouchableOpacity>
       <View style={styles.container}>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -140,6 +146,7 @@ const EducationalContentScreen = () => {
         </ScrollView>
       </View>
     </SafeAreaView>
+  </ScreenWithDrawer>
   );
 };
 
@@ -172,6 +179,9 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     borderBottomWidth: 2,
     borderBottomColor: primary,
+  },
+    backButton: {
+    marginRight: 12,
   },
   sectionHeader: {
     fontSize: 20,
