@@ -113,10 +113,10 @@ const EducationalContentScreen = () => {
             {LIBRARY_CONTENT.map((item) => (
               <View key={item.id} style={styles.card}>
                 <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{item.title}</Text>
                   <View style={styles.iconContainer}>
                     <Ionicons name={getTypeIcon(item.type)} size={20} color={primary} />
                   </View>
-                  <Text style={styles.cardTitle}>{item.title}</Text>
                 </View>
                 <Text style={styles.cardContent}>{item.content}</Text>
               </View>
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${primary}15`,
     padding: 8,
     borderRadius: 10,
-    marginRight: 12,
+    marginLeft: 12,
   },
   cardTitle: {
     fontSize: 16,
@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
     flex: 1,
     lineHeight: 22,
+    textAlign: 'right',
   },
   cardContent: {
     fontSize: 14,
