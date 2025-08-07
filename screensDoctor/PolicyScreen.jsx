@@ -68,10 +68,10 @@ const PrivacyPolicyScreen = () => {
           {POLICY_ITEMS.map((item) => (
             <View key={item.id} style={styles.card}>
               <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>{item.title}</Text>
                 <View style={styles.iconContainer}>
                   <Ionicons name="document-text-outline" size={20} color={primary} />
                 </View>
-                <Text style={styles.cardTitle}>{item.title}</Text>
               </View>
               <Text style={styles.cardContent}>{item.content}</Text>
             </View>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: `${primary}15`,
     padding: 8,
     borderRadius: 10,
-    marginRight: 12,
+    marginLeft: 12,
   },
   cardTitle: {
     fontSize: 16,

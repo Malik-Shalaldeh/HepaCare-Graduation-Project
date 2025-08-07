@@ -23,6 +23,7 @@ import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import ChangePasswordScreen from '../Login/restPassword';
 import AvailableMedicationsScreen from '../screenPatient/AvailableMedicationsScreen';
 import MyMedicationsScreen from '../screenPatient/MyMedicationsScreen';
+import PrivacyPolicyScreen from '../screensDoctor/PolicyScreen';
 
 const primary = '#2196f3'; // اللون الرئيسي
 
@@ -199,6 +200,16 @@ function NavigatorPatient() {
             headerTitleAlign: 'center',
             drawerIcon: ({ size, color }) => (
               <Ionicons name="flask-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+          <Drawer.Screen
+          name="سياسة التطبيق"
+          component={PrivacyPolicyScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="document-text-outline" size={size} color={color} />
             ),
           }}
         />
