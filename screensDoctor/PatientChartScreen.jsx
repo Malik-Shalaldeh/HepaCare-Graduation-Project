@@ -56,13 +56,14 @@ export default function PatientChartScreen()
 
   // إعداد بيانات الرسم
   const labels = records.map(r => r.date);
-  
+
   const datasets = TESTS.map((t, i) => ({
     data: records.map(r => r[t.key] || 0),
     color: () => COLORS[i % COLORS.length],
     strokeWidth: 2,
   }));
 
+ 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />

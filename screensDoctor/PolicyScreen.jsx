@@ -1,94 +1,136 @@
-import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
+  ScrollView,
   SafeAreaView,
   TouchableOpacity,
-  StatusBar,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import ScreenWithDrawer from './ScreenWithDrawer';
 
-// اللون الأساسي
-const primary = '#2C3E50';
-const accent = '#2980B9';
-const textColor = '#34495E';
-const background = '#ecf0f1';
+const primary = '#00b29c';
+
+const POLICY_ITEMS = [
+  {
+    id: 1,
+    title: 'مقدمة',
+    content:
+      'نحن نأخذ خصوصيتك على محمل الجد. تم تصميم هذا التطبيق لمساعدة مرضى التهاب الكبد الوبائي، ونلتزم بحماية معلوماتك الشخصية.',
+  },
+  {
+    id: 2,
+    title: 'المعلومات التي نجمعها',
+    content:
+      'قد نقوم بجمع معلومات شخصية مثل الاسم، البريد الإلكتروني، والتاريخ الطبي لتحسين الخدمة المقدمة.',
+  },
+  {
+    id: 3,
+    title: 'كيفية استخدام المعلومات',
+    content:
+      'تُستخدم المعلومات لتقديم الرعاية الصحية، وتحليل البيانات الطبية، وتحسين جودة التطبيق.',
+  },
+  {
+    id: 4,
+    title: 'مشاركة البيانات',
+    content:
+      'لا نشارك معلوماتك مع أي طرف ثالث بدون موافقتك، إلا في حال وجود التزام قانوني.',
+  },
+  {
+    id: 5,
+    title: 'أمان المعلومات',
+    content:
+      'نستخدم تقنيات حديثة لحماية بياناتك، ونعمل على تحديث أنظمة الأمان باستمرار.',
+  },
+  {
+    id: 6,
+    title: 'التعديلات',
+    content:
+      'قد نقوم بتعديل سياسة الخصوصية من وقت لآخر، وسيتم إعلامك بأي تغيير من خلال التطبيق.',
+  },
+];
 
 const PrivacyPolicyScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={primary} barStyle="light-content" />
+    <ScreenWithDrawer>
+      <SafeAreaView style={styles.safeArea}>
+     
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={28} color={primary} />
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000000" />
-        </TouchableOpacity>
-    
+        <ScrollView showsVerticalScrollIndicator={false}>
 
-      {/* المحتوى */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.sectionTitle}>مقدمة</Text>
-        <Text style={styles.text}>نحن نأخذ خصوصيتك على محمل الجد. تم تصميم هذا التطبيق لمساعدة مرضى التهاب الكبد الوبائي، ونلتزم بحماية معلوماتك الشخصية.</Text>
+          {POLICY_ITEMS.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name="document-text-outline" size={20} color={primary} />
+                </View>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+              </View>
+              <Text style={styles.cardContent}>{item.content}</Text>
+            </View>
+          ))}
 
-        <Text style={styles.sectionTitle}>المعلومات التي نجمعها</Text>
-        <Text style={styles.text}>قد نقوم بجمع معلومات شخصية مثل الاسم، البريد الإلكتروني، والتاريخ الطبي لتحسين الخدمة المقدمة.</Text>
-
-        <Text style={styles.sectionTitle}>كيفية استخدام المعلومات</Text>
-        <Text style={styles.text}>تُستخدم المعلومات لتقديم الرعاية الصحية، وتحليل البيانات الطبية، وتحسين جودة التطبيق.</Text>
-
-        <Text style={styles.sectionTitle}>مشاركة البيانات</Text>
-        <Text style={styles.text}>لا نشارك معلوماتك مع أي طرف ثالث بدون موافقتك، إلا في حال وجود التزام قانوني.</Text>
-
-        <Text style={styles.sectionTitle}>أمان المعلومات</Text>
-        <Text style={styles.text}>نستخدم تقنيات حديثة لحماية بياناتك، ونعمل على تحديث أنظمة الأمان باستمرار.</Text>
-
-        <Text style={styles.sectionTitle}>التعديلات</Text>
-        <Text style={styles.text}>قد نقوم بتعديل سياسة الخصوصية من وقت لآخر، وسيتم إعلامك بأي تغيير من خلال التطبيق.</Text>
-
-        <View style={{ height: Platform.OS === 'android' ? 30 : 20 }} />
-      </ScrollView>
-    </SafeAreaView>
+          <View style={{ height: Platform.OS === 'android' ? 30 : 20 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </ScreenWithDrawer>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: background,
+    backgroundColor: '#f8f9fa',
   },
- 
+
   backButton: {
-    margin: 8,
+    marginRight: 12,
   },
-  headerTitle: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+
+  card: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderLeftWidth: 4,
+    borderLeftColor: primary,
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: Platform.OS === 'android' ? 40 : 20,
-    backgroundColor: background,
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: accent,
-    marginTop: 20,
-    marginBottom: 8,
-    textAlign: 'right',
+  iconContainer: {
+    backgroundColor: `${primary}15`,
+    padding: 8,
+    borderRadius: 10,
+    marginRight: 12,
   },
-  text: {
+  cardTitle: {
     fontSize: 16,
-    lineHeight: 24,
-    color: textColor,
+    fontWeight: '600',
+    color: primary,
+    flex: 1,
+    lineHeight: 22,
+    textAlign:'right'
+  },
+  cardContent: {
+    fontSize: 14,
+    color: '#222',
+    lineHeight: 22,
     textAlign: 'right',
   },
 });
