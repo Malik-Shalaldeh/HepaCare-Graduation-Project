@@ -119,10 +119,10 @@ const EducationalContentScreen = () => {
             {LIBRARY_CONTENT.map((item) => (
               <View key={item.id} style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle}>{item.title}</Text>
                   <View style={styles.iconContainer}>
                     <Ionicons name={getTypeIcon(item.type)} size={20} color={primary} />
                   </View>
+                  <Text style={styles.cardTitle}>{item.title}</Text>
                 </View>
                 <Text style={styles.cardContent}>{item.content}</Text>
               </View>
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionHeaderContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     marginHorizontal: 20,
     marginVertical: 16,
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
     borderBottomColor: primary,
   },
     backButton: {
-    marginRight: 12,
+    marginRight: 5,
   },
   sectionHeader: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
-    marginLeft: 12,
+    marginRight: 5,
   },
   card: {
     backgroundColor: '#ffffff',
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     borderLeftColor: primary,
   },
   cardHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
@@ -215,7 +215,8 @@ const styles = StyleSheet.create({
     backgroundColor: `${primary}15`,
     padding: 8,
     borderRadius: 10,
-    marginLeft: 12,
+    marginRight: 5,
+    marginLeft: 8,
   },
   cardTitle: {
     fontSize: 16,
@@ -224,12 +225,14 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 22,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   cardContent: {
     fontSize: 14,
     color: '#222', // أسود واضح
     lineHeight: 22,
     textAlign: 'right',
+    writingDirection: 'rtl',
   },
   faqCard: {
     backgroundColor: '#ffffff',
@@ -249,12 +252,12 @@ const styles = StyleSheet.create({
     borderLeftColor: '#3498db',
   },
   questionContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
   questionIcon: {
-    marginRight: 10,
+    marginRight: 8,
     marginTop: 2,
   },
   question: {
@@ -263,6 +266,8 @@ const styles = StyleSheet.create({
     color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
     flex: 1,
     lineHeight: 22,
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   answer: {
     fontSize: 14,
