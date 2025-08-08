@@ -5,6 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './Login/LoginScreen';
 import NavigatorPatient from './componentPaitent/PatientDrawerNavigator';
 import NavigatorDoctor from './componentDoctor/navigatorDoctorScreen';
+import AdminWelcomeScreen from './screensAdmin/AdminWelcomeScreen';
+import LabsWelcomeScreen from './screensLabs/LabsWelcomeScreen';
+import HealthWelcomeScreen from './screensHealth/HealthWelcomeScreen';
 import { VisitDataProvider } from './contexts/VisitDataContext';
 import { AppointmentsProvider } from './contexts/AppointmentsContext';
 import { EducationalContentProvider } from './contexts/EducationalContentContext';
@@ -23,6 +26,9 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Doctor" component={NavigatorDoctor} />
           <Stack.Screen name="Patient" component={NavigatorPatient} />
+          <Stack.Screen name="Admin" component={AdminWelcomeScreen} />
+          <Stack.Screen name="Labs" component={LabsWelcomeScreen} />
+          <Stack.Screen name="Health" component={HealthWelcomeScreen} />
         </Stack.Navigator>
           </NavigationContainer>
         </EducationalContentProvider>

@@ -19,10 +19,27 @@ export default function LoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
+    // حساب الطبيب
     if (username === '9500' && password === '1234') {
       navigation.replace('Doctor');
+
+    // حساب المريض
     } else if (username === '4200' && password === '1234') {
       navigation.replace('Patient');
+
+    // حساب إدارة النظام – لا واجهة مخصّصة حتى الآن
+    } else if (username === '3500' && password === '1234') {
+      navigation.replace('Admin');
+
+    // حساب المختبرات – لا واجهة مخصّصة حتى الآن
+    } else if (username === '4500' && password === '1234') {
+      navigation.replace('Labs');
+
+    // حساب الصحة – لا واجهة مخصّصة حتى الآن
+    } else if (username === '5500' && password === '1234') {
+      navigation.replace('Health');
+
+    // بيانات خاطئة
     } else {
       Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
     }
