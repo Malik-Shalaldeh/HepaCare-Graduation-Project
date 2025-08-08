@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DoctorsScreen from '../screensAdmin/DoctorsScreen';
-import UpdatePasswordScreen from '../screensAdmin/UpdatePasswordScreen';
+import DoctorsScreen from '../screensAdmin/DoctorsOperationsScreen';
+import Setting from "../screensAdmin/Setting";
 
 const Tab = createBottomTabNavigator();
 
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
           tabBarHideOnKeyboard: true,
         })}
       >
-        <Tab.Screen name="الاعدادات" component={UpdatePasswordScreen} />
+        <Tab.Screen name="الاعدادات" component={Setting} />
         <Tab.Screen name="الأطباء" component={DoctorsScreen} />
         <Tab.Screen name="الرئيسية" component={AdminHome} />
         {/* View بسيطة كمحتوى افتراضي للمختبرات لتجنب الأخطاء */}

@@ -5,7 +5,6 @@ import PatientListScreen from '../screensDoctor/PatientListScreen';
 import Medications from '../screensDoctor/Medications';
 import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
 import ChatScreen from '../screensDoctor/ChatScreen';
-import MedicalIndicatorsScreen from '../screensDoctor/MedicalIndicatorsScreen';
 import PatientChartScreen from '../screensDoctor/PatientChartScreen';
 
 const Stack = createStackNavigator();
