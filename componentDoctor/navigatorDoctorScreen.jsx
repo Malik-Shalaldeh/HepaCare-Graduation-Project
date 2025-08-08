@@ -22,7 +22,7 @@ import EducationalContentStack from './EducationalContentStack';
 import ChatScreen from '../screensDoctor/ChatScreen';
 import Dashboard from '../screensDoctor/Dashboard';
 import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
-import PrivacyPolicyScreen from '../screensDoctor/PolicyScreen';
+import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
 import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
 import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
 import ChangePasswordScreen from '../Login/restPassword';

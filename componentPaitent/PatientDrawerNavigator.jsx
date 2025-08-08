@@ -18,12 +18,12 @@ import PatientAppointmentsScreen from '../screenPatient/PatientAppointmentsScree
 import PatientMedications from '../screenPatient/PatientMedications';
 import PatientDashboard from '../screenPatient/PatientDashboard';
 import ChatScreen from '../screenPatient/chatScreenPatient';
-import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
+import EducationalContentScreen from '../screensCommon/EducationalContentScreen';
 import FeedbackScreen from '../screenPatient/FeedbackScreen';
 import ChangePasswordScreen from '../Login/restPassword';
 import AvailableMedicationsScreen from '../screenPatient/AvailableMedicationsScreen';
 import MyMedicationsScreen from '../screenPatient/MyMedicationsScreen';
-import PrivacyPolicyScreen from '../screensDoctor/PolicyScreen';
+import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
 
 const primary = '#2196f3'; // اللون الرئيسي
 

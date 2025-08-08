@@ -1,6 +1,4 @@
 // sami 
-import ENDPOINTS from '../samiendpoint'; // استيراد جميع روابط الباك اند المركزية
-import axios from 'axios'; // سنستخدم axios مستقبلاً للربط الحقيقي
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native';

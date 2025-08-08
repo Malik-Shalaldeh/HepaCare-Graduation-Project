@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import EducationalContentScreen from '../screensDoctor/EducationalContentScreen';
+import EducationalContentScreen from '../screensCommon/EducationalContentScreen';
 
 const Stack = createStackNavigator();
 

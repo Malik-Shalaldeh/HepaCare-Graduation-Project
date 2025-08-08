@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import ScreenWithDrawer from './ScreenWithDrawer';
+import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 
 const primary = '#00b29c';
 
