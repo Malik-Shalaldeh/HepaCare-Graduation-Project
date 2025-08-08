@@ -65,7 +65,7 @@ export default function Setting() {
 
         <TouchableOpacity
           style={[styles.btn, styles.btnOutline]}
-          onPress={navigation.navigate('سياسة التطبيق')}
+          onPress={navigation.navigate('')}
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>
