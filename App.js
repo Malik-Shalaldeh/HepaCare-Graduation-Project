@@ -1,16 +1,15 @@
 // App.js
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './Login/LoginScreen';
 import NavigatorPatient from './componentPaitent/PatientDrawerNavigator';
 import NavigatorDoctor from './componentDoctor/navigatorDoctorScreen';
-import AdminWelcomeScreen from './screensAdmin/AdminWelcomeScreen';
 import HealthWelcomeScreen from './screensHealth/HealthWelcomeScreen';
 import { VisitDataProvider } from './contexts/VisitDataContext';
 import { AppointmentsProvider } from './contexts/AppointmentsContext';
 import { EducationalContentProvider } from './contexts/EducationalContentContext';
 import NavigatorLab from './componentLap/LapDrawerNavigator';
+import AdminWelcomeScreen from './screensAdmin/AdminDashbordScreen';
 
 
 

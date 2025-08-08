@@ -27,15 +27,15 @@ export default function LoginScreen({ navigation }) {
     } else if (username === '4200' && password === '1234') {
       navigation.replace('Patient');
 
-    // حساب إدارة النظام – لا واجهة مخصّصة حتى الآن
+    // حساب إدارة النظام
     } else if (username === '3500' && password === '1234') {
       navigation.replace('Admin');
 
-    // حساب المختبرات – لا واجهة مخصّصة حتى الآن
+    // حساب المختبرات 
     } else if (username === '4500' && password === '1234') {
       navigation.replace('Labs');
 
-    // حساب الصحة – لا واجهة مخصّصة حتى الآن
+    // حساب الصحة
     } else if (username === '5500' && password === '1234') {
       navigation.replace('Health');
 
