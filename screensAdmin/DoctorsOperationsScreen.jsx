@@ -10,6 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 // إذا بدك تنقّل لشاشات ثانية، فعّل السطر التالي واستخدمه
 // import { useNavigation } from '@react-navigation/native';
 
@@ -18,21 +19,18 @@ const textColor = '#2C3E50';
 
 export default function DoctorsScreen() {
   // فعّل التنقّل إذا عندك Navigator:
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const onAdd = () => {
-    Alert.alert('إضافة طبيب', 'هنا ستنتقل لشاشة إضافة طبيب.');
-    // navigation.navigate('AddDoctor');
+    navigation.navigate('AddDoctor');
   };
 
   const onDelete = () => {
-    Alert.alert('حذف طبيب', 'هنا ستنتقل لشاشة حذف طبيب.');
-    // navigation.navigate('DeleteDoctor');
+     navigation.navigate('DeleteDoctor');
   };
 
   const onShowAll = () => {
-    Alert.alert('جميع الأطباء', 'هنا ستنتقل لشاشة عرض جميع الأطباء.');
-    // navigation.navigate('DoctorsList');
+    navigation.navigate('AllDoctors');
   };
 
   return (
@@ -48,7 +46,7 @@ export default function DoctorsScreen() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.btn, styles.btnDanger]} onPress={onDelete} activeOpacity={0.9}>
+        <TouchableOpacity style={[styles.btn , styles.btnPrimary]} onPress={onDelete} activeOpacity={0.9}>
           <View style={styles.btnContent}>
             <Ionicons name="trash-outline" size={24} color="#fff" />
             <Text style={styles.btnText}>حذف طبيب</Text>

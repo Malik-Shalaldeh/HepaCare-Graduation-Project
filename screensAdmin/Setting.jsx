@@ -22,18 +22,28 @@ export default function Setting() {
   const navigation = useNavigation();
 
   const onResetUser = () => {
-    Alert.alert('إعادة تعيين', 'سيتم إعادة تعيين كلمة مرور مستخدم.');
-    // navigation.navigate('ResetUserPassword');
+    navigation.navigate('UpdateUserPasswordScreen');
   };
 
   const onResetAdmin = () => {
-    Alert.alert('إعادة تعيين', 'سيتم إعادة تعيين كلمة مرور الأدمن.');
-    // navigation.navigate('ResetAdminPassword');
+    navigation.navigate('ChangePasswordScreen');
   };
 
-  const onViewPolicy = () => {
-  navigation.navigate('PrivacyPolicyScreen'); // ✅ الاسم كما في Drawer.Screen
-  };
+  const Logout = () => {
+     Alert.alert(
+          'تسجيل الخروج',
+          'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+          [
+            { text: 'إلغاء', style: 'cancel' },
+            {
+              text: 'تسجيل خروج',
+              onPress: () => navigation.navigate('Login'),
+              style: 'destructive',
+            },
+          ],
+          { cancelable: true }
+        );
+   };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -48,7 +58,7 @@ export default function Setting() {
         >
           <View style={styles.btnContent}>
             <Ionicons name="key-outline" size={22} color="#fff" />
-            <Text style={styles.btnText}>إعادة تعيين كلمة مرور مستخدم</Text>
+            <Text style={styles.btnText}>تحديث كلمة مرور مستخدم</Text>
           </View>
         </TouchableOpacity>
 
@@ -65,12 +75,12 @@ export default function Setting() {
 
         <TouchableOpacity
           style={[styles.btn, styles.btnOutline]}
-          onPress={navigation.navigate('')}
+          onPress={Logout}
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>
-            <Ionicons name="document-text-outline" size={22} color={primary} />
-            <Text style={[styles.btnText, { color: primary }]}>الاطلاع على السياسة</Text>
+            <Ionicons name="exit-outline" size={22} color={primary} />
+            <Text style={[styles.btnText, { color: primary }]}>تسجيل الخروج</Text>
           </View>
         </TouchableOpacity>
       </View>

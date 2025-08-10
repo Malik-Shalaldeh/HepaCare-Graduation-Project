@@ -9,7 +9,7 @@ import { VisitDataProvider } from './contexts/VisitDataContext';
 import { AppointmentsProvider } from './contexts/AppointmentsContext';
 import { EducationalContentProvider } from './contexts/EducationalContentContext';
 import NavigatorLab from './componentLap/LapDrawerNavigator';
-import AdminWelcomeScreen from './screensAdmin/AdminDashbordScreen';
+import AdminTabs from './screensAdmin/AdminTabs';
 
 
 
@@ -25,7 +25,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Doctor" component={NavigatorDoctor} />
           <Stack.Screen name="Patient" component={NavigatorPatient} />
-          <Stack.Screen name="Admin" component={AdminWelcomeScreen} />
+          <Stack.Screen name="Admin" component={AdminTabs} />
           <Stack.Screen name="Labs" component={NavigatorLab} />
           <Stack.Screen name="Health" component={HealthWelcomeScreen} />
         </Stack.Navigator>
