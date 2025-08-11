@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   SafeAreaView,
   View,
@@ -6,19 +5,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  Alert,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-// إذا بدك تنقّل لشاشات ثانية، فعّل السطر التالي واستخدمه
-// import { useNavigation } from '@react-navigation/native';
 
 const primary = '#00b29c';
 const textColor = '#2C3E50';
 
 export default function DoctorsScreen() {
-  // فعّل التنقّل إذا عندك Navigator:
   const navigation = useNavigation();
 
   const onAdd = () => {
@@ -36,7 +31,9 @@ export default function DoctorsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
       <View style={styles.container}>
+
         <Text style={styles.title}>إدارة سجلات الأطباء</Text>
 
         <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={onAdd} activeOpacity={0.9}>
@@ -46,6 +43,7 @@ export default function DoctorsScreen() {
           </View>
         </TouchableOpacity>
 
+
         <TouchableOpacity style={[styles.btn , styles.btnPrimary]} onPress={onDelete} activeOpacity={0.9}>
           <View style={styles.btnContent}>
             <Ionicons name="trash-outline" size={24} color="#fff" />
@@ -53,12 +51,15 @@ export default function DoctorsScreen() {
           </View>
         </TouchableOpacity>
 
+
         <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={onShowAll} activeOpacity={0.9}>
           <View style={styles.btnContent}>
             <Ionicons name="list-outline" size={24} color="#fff" />
             <Text style={styles.btnText}>عرض جميع الأطباء</Text>
           </View>
         </TouchableOpacity>
+        
+
       </View>
     </SafeAreaView>
   );

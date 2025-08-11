@@ -1,23 +1,20 @@
 // screensAdmin/AdminHome.tsx
-import React from 'react';
 import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// ألوان ثابتة نستخدمها في الصفحة
 const primary = '#00b29c';
 const text    = '#2C3E50';
 const subtle  = '#6B7280';
 const bg      = '#F8FAFB';
 
 export default function AdminHome() {
-  // تجهيز التاريخ لعرضه داخل الكارد
+
   const today = new Date();
   const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const date = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
   return (
     <View style={styles.page}>
-      {/* شريط الحالة بلون أساسي */}
       <StatusBar backgroundColor={primary} barStyle="dark-content" />
 
       {/* كارد شعار التطبيق + التاريخ */}
@@ -26,7 +23,7 @@ export default function AdminHome() {
         <Text style={styles.logoDate}>{date}</Text>
       </View>
 
-      {/* كارد ترحيب: النص على اليمين والأيقونة على اليسار */}
+      {/*كارد ترحيب */}
       <View style={styles.welcomeCard}>
         <View style={styles.textBox}>
           <Text style={styles.welcomeTitle}>مرحباً أيها المدير 👋</Text>

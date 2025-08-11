@@ -1,5 +1,4 @@
-// navigation/AdminTabs.tsx
-import React from 'react';
+// ScreensAdmin/AdminTabs.jsx
 import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,7 +12,7 @@ import SettingAdminStack from './SettingAdminStack';
 const Tab = createBottomTabNavigator();
 const primary = '#00b29c';
 
-export default function AdminTabs() {
+ function AdminTabs() {
   return (
     <Tab.Navigator
       initialRouteName="الرئيسية"
@@ -62,8 +61,11 @@ export default function AdminTabs() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flask" size={size} color={color} />
           ),
+          
         }}
       />
     </Tab.Navigator>
   );
 }
+
+export default AdminTabs;

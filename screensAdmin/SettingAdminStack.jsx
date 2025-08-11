@@ -1,5 +1,4 @@
 // screensAdmin/AdminStack.jsx
-import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // الشاشات
@@ -7,7 +6,6 @@ import ChangePasswordScreen from '../Login/restPassword';
 import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';   
 import Setting from './Setting';
 import UpdateUserPasswordScreen from './UpdateUserPasswordScreen';
-
 
 
 const Stack = createNativeStackNavigator();
@@ -35,10 +33,6 @@ export default function SettingAdminStack() {
         component={UpdateUserPasswordScreen}
         options={{ title: 'تحديث كلمة مرور مستخدم' }}
       />
-      
-
-
-      
     </Stack.Navigator>
   );
 }

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,14 +10,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-// لو بدك تربط الأزرار بالتنقّل، فعّل السطر التالي
-// import { useNavigation } from '@react-navigation/native';
 
 const primary = '#00b29c';
 const dark = '#2C3E50';
 
 export default function Setting() {
-  // فعّل التنقّل إذا عندك Navigator
   const navigation = useNavigation();
 
   const onResetUser = () => {
@@ -118,8 +114,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 2,
   },
-  btnPrimary: { backgroundColor: primary },
-  btnDark: { backgroundColor: dark },
+  btnPrimary: { 
+    backgroundColor: primary 
+  },
+
+  btnDark: { 
+    backgroundColor: dark 
+  },
+
   btnOutline: {
     backgroundColor: '#fff',
     borderWidth: 1.5,
