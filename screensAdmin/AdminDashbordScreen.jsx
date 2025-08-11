@@ -54,9 +54,7 @@ export default function AdminHome() {
   );
 }
 
-// ستايلات الصفحة والكروت والنصوص
 const styles = StyleSheet.create({
-  // خلفية الصفحة وحواف داخلية
   page: {
     flex: 1,
     backgroundColor: bg,
@@ -65,7 +63,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
 
-  // كارد العنوان والتاريخ
   logoCard: {
     backgroundColor: primary,
     borderRadius: 16,
