@@ -16,6 +16,8 @@ const LABS_DATA = [
 ];
 
 const LabsScreen = ({ route }) => {
+
+  const Navigation = useNavigation();
   // لو جتنا المدينة من الباراميتر، بنفلتر المختبرات
   const cityParam = route?.params?.city;
   const [search, setSearch] = useState(cityParam || '');
@@ -38,6 +40,11 @@ const LabsScreen = ({ route }) => {
   const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+
+        <TouchableOpacity onPress={() => Navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={25} color={'#000'} />
+        </TouchableOpacity>
+
       <View style={styles.container}>
 
         <TextInput
@@ -86,6 +93,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  backButton: {
+    margin:10,
+    marginTop:-20
   },
   listContent: {
     paddingBottom: 24,
