@@ -1,5 +1,5 @@
 // screensAdmin/AdminHome.tsx
-import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, Platform, SafeAreaView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const primary = '#00b29c';
@@ -14,7 +14,7 @@ export default function AdminHome() {
   const date = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
   return (
-    <View style={styles.page}>
+    <SafeAreaView style={styles.page}>
       <StatusBar backgroundColor={primary} barStyle="dark-content" />
 
       {/* كارد شعار التطبيق + التاريخ */}
@@ -50,7 +50,7 @@ export default function AdminHome() {
           style={styles.iconLeft}
         />
       </View>
-    </View>
+          </SafeAreaView>
   );
 }
 
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.12,
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 4 },
-        marginTop:20,
       },
     }),
   },
