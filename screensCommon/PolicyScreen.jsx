@@ -65,7 +65,8 @@ const PrivacyPolicyScreen = () => {
 
         <ScrollView showsVerticalScrollIndicator={false}>
 
-          {POLICY_ITEMS.map((item) => (
+          {
+          POLICY_ITEMS.map((item) => (
             <View key={item.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <Text style={styles.cardTitle}>{item.title}</Text>
@@ -75,7 +76,8 @@ const PrivacyPolicyScreen = () => {
               </View>
               <Text style={styles.cardContent}>{item.content}</Text>
             </View>
-          ))}
+          ))
+          }
 
           <View style={{ height: Platform.OS === 'android' ? 30 : 20 }} />
         </ScrollView>
