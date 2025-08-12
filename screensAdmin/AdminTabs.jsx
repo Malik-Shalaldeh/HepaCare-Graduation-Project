@@ -7,6 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AdminHome from '../screensAdmin/AdminDashbordScreen';
 import DoctorAdminStack from './DoctorAdminStack';
 import SettingAdminStack from './SettingAdminStack';
+import LapsNavigator from './LapsNavigator'; // ✅ بدل LapsStack
 
 
 const Tab = createBottomTabNavigator();
@@ -56,13 +57,8 @@ const primary = '#00b29c';
       />
       <Tab.Screen
         name="المختبرات"
-        component={''}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="flask" size={size} color={color} />
-          ),
-          
-        }}
+        component={LapsNavigator} 
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="flask" size={size} color={color} /> }}
       />
     </Tab.Navigator>
   );
