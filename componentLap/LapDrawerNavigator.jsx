@@ -127,6 +127,7 @@ function NavigatorPatient() {
           name="الرئيسية"
           component={MainTabs}
           options={{
+            headerShown: false,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),

@@ -7,17 +7,6 @@ const PatientMedications = ({ navigation }) => {
   return (
     <ScreenWithDrawer>
 
-      {/* ✅ الفحوصات المطلوبة" */}
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={() => navigation.navigate('عرض الفحوصات المطلوبة')}
-      >
-        <View style={styles.ButtonContent}>
-          <Ionicons name="medkit-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.ButtonText}>عرض الفحوصات المطلوبة</Text>
-        </View>
-      </TouchableOpacity>
-
       {/* ✅ "زر داخال نتائج الفحوصات" */}
       <TouchableOpacity
       style={{...styles.Button,backgroundColor:'#00796B'}}
