@@ -19,6 +19,7 @@ import ChangePasswordScreen from "../Login/restPassword";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import TestScreen from "../screensLabs/TestScreen";
 import InputTestResultScreen from "../screensLabs/InputTestResultScreen";
+import HealthRatingsScreen from "../screensHealth/HealthRatingsScreen";
 
 const primary = "#2196f3"; // اللون الرئيسي
 
@@ -152,7 +153,6 @@ function NavigatorPatient() {
                 size={size}
                 color={color}
               />
-<<<<<<< HEAD
             ),
           }}
         />
@@ -163,8 +163,6 @@ function NavigatorPatient() {
           options={{
             drawerIcon: ({ size, color }) => (
               <Ionicons name="star-outline" size={size} color={color} />
-=======
->>>>>>> 1b1802c883d29229526ba77e4267ad73e0f2ed89
             ),
           }}
         />

@@ -19,7 +19,7 @@ import PatientMedications from "../screenPatient/PatientMedications";
 import PatientDashboard from "../screenPatient/PatientDashboard";
 import ChatScreen from "../screenPatient/chatScreenPatient";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
-import ServiceQualityScreen from "../screenPatient/ServiceQualityScreen";
+import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import AvailableMedicationsScreen from "../screenPatient/AvailableMedicationsScreen";
 import MyMedicationsScreen from "../screenPatient/MyMedicationsScreen";
@@ -134,6 +134,7 @@ function NavigatorPatient() {
           name="الرئيسية"
           component={MainTabs}
           options={{
+            headerShown: false,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
@@ -150,7 +151,7 @@ function NavigatorPatient() {
         />
         <Drawer.Screen
           name="تقييم جودة الخدمات"
-          component={ServiceQualityScreen}
+          component={FeedbackScreen}
           options={{
             drawerIcon: ({ size, color }) => (
               <Ionicons name="thumbs-up-outline" size={size} color={color} />

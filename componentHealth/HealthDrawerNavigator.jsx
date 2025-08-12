@@ -2,8 +2,9 @@
 // جميع التعليقات داخل الكود باللغة العربية فقط.
 
 import React from "react";
-import { StatusBar, Alert } from "react-native";
+import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -14,7 +15,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 import HealthWelcomeScreen from "../screensHealth/HealthWelcomeScreen";
 import HealthRatingsScreen from "../screensHealth/HealthRatingsScreen";
+import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
+import CommonLabsScreen from "../screensCommon/LabsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
+import ChangePasswordScreen from "../Login/restPassword";
 
 const primary = "#2196f3";
 
@@ -50,6 +54,39 @@ function CustomDrawerContent(props) {
   );
 }
 
+// تبويبات سفلية بسيطة: لوحة التحكم + التقييمات
+const Tab = createBottomTabNavigator();
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="لوحة التحكم"
+      screenOptions={({ route }) => ({
+        headerShown: true,
+        tabBarIcon: ({ color, size }) => {
+          const icons = {
+            "لوحة التحكم": "home-outline",
+            التقييمات: "star-outline",
+          };
+          return (
+            <Ionicons name={icons[route.name]} size={size} color={color} />
+          );
+        },
+        tabBarActiveTintColor: primary,
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          height: 90,
+          marginBottom: Platform.OS === "android" ? 5 : 0,
+        },
+        tabBarHideOnKeyboard: true,
+      })}
+    >
+      {/* ترتيب الشاشات هنا يجعل لوحة التحكم على اليمين (RTL) والتقييمات على اليسار */}
+      <Tab.Screen name="التقييمات" component={HealthRatingsScreen} />
+      <Tab.Screen name="لوحة التحكم" component={HealthWelcomeScreen} />
+    </Tab.Navigator>
+  );
+}
+
 const Drawer = createDrawerNavigator();
 
 export default function HealthDrawerNavigator() {
@@ -58,7 +95,7 @@ export default function HealthDrawerNavigator() {
       <StatusBar backgroundColor={primary} barStyle="light-content" />
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
-        initialRouteName="الرئيسية"
+        initialRouteName="MainTabs"
         screenOptions={{
           headerShown: true,
           drawerActiveTintColor: primary,
@@ -66,22 +103,24 @@ export default function HealthDrawerNavigator() {
           drawerStyle: { backgroundColor: "#fff" },
         }}
       >
+        {/* إخفاء MainTabs من القائمة وإبقاؤه كوجهة رئيسية */}
         <Drawer.Screen
-          name="الرئيسية"
-          component={HealthWelcomeScreen}
+          name="MainTabs"
+          component={MainTabs}
           options={{
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
-            ),
+            drawerLabel: () => null,
+            title: null,
+            headerShown: false,
+            drawerIcon: () => null,
           }}
         />
 
         <Drawer.Screen
-          name="التقييمات"
-          component={HealthRatingsScreen}
+          name="الرئيسية"
+          component={MainTabs}
           options={{
             drawerIcon: ({ size, color }) => (
-              <Ionicons name="star-outline" size={size} color={color} />
+              <Ionicons name="home-outline" size={size} color={color} />
             ),
           }}
         />
@@ -96,6 +135,37 @@ export default function HealthDrawerNavigator() {
                 size={size}
                 color={color}
               />
+            ),
+          }}
+        />
+
+        <Drawer.Screen
+          name="المحتوى التثقيفي"
+          component={EducationalContentScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="book-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+        <Drawer.Screen
+          name="المختبرات العامة"
+          component={CommonLabsScreen}
+          options={{
+            headerTitle: "المختبرات المعتمدة",
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="flask-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+        <Drawer.Screen
+          name="إعادة تعيين كلمة المرور"
+          component={ChangePasswordScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="key-outline" size={size} color={color} />
             ),
           }}
         />
