@@ -1,5 +1,5 @@
 // screensAdmin/AddNewDoctorScreen.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 const PRIMARY = '#00b29c';
 
-export default function AddNewDoctorScreen() {
+export default function AddNewDoctorScreen() 
+{
   const [name, setName] = useState('');
   const [nid, setNid] = useState('');
   const [clinic, setClinic] = useState('');
@@ -45,15 +46,13 @@ export default function AddNewDoctorScreen() {
   };
 
   const onSave = () => {
-    if (!name || !nid || !clinic || !phone || birthText === 'اختر تاريخ الميلاد') {
-      Alert.alert('تنبيه', 'رجاءً املأ جميع الحقول');
-      return;
-    }
-    const phoneOk = /^\d{7,15}$/.test(phone);
-    if (!phoneOk) {
-      Alert.alert('تنبيه', 'رقم الهاتف أرقام فقط (7-15 رقم)');
-      return;
-    }
+    
+  if (!name || !nid || !clinic || !phone || birthText === 'اختر تاريخ الميلاد' ||
+    phone.length !== 10 || !phone.startsWith('05') || isNaN(phone)) {
+  Alert.alert('تنبيه', 'رجاءً املأ جميع الحقول، ورقم الهاتف يجب أن يكون 10 أرقام ويبدأ بـ 05');
+  return;
+}
+
     Alert.alert('تم الحفظ', 'تم إضافة الطبيب بنجاح');
     setName('');
     setNid('');
