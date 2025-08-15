@@ -1,5 +1,5 @@
 // screensAdmin/DeleteDoctorScreen.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,8 @@ const DOCTORS = [
   { id: 'D1003', nationalId: '4011122233', name: 'د. معاذ حسان' },
 ];
 
-export default function DeleteDoctorScreen() {
+export default function DeleteDoctorScreen()
+ {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
@@ -88,11 +89,6 @@ export default function DeleteDoctorScreen() {
           onChangeText={setSearch}
           textAlign="right"
         />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch('')}>
-            <Ionicons name="close-circle" size={18} color="#6B7280" />
-          </TouchableOpacity>
-        )}
       </View>
 
       <FlatList

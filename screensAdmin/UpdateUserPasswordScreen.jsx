@@ -1,5 +1,5 @@
 // screensAdmin/UpdateUserPasswordScreen.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -29,9 +29,18 @@ export default function UpdateUserPasswordScreen() {
   ];
 
   const onSearch = () => {
-    if (!nid) { Alert.alert('تنبيه', 'أدخل رقم الهوية'); return; }
+    if (!nid) {
+       Alert.alert('تنبيه', 'أدخل رقم الهوية'); return; 
+      }
+
     const found = USERS.find(u => u.nationalId === nid.trim());
-    if (!found) { setUser(null); Alert.alert('غير موجود', 'لا يوجد مستخدم بهذا الرقم'); return; }
+
+    if (!found) {
+        setUser(null);
+        Alert.alert('غير موجود', 'لا يوجد مستخدم بهذا الرقم'); 
+        return;
+       }
+
     setUser(found);
     setPass1('');
     setPass2('');
@@ -39,10 +48,21 @@ export default function UpdateUserPasswordScreen() {
     setShow2(false);
   };
 
-  const onUpdate = () => {
-    if (!user) { Alert.alert('تنبيه', 'ابحث عن المستخدم أولاً'); return; }
-    if (!pass1 || !pass2) { Alert.alert('تنبيه', 'أدخل كلمة المرور ثم أكدها'); return; }
-    if (pass1 !== pass2) { Alert.alert('تنبيه', 'كلمتا المرور غير متطابقتين'); return; }
+  const onUpdate = () => 
+    {
+    if (!user) {
+       Alert.alert('تنبيه', 'ابحث عن المستخدم أولاً'); 
+       return; 
+      }
+    if (!pass1 || !pass2) {
+       Alert.alert('تنبيه', 'أدخل كلمة المرور ثم أكدها'); 
+       return; 
+      }
+    if (pass1 !== pass2) {
+       Alert.alert('تنبيه', 'كلمتا المرور غير متطابقتين'); 
+       return; 
+      }
+      
     // TODO: نداء API
     Alert.alert('تم التحديث', `تم تحديث كلمة مرور: ${user.name}`);
     setUser(null);
@@ -72,7 +92,7 @@ export default function UpdateUserPasswordScreen() {
         />
         <TouchableOpacity onPress={onSearch} activeOpacity={0.85} style={styles.searchBtn}>
           <Ionicons name="search-outline" size={18} color="#FFFFFF" />
-</TouchableOpacity>
+       </TouchableOpacity>
       </View>
 
       {user && (

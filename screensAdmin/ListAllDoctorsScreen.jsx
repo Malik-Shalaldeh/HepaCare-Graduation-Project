@@ -1,11 +1,10 @@
 // screensAdmin/DoctorsListScreen.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,15 +59,7 @@ export default function AllDoctorsScreen() {
           onChangeText={setSearch}
           textAlign="right"
         />
-        {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch('')}>
-            <Ionicons
-              name="close-circle"
-              size={18}
-              color="#6B7280"
-            />
-          </TouchableOpacity>
-        )}
+
       </View>
 
       {/* القائمة */}
