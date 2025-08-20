@@ -123,7 +123,7 @@ export default function HealthDrawerNavigator() {
               <Ionicons name="home-outline" size={size} color={color} />
             ),
           }}
-        />ئ
+        />
 
         <Drawer.Screen
           name="سياسة التطبيق"

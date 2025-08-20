@@ -17,7 +17,7 @@ import LabsScreen from "../screenPatient/LabsScreen"; // sami: شاشة المخ
 import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen"; // sami: شاشة مواعيدي
 import PatientMedications from "../screenPatient/PatientMedications";
 import PatientDashboard from "../screenPatient/PatientDashboard";
-import ChatScreen from "../screenPatient/chatScreenPatient";
+import ChatScreenPatient3 from "../screenPatient/chatScreenPatient3";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
@@ -92,7 +92,7 @@ function MainTabs() {
       <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
       <Tab.Screen name="الأدوية" component={PatientMedications} />
       <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
-      <Tab.Screen name="الرسائل" component={ChatScreen} />
+      <Tab.Screen name="الرسائل" component={ChatScreenPatient3} />
     </Tab.Navigator>
   );
 }
