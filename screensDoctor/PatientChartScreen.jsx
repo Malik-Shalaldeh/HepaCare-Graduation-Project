@@ -13,6 +13,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
+import axios from 'axios';
 
 const TESTS = [
   { key: 'ALT',       label: 'ALT (U/L)' },
@@ -24,26 +25,27 @@ const TESTS = [
   { key: 'APRI',      label: 'APRI' },
 ];
 
-// مثال بيانات (استبدلها بجلب حقيقي)
-const DATA = {
-  '1': [
-    { date:'2025-06-01', ALT:42, AST:38, Bilirubin:1.0, INR:1.0, Platelets:180, FIB4:1.0, APRI:0.5 },
-    { date:'2025-07-01', ALT:50, AST:45, Bilirubin:1.2, INR:1.1, Platelets:160, FIB4:1.2, APRI:0.6 },
-    { date:'2025-08-01', ALT:55, AST:50, Bilirubin:1.3, INR:1.2, Platelets:150, FIB4:1.5, APRI:0.7 },
-  ],
-};
-
 const COLORS = ['#D32F2F','#1976D2','#388E3C','#FBC02D','#7B1FA2','#00796B','#F57C00'];
 const { width } = Dimensions.get('window');
 
-export default function PatientChartScreen() 
-{
+export default function PatientChartScreen() {
   const { patientId, patientName } = useRoute().params;
   const navigation = useNavigation();
   const [records, setRecords] = useState(null);
 
+  // ✅ جلب بيانات المريض من السيرفر
   useEffect(() => {
-    setRecords(DATA[patientId] || []);
+    async function loadData() {
+      try {
+        const response = await axios.get(
+          `http://192.168.1.12:8000/patient-chart?patient_id=${patientId}`
+        );
+        setRecords(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    loadData();
   }, [patientId]);
 
   if (records === null) {
@@ -54,20 +56,16 @@ export default function PatientChartScreen()
     );
   }
 
-  // إعداد بيانات الرسم
   const labels = records.map(r => r.date);
-
   const datasets = TESTS.map((t, i) => ({
     data: records.map(r => r[t.key] || 0),
     color: () => COLORS[i % COLORS.length],
     strokeWidth: 2,
   }));
 
- 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
       <TouchableOpacity
         onPress={() => navigation.navigate('PatientListScreen')}
         style={styles.backBtn}

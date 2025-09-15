@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { useVisitData } from '../contexts/VisitDataContext';
+import axios from 'axios';
+
 
 const primary = '#00b29c';
 
@@ -22,7 +23,6 @@ const EvaluationVisitScreen = () => {
   
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
-  const { addVisit } = useVisitData();
 
   // إذا لم يأتِ patientId نرجع للخلف
   useEffect(() => {
@@ -49,31 +49,34 @@ const EvaluationVisitScreen = () => {
   const [notes, setNotes] = useState('');
   const [psychosocial, setPsychosocial] = useState('');
 
-  const handleSave = () => {
-    if (!condition || !adherence) {
-      Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
-      return;
-    }
-    const evaluation = {
-      id: Date.now().toString(),
-      patientId: selectedPatient.id,
-      patientName: selectedPatient.name,
-      condition,
-      adherence,
-      notes,
-      psychosocial,
-      date: new Date().toLocaleDateString(),
-    };
-    addVisit(selectedPatient.id, evaluation);
+  const handleSave = async () => {
+  if (!condition || !adherence) {
+    Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
+    return;
+  }
 
-    // فرغ الحقول
+  try {
+    await axios.post('http://192.168.1.12:8000/visits/', {
+     patient_id: patientId,
+     general_state: condition,
+     adherence: adherence,
+     doctor_notes: notes,
+     psychological_notes: psychosocial,
+    });
+
+           
+
+    Alert.alert('✅ تم حفظ التقييم للمريض: ' + patientName);
+
     setCondition('');
     setAdherence('');
     setNotes('');
     setPsychosocial('');
-
-    Alert.alert('✅ تم حفظ التقييم للمريض: ' + selectedPatient.name);
-  };
+  } catch (error) {
+    Alert.alert('❌ خطأ', 'تعذّر حفظ التقييم. تحقق من الاتصال بالسيرفر.');
+    console.error(error);
+  }
+};
 
   const renderOptionGroup = (label, options, selected, onSelect) => (
     <View style={styles.optionGroup}>

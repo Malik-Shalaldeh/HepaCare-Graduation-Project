@@ -2,41 +2,12 @@ import { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'; 
-
-const sampleResults = [
-  {
-    id: '1',
-    patientId: '1001',
-    name: 'أحمد خالد',
-    test: 'تحليل كبد ALT',
-    result: '45 U/L',
-    evaluation: 'مرتفع قليلاً',
-    doctorNote: 'ينصح بإعادة الفحص بعد أسبوع وتقليل الدهون.',
-    dat: '10/4/2025'
-  },
-  {
-    id: '2',
-    patientId: '1002',
-    name: 'سارة محمود',
-    test: 'تحليل كبد AST',
-    result: '32 U/L',
-    evaluation: 'طبيعي',
-    doctorNote: 'استمر على النظام الغذائي.',
-    dat: '5/4/2020'
-  },
-  {
-    id: '3',
-    patientId: '1001',
-    name: 'أحمد خالد',
-    test: 'تحليل بيليروبين',
-    result: '1.2 mg/dL',
-    evaluation: 'طبيعي',
-    doctorNote: 'نتائج ممتازة.',
-    dat: '3/8/2015'
-  },
-];
+import { Linking } from 'react-native';
+import { Alert } from 'react-native';
+import axios from 'axios';
 
 const TestResultsScreen = () => {
+  
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const navigation = useNavigation();
@@ -45,18 +16,24 @@ const TestResultsScreen = () => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  const handleSearch = () => {
-    const query = searchInput.trim().toLowerCase();
-    if (!query) {
-      setFilteredResults([]);
-      return;
-    }
-    const results = sampleResults.filter(item =>
-      item.patientId.includes(query) ||
-      item.name.toLowerCase().includes(query)
-    );
-    setFilteredResults(results);
-  };
+ const handleSearch = async () => {
+  const query = searchInput.trim();
+  if (!query) {
+    setFilteredResults([]);
+    return;
+  }
+
+  try {
+    const res = await axios.get('http://192.168.1.12:8000/test-results', {
+    params: { query }
+    });
+    setFilteredResults(res.data);
+  } 
+  catch (error) {
+    console.error(error);
+  }
+};
+
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -67,9 +44,25 @@ const TestResultsScreen = () => {
       <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>
       <Text style={styles.note}>📅 تاريخ الفحص: {item.dat}</Text>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+      <TouchableOpacity
+        style={styles.searchButton}
+        onPress={() => {
+        if (item.filePath) {
+          Linking.openURL(`http://192.168.1.112/${item.filePath}`);
+        } else {
+          Alert.alert(
+          'تنبيه',               
+          'لا يوجد ملف مرفق لهذا الفحص', 
+         [
+         { text: 'موافق' } 
+         ]
+    );
+        }
+      }}
+      >
       <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
+
 
     </View>
   );

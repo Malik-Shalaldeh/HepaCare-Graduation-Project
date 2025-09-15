@@ -19,7 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const INITIAL_PATIENTS = [
-  { id: '1', name: 'مالك شلالدة', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
+  { id: '1', name: 'محمد عادل ', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
   { id: '2', name: 'عبد الجندي', nationalId: '0987654321', age: 32, lastVisit: '2025-05-15' },
   { id: '3', name: 'محمود علي', nationalId: '5678901234', age: 58, lastVisit: '2025-05-10' },
   { id: '4', name: 'فاطمة أحمد', nationalId: '4321098765', age: 27, lastVisit: '2025-05-05' },
@@ -152,7 +152,7 @@ const PatientListScreen = () => {
       {/* زر الرجوع */}
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate("MainTabs")}
       >
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>

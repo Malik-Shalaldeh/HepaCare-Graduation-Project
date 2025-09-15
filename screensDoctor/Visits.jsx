@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 const primary = '#00b29c';
 
 const patientsData = [
-  { id: '1', name: 'مالك شلالدة' },
+  { id: '1', name: 'محمد عادل' },
   { id: '2', name: 'عبد الجندي' },
   { id: '3', name: 'محمود علي' },
   { id: '4', name: 'فاطمة أحمد' },
