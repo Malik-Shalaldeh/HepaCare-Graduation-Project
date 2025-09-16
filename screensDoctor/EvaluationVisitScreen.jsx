@@ -56,13 +56,18 @@ const EvaluationVisitScreen = () => {
   }
 
   try {
-    await axios.post('http://192.168.1.12:8000/visits/', {
-     patient_id: patientId,
-     general_state: condition,
-     adherence: adherence,
-     doctor_notes: notes,
-     psychological_notes: psychosocial,
-    });
+    await axios.post('http://192.168.1.11:8000/visits/', {
+  patient_id: patientId,
+  general_state:
+    condition === 'جيدة' ? 'GOOD' :
+    condition === 'متوسطة' ? 'MEDIUM' : 'BAD',
+  adherence:
+    adherence === 'نعم' ? 'YES' :
+    adherence === 'لا' ? 'NO' : 'SOMETIMES',
+  doctor_notes: notes,
+  psychological_notes: psychosocial,
+  });
+
 
            
 

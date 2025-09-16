@@ -19,9 +19,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const INITIAL_PATIENTS = [
-  { id: '1', name: 'محمد عادل ', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
+  { id: '3', name: 'علاء سمير', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
   { id: '2', name: 'عبد الجندي', nationalId: '0987654321', age: 32, lastVisit: '2025-05-15' },
-  { id: '3', name: 'محمود علي', nationalId: '5678901234', age: 58, lastVisit: '2025-05-10' },
+  { id: '33', name: 'محمود علي', nationalId: '5678901234', age: 58, lastVisit: '2025-05-10' },
   { id: '4', name: 'فاطمة أحمد', nationalId: '4321098765', age: 27, lastVisit: '2025-05-05' },
   { id: '5', name: 'خالد عمر', nationalId: '9012345678', age: 63, lastVisit: '2025-04-30' },
   { id: '6', name: 'ريم الخطيب', nationalId: '3456789012', age: 41, lastVisit: '2025-04-25' },

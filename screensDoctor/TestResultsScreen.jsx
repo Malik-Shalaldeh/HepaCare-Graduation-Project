@@ -24,7 +24,7 @@ const TestResultsScreen = () => {
   }
 
   try {
-    const res = await axios.get('http://192.168.1.12:8000/test-results', {
+    const res = await axios.get('http://192.168.1.11:8000/test-results', {
     params: { query }
     });
     setFilteredResults(res.data);
