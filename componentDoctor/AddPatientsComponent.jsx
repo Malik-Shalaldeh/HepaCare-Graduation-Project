@@ -14,6 +14,8 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 
+const API = "http://192.168.1.2:8000"; // عدّل IP
+
 const commonDiseases = [
   "Diabetes",
   "High Blood Pressure",
@@ -95,7 +97,8 @@ export default function AddPatientsComponent() {
     });
   };
 
-  const handleSave = () => {
+  // === ربط الحفظ بالباك-إند (بدون تعديل الستايل) ===
+  const handleSave = async () => {
     const { fullName, idNumber, phone, address, dob, gender, clinic } =
       newPatient;
     if (
@@ -113,26 +116,48 @@ export default function AddPatientsComponent() {
       ...newPatient.customMedications.filter(Boolean),
     ];
 
-    console.log("Final Diseases:", finalDiseases);
-    console.log("Final Medications:", finalMedications);
+    try {
+      const body = {
+        full_name: fullName,
+        national_id: idNumber,
+        phone,
+        address,
+        birth_date: dob,
+        clinic_name: clinic || "Main Clinic",
+        doctor_id: 2, // مؤقتًا: د. عادل (id=2 في DB) — ممكن تربطه بالمستخدم الحالي لاحقًا
+        username: idNumber,
+        password: "1234",
+        diseases: finalDiseases,
+        medications: finalMedications,
+      };
 
-    Alert.alert("تم", "تمت إضافة المريض بنجاح.");
-    setNewPatient({
-      fullName: "",
-      idNumber: "",
-      phone: "",
-      address: "",
-      dob: "",
-      age: "",
-      gender: "",
-      clinic: "",
-      diseases: [],
-      customDiseases: [""],
-      medications: [],
-      customMedications: [""],
-    });
-    setStep(1);
-    navigation.navigate("المرضى");
+      const res = await fetch(`${API}/patient/patients`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("save failed");
+
+      Alert.alert("تم", "تمت إضافة المريض بنجاح.");
+      setNewPatient({
+        fullName: "",
+        idNumber: "",
+        phone: "",
+        address: "",
+        dob: "",
+        age: "",
+        gender: "",
+        clinic: "",
+        diseases: [],
+        customDiseases: [""],
+        medications: [],
+        customMedications: [""],
+      });
+      setStep(1);
+      navigation.navigate("المرضى");
+    } catch (e) {
+      Alert.alert("خطأ", "تعذر حفظ المريض. حاول مرة أخرى.");
+    }
   };
 
   const filteredDiseases = commonDiseases.filter((d) =>

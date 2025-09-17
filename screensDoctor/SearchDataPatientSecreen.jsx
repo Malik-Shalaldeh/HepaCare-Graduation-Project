@@ -13,64 +13,80 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function DataPatientsListScreen() {
-  // ====== البيانات الثابتة للأمثلة ======
-  const [patients, setPatients] = useState([
-    {
-      id: "1",
-      name: "أحمد محمد",
-      symptoms: "صداع، دوخة",
-      tests: "تحليل دم، تصوير أشعة",
-      medications: [
-        { name: "باراسيتامول", dosage: "500mg", frequency: "كل 8 ساعات" },
-        { name: "أموكسيسيلين", dosage: "250mg", frequency: "كل 12 ساعة" },
-      ],
-      visits: [
-        {
-          date: "2025-05-10",
-          doctorNotes: "تحسن بسيط بعد العلاج",
-        },
-        {
-          date: "2025-04-15",
-          doctorNotes: "بدأت الأعراض مؤخرًا، يحتاج متابعة",
-        },
-      ],
-    },
-    {
-      id: "2",
-      name: "سارة علي",
-      symptoms: "سعال، حرارة مرتفعة",
-      tests: "صورة صدر",
-      medications: [
-        { name: "أدفيل", dosage: "200mg", frequency: "كل 6 ساعات" },
-      ],
-      visits: [
-        {
-          date: "2025-05-18",
-          doctorNotes: "التهاب رئوي خفيف، متابعة بعد أسبوع",
-        },
-      ],
-    },
-    // يمكنك إضافة المزيد من السجلات هنا
-  ]);
+const API = "http://192.168.1.2:8000"; // عدّل IP
 
-  // ====== حالات البحث والاختيار ======
+export default function DataPatientsListScreen() {
+  const navigation = useNavigation();
+
+  // ====== بيانات ديناميكية من السيرفر بدل الثابتة ======
+  const [patients, setPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  // ====== فلترة المرضى بشكل case-insensitive ======
-  const filteredPatients = patients.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
-  );
+  // ====== فلترة: نجيب مباشرة من API حسب النص ======
+  const handleSearchChange = async (text) => {
+    setSearchTerm(text);
+    setSelectedPatient(null);
+    const q = text.trim();
+    if (!q) { setPatients([]); return; }
+    try {
+      const res = await fetch(`${API}/patient/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setPatients(
+        (data.patients || []).map(p => ({
+          id: String(p.patient_id),
+          name: p.full_name
+        }))
+      );
+    } catch {
+      setPatients([]);
+    }
+  };
 
   // ====== دالة عرض عنصر في قائمة المرضى ======
   const renderPatientItem = ({ item }) => (
     <TouchableOpacity
       style={styles.patientItem}
       activeOpacity={0.8}
-      onPress={() => {
+      onPress={async () => {
         Keyboard.dismiss();
-        setSelectedPatient(item);
+        try {
+          const pid = Number(item.id);
+          const [detail, labs] = await Promise.all([
+            fetch(`${API}/patient/patients/${pid}`).then(r => r.json()),
+            fetch(`${API}/lab/results/${pid}`).then(r => r.json()).catch(() => ({results: []})),
+          ]);
+
+          const meds = (detail.medications || []).map(m => ({
+            name: m.brand_name,
+            dosage: m.dose_text,
+            frequency: m.frequency_text,
+          }));
+          const visits = (detail.visits || []).map(v => ({
+            date: v.visit_date,
+            doctorNotes: v.doctor_notes || "",
+          }));
+          const symptoms = (detail.symptoms || []).map(s => s.name).join("، ");
+          const tests = (labs.results || []).slice(0,5).map(r => r.test_name).join("، ");
+
+          setSelectedPatient({
+            id: String(pid),
+            name: (detail.patient && detail.patient.full_name) || item.name,
+            symptoms,
+            tests,
+            medications: meds,
+            visits,
+          });
+        } catch {
+          setSelectedPatient({
+            id: item.id,
+            name: item.name,
+            symptoms: "",
+            tests: "",
+            medications: [],
+            visits: [],
+          });
+        }
       }}
     >
       <View style={styles.patientRow}>
@@ -82,14 +98,13 @@ export default function DataPatientsListScreen() {
       </View>
     </TouchableOpacity>
   );
- 
-   const navigation = useNavigation();
+
   return (
     <>
       <View style={styles.container}>
           <TouchableOpacity style={{marginBottom:5}} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={24} color="#000" />
-              </TouchableOpacity>
+          </TouchableOpacity>
 
         {/* ====== حقل البحث عن المريض ====== */}
         <View style={styles.searchSection}>
@@ -99,10 +114,7 @@ export default function DataPatientsListScreen() {
             placeholder="ابحث عن مريض"
             placeholderTextColor={styles.placeholder.color}
             value={searchTerm}
-            onChangeText={(text) => {
-              setSearchTerm(text);
-              setSelectedPatient(null);
-            }}
+            onChangeText={handleSearchChange}
             autoCorrect={false}
           />
         </View>
@@ -110,7 +122,7 @@ export default function DataPatientsListScreen() {
         {/* ====== قائمة المرضى المفلترة ====== */}
         {searchTerm.trim() !== "" && (
           <FlatList
-            data={filteredPatients}
+            data={patients}
             keyExtractor={(item) => item.id}
             renderItem={renderPatientItem}
             style={styles.patientsList}
@@ -139,7 +151,7 @@ export default function DataPatientsListScreen() {
               <Text style={[styles.sectionTitle, styles.rtlText]}>الأعراض</Text>
             </View>
             <Text style={[styles.sectionContent, styles.rtlText]}>
-              {selectedPatient.symptoms}
+              {selectedPatient.symptoms || "لا يوجد"}
             </Text>
 
             {/* الفحوصات */}
@@ -148,7 +160,7 @@ export default function DataPatientsListScreen() {
               <Text style={[styles.sectionTitle, styles.rtlText]}>الفحوصات</Text>
             </View>
             <Text style={[styles.sectionContent, styles.rtlText]}>
-              {selectedPatient.tests}
+              {selectedPatient.tests || "لا يوجد"}
             </Text>
 
             {/* الأدوية */}

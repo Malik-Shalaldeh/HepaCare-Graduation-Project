@@ -48,28 +48,25 @@ const EvaluationVisitScreen = () => {
   const [adherence, setAdherence] = useState('');
   const [notes, setNotes] = useState('');
   const [psychosocial, setPsychosocial] = useState('');
-
-  const handleSave = async () => {
+const handleSave = async () => {
   if (!condition || !adherence) {
     Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
     return;
   }
 
   try {
-    await axios.post('http://192.168.1.11:8000/visits/', {
-  patient_id: patientId,
-  general_state:
-    condition === 'جيدة' ? 'GOOD' :
-    condition === 'متوسطة' ? 'MEDIUM' : 'BAD',
-  adherence:
-    adherence === 'نعم' ? 'YES' :
-    adherence === 'لا' ? 'NO' : 'SOMETIMES',
-  doctor_notes: notes,
-  psychological_notes: psychosocial,
-  });
-
-
-           
+    await axios.post('http://192.168.1.2:8000/visits/', {
+      patient_id: patientId,
+      visit_date: new Date().toISOString(), // 👈 التاريخ الحالي بصيغة ISO
+      general_state:
+        condition === 'جيدة' ? 'GOOD' :
+        condition === 'متوسطة' ? 'MEDIUM' : 'BAD',
+      adherence:
+        adherence === 'نعم' ? 'YES' :
+        adherence === 'لا' ? 'NO' : 'SOMETIMES',
+      doctor_notes: notes,
+      psychological_notes: psychosocial,
+    });
 
     Alert.alert('✅ تم حفظ التقييم للمريض: ' + patientName);
 
@@ -78,10 +75,11 @@ const EvaluationVisitScreen = () => {
     setNotes('');
     setPsychosocial('');
   } catch (error) {
-    Alert.alert('❌ خطأ', 'تعذّر حفظ التقييم. تحقق من الاتصال بالسيرفر.');
     console.error(error);
+    Alert.alert('❌ خطأ', 'تعذّر حفظ التقييم. تحقق من الاتصال بالسيرفر.');
   }
 };
+
 
   const renderOptionGroup = (label, options, selected, onSelect) => (
     <View style={styles.optionGroup}>

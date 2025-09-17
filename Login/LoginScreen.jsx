@@ -13,34 +13,25 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
+// ===== عدّل هذا على عنوان سيرفرك =====
+const API = "http://192.168.1.2:8000"; // عدّل IP
+
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    // حساب الطبيب
-    if (username === '9500' && password === '1234') {
-      navigation.replace('Doctor');
-
-    // حساب المريض
-    } else if (username === '4200' && password === '1234') {
-      navigation.replace('Patient');
-
-    // حساب إدارة النظام
-    } else if (username === '3500' && password === '1234') {
-      navigation.replace('Admin');
-
-    // حساب المختبرات 
-    } else if (username === '4500' && password === '1234') {
-      navigation.replace('Labs');
-
-    // حساب الصحة
-    } else if (username === '5500' && password === '1234') {
-      navigation.replace('Health');
-
-    // بيانات خاطئة
-    } else {
+  const handleLogin = async () => {
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error("bad creds");
+      const data = await res.json(); // { id, username, role, route }
+      navigation.replace(data.route); // "Doctor" | "Patient" | "Admin" | "Labs" | "Health"
+    } catch (e) {
       Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
     }
   };
