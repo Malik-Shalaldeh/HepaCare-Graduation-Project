@@ -24,7 +24,6 @@ const EvaluationVisitScreen = () => {
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
 
-  // إذا لم يأتِ patientId نرجع للخلف
   useEffect(() => {
     if (!patientId) {
       navigation.goBack();
@@ -48,7 +47,8 @@ const EvaluationVisitScreen = () => {
   const [adherence, setAdherence] = useState('');
   const [notes, setNotes] = useState('');
   const [psychosocial, setPsychosocial] = useState('');
-const handleSave = async () => {
+
+  const handleSave = async () => {
   if (!condition || !adherence) {
     Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
     return;
@@ -74,9 +74,10 @@ const handleSave = async () => {
     setAdherence('');
     setNotes('');
     setPsychosocial('');
+    
   } catch (error) {
     console.error(error);
-    Alert.alert('خطأ', 'لا يمكن تكرار الزيارة في نفس التاريخ');
+    Alert.alert('خطأ', 'لا يمكن تكرار الزيارة في نفس التاريخ وتاكد من المعلومات المدخلة');
   }
 };
 
