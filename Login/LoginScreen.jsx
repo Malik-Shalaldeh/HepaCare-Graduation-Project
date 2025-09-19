@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,12 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
-  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
-
-// ===== عدّل هذا على عنوان سيرفرك =====
-const API = "http://192.168.1.2:8000"; // عدّل IP
+const API = "http://192.168.1.126:8000";
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -28,9 +26,21 @@ export default function LoginScreen({ navigation }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+
       if (!res.ok) throw new Error("bad creds");
-      const data = await res.json(); // { id, username, role, route }
-      navigation.replace(data.route); // "Doctor" | "Patient" | "Admin" | "Labs" | "Health"
+
+      const data = await res.json();
+      console.log('Login response:', data);
+
+      // ✅ احفظ رقم الطبيب فقط إذا كان الدور DOCTOR
+      if (data.role === 'DOCTOR') {
+        await AsyncStorage.setItem('doctor_id', String(data.id));
+        console.log('doctor_id saved:', data.id);
+      } else {
+        await AsyncStorage.removeItem('doctor_id');
+      }
+
+      navigation.replace(data.route);
     } catch (e) {
       Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
     }
@@ -38,15 +48,12 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* ===== جزء الشعار بخلفية ملونة وشكل منحني ===== */}
       <View style={styles.header}>
         <View style={styles.curve} />
         <Text style={styles.logo}>HepaCare</Text>
       </View>
 
-      {/* ===== نموذج تسجيل الدخول ===== */}
       <View style={styles.form}>
-        {/* حقل اسم المستخدم مع أيقونة */}
         <View style={styles.inputContainer}>
           <Ionicons
             name="person-outline"
@@ -63,7 +70,6 @@ export default function LoginScreen({ navigation }) {
           />
         </View>
 
-        {/* حقل كلمة المرور مع أيقونة وزر لإظهار/إخفاء */}
         <View style={styles.inputContainer}>
           <Ionicons
             name="lock-closed-outline"
@@ -91,7 +97,6 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* زر الدخول */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>دخول</Text>
         </TouchableOpacity>
@@ -101,12 +106,10 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // الحاوية الرئيسية
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  // الهيدر مع الخلفية الملونة
   header: {
     height: 180,
     backgroundColor: '#00b29c',
@@ -122,7 +125,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     zIndex: 10,
   },
-  // الشكل المنحني السفلي للهيدر
   curve: {
     position: 'absolute',
     bottom: -40,
@@ -133,13 +135,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 50,
     zIndex: 1,
   },
-  // المنطقة التي تحتوي على الحقول والأزرار
   form: {
     flex: 1,
     paddingHorizontal: 30,
     paddingTop: 50,
   },
-  // حاوية كل حقل نصي مع الأيقونة
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -150,22 +150,18 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     paddingHorizontal: 10,
   },
-  // ستايل الأيقونة داخل حقل النص
   inputIcon: {
     marginRight: 8,
   },
-  // حقل النص نفسه
   input: {
     height: 50,
     flex: 1,
     fontSize: 16,
     color: '#333',
   },
-  // زر إظهار/إخفاء كلمة المرور (على اليمين)
   eyeButton: {
     padding: 8,
   },
-  // ستايل زر الدخول
   button: {
     height: 52,
     backgroundColor: '#00b29c',
@@ -173,9 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
-    // ظل خفيف للأندرويد
     elevation: 4,
-    // ظل خفيف للـ iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

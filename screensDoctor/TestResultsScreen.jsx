@@ -1,13 +1,22 @@
-import { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Linking,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'; 
-import { Linking } from 'react-native';
-import { Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const TestResultsScreen = () => {
-  
+const API = "http://192.168.1.126:8000";
+
+export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const navigation = useNavigation();
@@ -16,24 +25,27 @@ const TestResultsScreen = () => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
- const handleSearch = async () => {
-  const query = searchInput.trim();
-  if (!query) {
-    setFilteredResults([]);
-    return;
-  }
+  const handleSearch = async () => {
+    const query = searchInput.trim();
+    if (!query) {
+      setFilteredResults([]);
+      return;
+    }
 
-  try {
-    const res = await axios.get('http://192.168.1.2:8000/test-results', {
-    params: { query }
-    });
-    setFilteredResults(res.data);
-  } 
-  catch (error) {
-    console.error(error);
-  }
-};
+    try {
+      const doctorId = await AsyncStorage.getItem('doctor_id');
+      console.log('doctor_id to send:', doctorId);
 
+      const res = await axios.get(`${API}/test-results/`, {
+        params: { query, doctor_id: doctorId },
+      });
+
+      setFilteredResults(res.data);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+      Alert.alert('خطأ', 'فشل في جلب البيانات. تأكد من الاتصال أو من صلاحية الدخول.');
+    }
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -46,24 +58,14 @@ const TestResultsScreen = () => {
 
       <TouchableOpacity
         style={styles.searchButton}
-        onPress={() => {
-        if (item.filePath) {
-          Linking.openURL(`http://192.168.1.112/${item.filePath}`);
-        } else {
-          Alert.alert(
-          'تنبيه',               
-          'لا يوجد ملف مرفق لهذا الفحص', 
-         [
-         { text: 'موافق' } 
-         ]
-    );
+        onPress={() =>
+          item.filePath
+            ? Linking.openURL(`http://192.168.1.112/${item.filePath}`)
+            : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
-      }}
       >
-      <Text style={styles.btn}>فتح ملف الفحص</Text>
+        <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
-
-
     </View>
   );
 
@@ -72,24 +74,23 @@ const TestResultsScreen = () => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name='arrow-back' size={24} color='#000' />
       </TouchableOpacity>
-      
+
       <Text style={styles.header}>🔍 ابحث عن فحوصات المريض</Text>
-      
-      <TextInput 
+
+      <TextInput
         style={styles.input}
         placeholder='...ادخل اسم أو رقم المريض'
         onChangeText={setSearchInput}
         value={searchInput}
         autoCapitalize="none"
       />
-      
+
       <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
         <Ionicons name='search' size={20} color='#fff' />
         <Text style={styles.searchButtonText}>بحث</Text>
       </TouchableOpacity>
-      
 
-      <FlatList 
+      <FlatList
         data={filteredResults}
         renderItem={renderItem}
         keyExtractor={item => item.id}
@@ -101,7 +102,7 @@ const TestResultsScreen = () => {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F6F8',
     paddingHorizontal: 20,
     paddingTop: 30,
-    paddingBottom: 30,
   },
   backButton: {
     flexDirection: 'row',
@@ -149,13 +149,11 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontWeight: 'bold',
   },
-
-  btn : {
-   color: '#fff',
+  btn: {
+    color: '#fff',
     fontSize: 14,
     marginLeft: 8,
     fontWeight: 'bold',
-
   },
   card: {
     backgroundColor: '#fff',
@@ -206,5 +204,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-
-export default TestResultsScreen;

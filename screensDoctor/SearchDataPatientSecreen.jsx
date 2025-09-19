@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const API = "http://192.168.1.2:8000"; // عدّل IP
+const API = "http://192.168.1.126:8000"; // عدّل IP
 
 export default function DataPatientsListScreen() {
   const navigation = useNavigation();

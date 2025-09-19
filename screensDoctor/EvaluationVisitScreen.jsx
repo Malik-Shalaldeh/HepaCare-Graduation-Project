@@ -55,7 +55,7 @@ const handleSave = async () => {
   }
 
   try {
-    await axios.post('http://192.168.1.2:8000/visits/', {
+    await axios.post('http://192.168.1.126:8000/visits/', {
       patient_id: patientId,
       visit_date: new Date().toISOString(), // 👈 التاريخ الحالي بصيغة ISO
       general_state:
@@ -76,7 +76,7 @@ const handleSave = async () => {
     setPsychosocial('');
   } catch (error) {
     console.error(error);
-    Alert.alert('❌ خطأ', 'تعذّر حفظ التقييم. تحقق من الاتصال بالسيرفر.');
+    Alert.alert('خطأ', 'لا يمكن تكرار الزيارة في نفس التاريخ');
   }
 };
 
