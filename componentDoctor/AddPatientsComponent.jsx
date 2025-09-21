@@ -11,10 +11,11 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 
-const API = "http://192.168.1.2:8000"; // عدّل IP
+const API = "http://192.168.1.122:8000";
 
 const commonDiseases = [
   "Diabetes",
@@ -117,6 +118,14 @@ export default function AddPatientsComponent() {
     ];
 
     try {
+      const doctorId = await AsyncStorage.getItem("doctor_id");
+      if (!doctorId) {
+        return Alert.alert(
+          "خطأ",
+          "لا يوجد doctor_id مخزّن. تأكد أن الحساب طبيب أو أعد تسجيل الدخول."
+        );
+      }
+
       const body = {
         full_name: fullName,
         national_id: idNumber,
@@ -124,7 +133,7 @@ export default function AddPatientsComponent() {
         address,
         birth_date: dob,
         clinic_name: clinic || "Main Clinic",
-        doctor_id: 2, // مؤقتًا: د. عادل (id=2 في DB) — ممكن تربطه بالمستخدم الحالي لاحقًا
+        // ⛔ تم حذف doctor_id من الـ body — الإرسال عبر الهيدر فقط
         username: idNumber,
         password: "1234",
         diseases: finalDiseases,
@@ -133,7 +142,10 @@ export default function AddPatientsComponent() {
 
       const res = await fetch(`${API}/patient/patients`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Doctor-Id": String(doctorId), // <-- نرسل الدكتور من AsyncStorage
+        },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error("save failed");
@@ -322,7 +334,7 @@ export default function AddPatientsComponent() {
               onChangeText={setSearchDisease}
             />
             {filteredDiseases.map((disease) => (
-              <View style={styles.switchRow} key={disease}>
+              <View className="switchRow" style={styles.switchRow} key={disease}>
                 <Text>{disease}</Text>
                 <Switch
                   value={newPatient.diseases.includes(disease)}
@@ -383,7 +395,7 @@ export default function AddPatientsComponent() {
               onChangeText={setSearchMedication}
             />
             {filteredMedications.map((med) => (
-              <View style={styles.switchRow} key={med}>
+              <View className="switchRow" style={styles.switchRow} key={med}>
                 <Text>{med}</Text>
                 <Switch
                   value={newPatient.medications.includes(med)}

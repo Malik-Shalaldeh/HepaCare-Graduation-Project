@@ -12,7 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
-const API = "http://192.168.1.126:8000";
+const API = 'http://192.168.1.122:8000';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
