@@ -152,7 +152,7 @@ const PatientListScreen = () => {
       {/* زر الرجوع */}
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.navigate("MainTabs")}
+        onPress={() => navigation.goBack()}
       >
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>

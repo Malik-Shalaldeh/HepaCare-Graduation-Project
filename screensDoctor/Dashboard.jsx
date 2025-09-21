@@ -1,49 +1,89 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, ActivityIndicator, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
+const API = 'http://192.168.1.126:8000';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const Dashboard = () => {
   const navigation = useNavigation();
-  const patientsCount = 42;
+  const [doctorName, setDoctorName] = useState('');
+  const [patientsCount, setPatientsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const today = new Date();
-  const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو','يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
-  return (    
-    <ScreenWithDrawer title="لوحة التحكم" /* محتوى الشاشة */>
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const doctor_id = await AsyncStorage.getItem('doctor_id');
+        if (!doctor_id) {
+          Alert.alert('خطأ', 'لم يتم العثور على رقم الطبيب، يرجى تسجيل الدخول مجددًا.');
+          setLoading(false);
+          return;
+        }
 
-      {/* ✅ Header with Hepacare name */}
+        const res = await fetch(`${API}/doctor/dashboard?doctor_id=${doctor_id}`);
+        if (!res.ok) throw new Error('خطأ في الاتصال');
+
+        const data = await res.json();
+        setDoctorName(data.doctor_name);
+        setPatientsCount(data.patients_count);
+      } catch (err) {
+        console.error(err);
+        Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <ScreenWithDrawer title="لوحة التحكم">
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={accent} />
+        </View>
+      </ScreenWithDrawer>
+    );
+  }
+
+  return (
+    <ScreenWithDrawer title="لوحة التحكم">
+      {/* ✅ Header */}
       <View style={styles.header}>
-      <Text style={styles.headerText}>Hepacare</Text>
+        <Text style={styles.headerText}>Hepacare</Text>
       </View>
 
       <View style={styles.container}>
-
         {/* ✅ بطاقة الترحيب */}
         <View style={styles.card}>
           <Ionicons name="person-circle-outline" size={40} color={accent} style={styles.icon} />
           <View>
-            <Text style={styles.title}>مرحباً د. علي 👨‍⚕️</Text>
+            <Text style={styles.title}>مرحباً {doctorName} 👨‍⚕️</Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
         </View>
 
-        {/* ✅ بطاقة عدد المرضى بنفس ستايل الترحيب */}
+        {/* ✅ بطاقة عدد المرضى */}
         <View style={styles.card}>
           <Ionicons name="people-outline" size={40} color={accent} style={styles.icon} />
           <View>
             <Text style={styles.title}>{patientsCount} مريض</Text>
-            <Text style={styles.subtitle}>عدد المرضى  </Text>
+            <Text style={styles.subtitle}>عدد المرضى المشرف عليهم</Text>
           </View>
         </View>
-
       </View>
     </ScreenWithDrawer>
   );
@@ -57,7 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFB',
     alignItems: 'center',
   },
-
   card: {
     width: '100%',
     flexDirection: 'row',
@@ -72,44 +111,44 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
-
   icon: {
     marginEnd: 12,
   },
-
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: primary,
     marginBottom: 4,
   },
-
   subtitle: {
     fontSize: 14,
     color: textColor,
   },
-header: {
-  width: '100%',
-  backgroundColor: accent,
-  paddingVertical: 20,
-  paddingHorizontal: 24,
-  borderRadius: 16,
-  marginBottom: 30,
-  shadowColor: '#000',
-  shadowOpacity: 0.1,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: 4 },
-  elevation: 6,
-  alignItems: 'center',
-},
-
-headerText: {
-  fontSize: 28,
-  fontWeight: 'bold',
-  color: '#fff',
-  letterSpacing: 3,
-},
-
+  header: {
+    width: '100%',
+    backgroundColor: accent,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    letterSpacing: 3,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default Dashboard;

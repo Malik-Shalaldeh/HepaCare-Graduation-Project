@@ -10,31 +10,29 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const primary = '#00b29c';
+const API_URL = 'http://192.168.1.126:8000/auth/change-password';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
 
-  // حقول كلمات المرور
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
 
-  // حالات إظهار/إخفاء كلمة المرور
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // إخفاء الهيدر (Drawer يحتوي الهيدر)
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!currentPw || !newPw || !confirmPw) {
       Alert.alert('⚠️ تنبيه', 'يرجى ملء جميع الحقول.');
       return;
@@ -43,28 +41,45 @@ const ChangePasswordScreen = () => {
       Alert.alert('⚠️ خطأ', 'كلمة المرور الجديدة وتكرارها غير متطابقتين.');
       return;
     }
-    // تنفيذ منطق تغيير كلمة المرور هنا
-    Alert.alert('✅ تم تغيير كلمة المرور بنجاح');
-    setCurrentPw('');
-    setNewPw('');
-    setConfirmPw('');
-    setShowCurrent(false);
-    setShowNew(false);
-    setShowConfirm(false);
+
+    try {
+      const user_id = await AsyncStorage.getItem('user_id');
+      if (!user_id) {
+        Alert.alert('⚠️ خطأ', 'لم يتم العثور على رقم المستخدم، يرجى تسجيل الدخول مجددًا.');
+        return;
+      }
+
+      const url = `${API_URL}?user_id=${user_id}&current_password=${encodeURIComponent(currentPw)}&new_password=${encodeURIComponent(newPw)}`;
+      const res = await fetch(url, { method: 'POST' });
+
+      if (res.ok) {
+        Alert.alert('✅ تم تغيير كلمة المرور بنجاح');
+        setCurrentPw('');
+        setNewPw('');
+        setConfirmPw('');
+        setShowCurrent(false);
+        setShowNew(false);
+        setShowConfirm(false);
+      } else {
+        const data = await res.json();
+        Alert.alert('⚠️ خطأ', data.detail || 'فشل تغيير كلمة المرور');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم، تحقق من الشبكة.');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar  barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* زر الرجوع */}
       <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={28} color={primary} />
       </TouchableOpacity>
 
       <Text style={styles.title}>تغيير كلمة المرور</Text>
 
-      {/* عنوان وكلمة المرور الحالية */}
       <Text style={styles.label}>كلمة المرور الحالية</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -74,7 +89,7 @@ const ChangePasswordScreen = () => {
           value={currentPw}
           onChangeText={setCurrentPw}
         />
-        <TouchableOpacity onPress={() => setShowCurrent(prev => !prev)}>
+        <TouchableOpacity onPress={() => setShowCurrent(!showCurrent)}>
           <Ionicons
             name={showCurrent ? 'eye-off-outline' : 'eye-outline'}
             size={24}
@@ -83,7 +98,6 @@ const ChangePasswordScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* عنوان وكلمة المرور الجديدة */}
       <Text style={styles.label}>كلمة المرور الجديدة</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -93,7 +107,7 @@ const ChangePasswordScreen = () => {
           value={newPw}
           onChangeText={setNewPw}
         />
-        <TouchableOpacity onPress={() => setShowNew(prev => !prev)}>
+        <TouchableOpacity onPress={() => setShowNew(!showNew)}>
           <Ionicons
             name={showNew ? 'eye-off-outline' : 'eye-outline'}
             size={24}
@@ -102,7 +116,6 @@ const ChangePasswordScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* عنوان وتأكيد كلمة المرور */}
       <Text style={styles.label}>تأكيد كلمة المرور الجديدة</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -112,7 +125,7 @@ const ChangePasswordScreen = () => {
           value={confirmPw}
           onChangeText={setConfirmPw}
         />
-        <TouchableOpacity onPress={() => setShowConfirm(prev => !prev)}>
+        <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
           <Ionicons
             name={showConfirm ? 'eye-off-outline' : 'eye-outline'}
             size={24}
@@ -121,9 +134,8 @@ const ChangePasswordScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* زر حفظ التغيير */}
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>💾 حفظ التغيير</Text>
+        <Text style={styles.buttonText}>💾 حفظ </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -139,7 +151,7 @@ const styles = StyleSheet.create({
   backBtn: {
     marginBottom: 20,
     marginLeft: 10,
-    marginVertical:25
+    marginVertical: 25,
   },
   title: {
     fontSize: 24,
@@ -154,7 +166,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     textAlign: 'right',
     fontWeight: '600',
-    marginHorizontal:15
+    marginHorizontal: 15,
   },
   inputContainer: {
     flexDirection: 'row-reverse',
@@ -165,7 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     marginBottom: 20,
-    marginHorizontal:15
+    marginHorizontal: 15,
   },
   input: {
     flex: 1,
@@ -184,14 +196,12 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
-    marginHorizontal:15
-
+    marginHorizontal: 15,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    
   },
 });
 

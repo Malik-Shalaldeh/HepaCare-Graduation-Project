@@ -32,7 +32,10 @@ export default function LoginScreen({ navigation }) {
       const data = await res.json();
       console.log('Login response:', data);
 
-      // ✅ احفظ رقم الطبيب فقط إذا كان الدور DOCTOR
+      // ✅ احفظ رقم المستخدم العام (users.id)
+      await AsyncStorage.setItem('user_id', String(data.id));
+
+      // احفظ doctor_id فقط إن كان طبيبًا (للشاشات التي تحتاجه)
       if (data.role === 'DOCTOR') {
         await AsyncStorage.setItem('doctor_id', String(data.id));
         console.log('doctor_id saved:', data.id);
@@ -49,7 +52,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.curve} />
+        <View className="curve" />
         <Text style={styles.logo}>HepaCare</Text>
       </View>
 
@@ -124,16 +127,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     zIndex: 10,
-  },
-  curve: {
-    position: 'absolute',
-    bottom: -40,
-    width: width,
-    height: 80,
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-    zIndex: 1,
   },
   form: {
     flex: 1,
