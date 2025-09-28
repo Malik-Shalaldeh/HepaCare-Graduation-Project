@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';   // ✅ أضف استيراد axios
 
 const { width } = Dimensions.get('window');
 const API = 'http://192.168.1.122:8000';
@@ -21,21 +22,19 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+      // ✅ استخدام axios بدلاً من fetch
+      const res = await axios.post(`${API}/auth/login`, {
+        username,
+        password,
       });
 
-      if (!res.ok) throw new Error("bad creds");
-
-      const data = await res.json();
-      console.log('Login response:', data);
+      // axios يرجع data مباشرة بدون res.json()
+      const data = res.data;
 
       // ✅ احفظ رقم المستخدم العام (users.id)
       await AsyncStorage.setItem('user_id', String(data.id));
 
-      // احفظ doctor_id فقط إن كان طبيبًا (للشاشات التي تحتاجه)
+      // احفظ doctor_id فقط إن كان طبيبًا
       if (data.role === 'DOCTOR') {
         await AsyncStorage.setItem('doctor_id', String(data.id));
         console.log('doctor_id saved:', data.id);
@@ -45,6 +44,8 @@ export default function LoginScreen({ navigation }) {
 
       navigation.replace(data.route);
     } catch (e) {
+      // axios يلقي خطأ في حال status ليس 2xx
+      console.error('Login error:', e);
       Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
     }
   };
@@ -52,7 +53,6 @@ export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View className="curve" />
         <Text style={styles.logo}>HepaCare</Text>
       </View>
 
@@ -109,10 +109,7 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
+  container: { flex: 1, backgroundColor: '#ffffff' },
   header: {
     height: 180,
     backgroundColor: '#00b29c',
@@ -120,19 +117,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
   },
-  logo: {
-    fontSize: 34,
-    fontWeight: 'bold',
-    color: '#fff',
-    zIndex: 10,
-  },
-  form: {
-    flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 50,
-  },
+  logo: { fontSize: 34, fontWeight: 'bold', color: '#fff' },
+  form: { flex: 1, paddingHorizontal: 30, paddingTop: 50 },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -143,18 +130,9 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     paddingHorizontal: 10,
   },
-  inputIcon: {
-    marginRight: 8,
-  },
-  input: {
-    height: 50,
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  eyeButton: {
-    padding: 8,
-  },
+  inputIcon: { marginRight: 8 },
+  input: { height: 50, flex: 1, fontSize: 16, color: '#333' },
+  eyeButton: { padding: 8 },
   button: {
     height: 52,
     backgroundColor: '#00b29c',
@@ -168,9 +146,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
 });

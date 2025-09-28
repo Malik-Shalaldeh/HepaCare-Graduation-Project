@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, ActivityIndicator, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const primary = '#2C3E50';
@@ -13,7 +12,7 @@ const API = 'http://192.168.1.122:8000';
 const { width } = Dimensions.get('window');
 
 const Dashboard = () => {
-  const navigation = useNavigation();
+
   const [doctorName, setDoctorName] = useState('');
   const [patientsCount, setPatientsCount] = useState(0);
   const [loading, setLoading] = useState(true);
