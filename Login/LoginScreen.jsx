@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';   // ✅ أضف استيراد axios
 
 const { width } = Dimensions.get('window');
-const API = 'http://192.168.1.122:8000';
+const API = 'http://192.168.1.14:8000';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
