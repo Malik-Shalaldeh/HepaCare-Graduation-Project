@@ -55,7 +55,7 @@ const EvaluationVisitScreen = () => {
   }
 
   try {
-    await axios.post('http://192.168.1.126:8000/visits/', {
+    await axios.post('http://192.168.1.14:8000/visits/', {
       patient_id: patientId,
       visit_date: new Date().toISOString(), // 👈 التاريخ الحالي بصيغة ISO
       general_state:
