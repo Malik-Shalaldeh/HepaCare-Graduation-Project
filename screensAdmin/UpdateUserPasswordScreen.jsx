@@ -1,153 +1,175 @@
-// screensAdmin/UpdateUserPasswordScreen.js
 import { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, Alert, FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-const PRIMARY = '#00b29c';      // أخضر أساسي
+const PRIMARY = '#00b29c';
+const API = 'http://192.168.1.14:8000';
+
+const roles = [
+  { key: 'DOCTOR', label: 'طبيب' },
+  { key: 'PATIENT', label: 'مريض' },
+  { key: 'LAB', label: 'مختبر' },
+  { key: 'MOH', label: 'وزارة الصحة' },
+  { key: 'ADMIN', label: 'أدمن' },
+];
 
 export default function UpdateUserPasswordScreen() {
-  const [nid, setNid]           = useState('');
-  const [user, setUser]         = useState(null);
-  const [pass1, setPass1]       = useState('');
-  const [pass2, setPass2]       = useState('');
-  const [showPass1, setShow1]   = useState(false);
-  const [showPass2, setShow2]   = useState(false);
+  const [role, setRole] = useState('');
+  const [name, setName] = useState('');
+  const [results, setResults] = useState([]);
+  const [user, setUser] = useState(null);
+  const [pass1, setPass1] = useState('');
+  const [pass2, setPass2] = useState('');
 
-  // بيانات تجريبية
-  const USERS = [
-  { id: 'D165', nationalId: '402335489', name: 'د.ايه تفاحة' },
-  { id: 'D1001', nationalId: '4023456789', name: 'د. أحمد خالد' },
-  { id: 'D1002', nationalId: '4098765432', name: 'د. سارة محمود' },
-  { id: 'D1003', nationalId: '4011122233', name: 'د. معاذ حسان' },
-  ];
-
-  const onSearch = () => {
-    if (!nid) {
-       Alert.alert('تنبيه', 'أدخل رقم الهوية'); return; 
-      }
-
-    const found = USERS.find(u => u.nationalId === nid.trim());
-
-    if (!found) {
-        setUser(null);
-        Alert.alert('غير موجود', 'لا يوجد مستخدم بهذا الرقم'); 
-        return;
-       }
-
-    setUser(found);
-    setPass1('');
-    setPass2('');
-    setShow1(false);
-    setShow2(false);
-  };
-
-  const onUpdate = () => 
-    {
-    if (!user) {
-       Alert.alert('تنبيه', 'ابحث عن المستخدم أولاً'); 
-       return; 
-      }
-    if (!pass1 || !pass2) {
-       Alert.alert('تنبيه', 'أدخل كلمة المرور ثم أكدها'); 
-       return; 
-      }
-    if (pass1 !== pass2) {
-       Alert.alert('تنبيه', 'كلمتا المرور غير متطابقتين'); 
-       return; 
-      }
-      
-    // TODO: نداء API
-    Alert.alert('تم التحديث', `تم تحديث كلمة مرور: ${user.name}`);
+  const onChooseRole = async (r) => {
+    setRole(r);
     setUser(null);
-    setNid('');
-    setPass1('');
-    setPass2('');
-    setShow1(false);
-    setShow2(false);
+    setResults([]);
+    setName('');
+    if (r === 'MOH' || r === 'ADMIN') {
+      try {
+        const res = await axios.get(`${API}/admin/search-by-role`, { params: { role: r } });
+        if (res.data.length > 0) setUser(res.data[0]);
+      } catch {
+        Alert.alert('خطأ', 'تعذر جلب حساب هذا الدور');
+      }
+    }
   };
 
-  const disabled = !user || !pass1 || !pass2;
+  const onSearch = async () => {
+    if (!role) {
+      Alert.alert('تنبيه', 'اختر الدور أولاً');
+      return;
+    }
+    if (!name.trim() && role !== 'MOH' && role !== 'ADMIN') {
+      Alert.alert('تنبيه', 'أدخل الاسم');
+      return;
+    }
+    try {
+      const res = await axios.get(`${API}/admin/search-by-role`, { params: { role, name } });
+      setResults(res.data);
+    } catch {
+      setResults([]);
+      Alert.alert('غير موجود', 'لا يوجد نتائج مطابقة');
+    }
+  };
+
+  const onSelectUser = async (id) => {
+    try {
+      const res = await axios.get(`${API}/admin/user-details`, { params: { user_id: id, role } });
+      setUser(res.data);
+      setResults([]);
+    } catch {
+      Alert.alert('خطأ', 'تعذر جلب تفاصيل المستخدم');
+    }
+  };
+
+  const onUpdate = async () => {
+    if (!user) {
+      Alert.alert('تنبيه', 'اختر مستخدم أولاً');
+      return;
+    }
+    if (!pass1 || !pass2) {
+      Alert.alert('تنبيه', 'أدخل كلمة المرور');
+      return;
+    }
+    if (pass1 !== pass2) {
+      Alert.alert('تنبيه', 'كلمتا المرور غير متطابقتين');
+      return;
+    }
+    try {
+      await axios.post(`${API}/admin/update-user-password`, null, {
+        params: { user_id: user.id, new_password: pass1 },
+      });
+      Alert.alert('تم', `تم تحديث كلمة مرور: ${user.name}`);
+      setUser(null);
+      setPass1('');
+      setPass2('');
+    } catch {
+      Alert.alert('خطأ', 'تعذر تحديث كلمة المرور');
+    }
+  };
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.label}>رقم الهوية</Text>
-
-      <View style={styles.searchRow}>
-        <Ionicons name="search" size={18} color="#64748B" />
-        <TextInput
-          style={styles.input}
-          placeholder="ابحث برقم الهوية"
-          placeholderTextColor="#94A3B8"
-          value={nid}
-          onChangeText={setNid}
-          keyboardType="number-pad"
-          textAlign="right"
-        />
-        <TouchableOpacity onPress={onSearch} activeOpacity={0.85} style={styles.searchBtn}>
-          <Ionicons name="search-outline" size={18} color="#FFFFFF" />
-       </TouchableOpacity>
+      <Text style={styles.label}>اختر الدور</Text>
+      <View style={styles.rolesRow}>
+        {roles.map((r) => (
+          <TouchableOpacity
+            key={r.key}
+            onPress={() => onChooseRole(r.key)}
+            style={[styles.roleBtn, role === r.key && styles.roleBtnActive]}
+          >
+            <Text style={[styles.roleText, role === r.key && styles.roleTextActive]}>
+              {r.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
+
+      {role && role !== 'MOH' && role !== 'ADMIN' && (
+        <>
+          <Text style={styles.label}>الاسم</Text>
+          <View style={styles.searchBox}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="ابحث بالاسم"
+              value={name}
+              onChangeText={setName}
+              textAlign="right"
+            />
+            <TouchableOpacity onPress={onSearch} style={styles.searchIcon}>
+              <Ionicons name="search-outline" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
+      {results.length > 0 && (
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => onSelectUser(item.id)} style={styles.resultItem}>
+              <Text style={styles.resultText}>{item.name} ({item.role})</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
 
       {user && (
         <View style={styles.userCard}>
-          <Ionicons name="person-circle-outline" size={24} color={PRIMARY} style={styles.userIcon} />
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.userMeta}>رقم الهوية: {user.nationalId}</Text>
-          </View>
+          <Text style={styles.userName}>{user.name}</Text>
+          {user.role === "PATIENT" && <Text style={styles.userMeta}>رقم الهوية: {user.nationalId}</Text>}
+          {user.role === "DOCTOR" && <Text style={styles.userMeta}>رقم الطبيب: {user.doctorId}</Text>}
+          <Text style={styles.userMeta}>الدور: {user.role}</Text>
         </View>
       )}
 
       {user && (
         <>
           <Text style={styles.label}>كلمة المرور الجديدة</Text>
-          <View style={styles.passRow}>
-            <Ionicons name="lock-closed-outline" size={18} color={PRIMARY} />
-            <TextInput
-              style={styles.passInput}
-              placeholder="أدخل كلمة المرور"
-              placeholderTextColor="#94A3B8"
-              value={pass1}
-              onChangeText={setPass1}
-              secureTextEntry={!showPass1}
-              textAlign="right"
-            />
-            <TouchableOpacity onPress={() => setShow1(v => !v)} activeOpacity={0.8} style={styles.eyeBtn}>
-              <Ionicons name={showPass1 ? 'eye-off-outline' : 'eye-outline'} size={20} color="#64748B" />
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.label}>تأكيد كلمة المرور</Text>
-          <View style={styles.passRow}>
-            <Ionicons name="lock-closed-outline" size={18} color={PRIMARY} />
-            <TextInput
-              style={styles.passInput}
-              placeholder="أعد إدخال كلمة المرور"
-              placeholderTextColor="#94A3B8"
-              value={pass2}
-              onChangeText={setPass2}
-              secureTextEntry={!showPass2}
-              textAlign="right"
-            />
-            <TouchableOpacity onPress={() => setShow2(v => !v)} activeOpacity={0.8} style={styles.eyeBtn}>
-              <Ionicons name={showPass2 ? 'eye-off-outline' : 'eye-outline'} size={20} color="#64748B" />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            onPress={onUpdate}
-            activeOpacity={0.9}
-            disabled={disabled}
-            style={[styles.updateBtn, disabled && { opacity: 0.5 }]}
-          >
-            <Ionicons name="key-outline" size={16} color="#FFFFFF" />
+          <TextInput
+            style={styles.input}
+            placeholder="كلمة المرور"
+            value={pass1}
+            onChangeText={setPass1}
+            secureTextEntry
+            textAlign="right"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="تأكيد كلمة المرور"
+            value={pass2}
+            onChangeText={setPass2}
+            secureTextEntry
+            textAlign="right"
+          />
+          <TouchableOpacity onPress={onUpdate} style={styles.updateBtn}>
             <Text style={styles.updateText}>تحديث كلمة المرور</Text>
           </TouchableOpacity>
         </>
@@ -157,125 +179,133 @@ export default function UpdateUserPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    alignItems: 'center',
+
+  screen: { 
+    flex: 1, 
+    backgroundColor: '#FFFFFF', 
+    padding: 16 
   },
-  label: {
-    color: '#0F172A',
-    fontSize: 14,
-    fontWeight: '700',
-    textAlign: 'right',
-    alignSelf: 'flex-end',
-    marginBottom: 6,
-    marginTop: 8,
-    width: '88%',
+
+  label: { 
+    fontSize: 14, 
+    fontWeight: '700', 
+    marginBottom: 6, 
+    textAlign: 'right', 
+    color: '#0F172A' 
   },
-  searchRow: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-    width: '88%',
+
+  rolesRow: { 
+    flexDirection: 'row-reverse', 
+    flexWrap: 'wrap', 
+    marginBottom: 10 
   },
-  input: {
-    flex: 1,
-    color: '#0F172A',
-    fontSize: 15,
-    textAlign: 'right',
+
+  roleBtn: { 
+    paddingVertical: 6, 
+    paddingHorizontal: 12, 
+    margin: 4, 
+    borderWidth: 1, 
+    borderColor: '#CBD5E1', 
+    borderRadius: 8 
   },
-  searchBtn: {
-    backgroundColor: PRIMARY,
-    width: 42,
-    height: 42,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  roleBtnActive: { 
+    backgroundColor: PRIMARY, 
+    borderColor: PRIMARY 
   },
-  userCard: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-    width: '88%',
-    marginTop: 10,
-    marginBottom: 6,
+
+  roleText: { 
+    color: '#0F172A', 
+    fontSize: 13 
   },
-  userIcon: {
-    marginLeft: 6,
+
+  roleTextActive: { 
+    color: '#FFFFFF' 
   },
-  userInfo: {
-    flex: 1,
-    alignItems: 'flex-end',
+
+  searchBox: { 
+    flexDirection: 'row-reverse', 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 10, 
+    overflow: 'hidden', 
+    marginBottom: 10 
   },
-  userName: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 2,
-    textAlign: 'right',
-    width: '100%',
+
+  searchInput: { 
+    flex: 1, 
+    paddingVertical: 6, 
+    paddingHorizontal: 10, 
+    fontSize: 14, 
+    color: '#0F172A' 
   },
-  userMeta: {
-    fontSize: 13,
-    color: '#64748B',
-    textAlign: 'right',
-    width: '100%',
+
+  searchIcon: { 
+    backgroundColor: PRIMARY, 
+    padding: 10, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
   },
-  passRow: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
-    width: '88%',
+
+  resultItem: { 
+    padding: 10, 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#E2E8F0' 
   },
-  passInput: {
-    flex: 1,
-    color: '#0F172A',
-    fontSize: 15,
-    textAlign: 'right',
+
+  resultText: { 
+    textAlign: 'right', 
+    color: '#0F172A', 
+    fontSize: 14 
   },
-  eyeBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  userCard: { 
+    padding: 12, 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 10, 
+    marginVertical: 10, 
+    backgroundColor: '#F8FAFC' 
   },
-  updateBtn: {
-    backgroundColor: PRIMARY,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginTop: 12,
-    minWidth: 170,
+
+  userName: { 
+    fontSize: 16, 
+    fontWeight: '800', 
+    marginBottom: 4, 
+    textAlign: 'right', 
+    color: '#0F172A' 
   },
-  updateText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-    marginStart: 6,
+
+  userMeta: { 
+    fontSize: 13, 
+    color: '#475569', 
+    textAlign: 'right' 
   },
+
+  input: { 
+    borderWidth: 1, 
+    borderColor: '#E2E8F0', 
+    borderRadius: 8, 
+    paddingVertical: 6, 
+    paddingHorizontal: 10, 
+    fontSize: 14, 
+    marginBottom: 8, 
+    color: '#0F172A' 
+  },
+
+  updateBtn: { 
+    backgroundColor: PRIMARY, 
+    paddingVertical: 10, 
+    borderRadius: 8, 
+    alignItems: 'center', 
+    marginTop: 10 
+  },
+
+  updateText: { 
+    color: '#FFFFFF', 
+    fontWeight: '700', 
+    fontSize: 14 
+  },
+
 });
