@@ -1,4 +1,4 @@
-// screensAdmin/DeleteDoctorScreen.js
+// screensAdmin/ToggleDoctorScreen.js
 import { useState } from 'react';
 import {
   View,
@@ -9,41 +9,65 @@ import {
   StyleSheet,
   Alert,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
 const PRIMARY = '#00b29c';
+const API = "http://192.168.1.9:8000";
 
-const DOCTORS = [
-  { id: 'D165', nationalId: '402335489', name: 'د.ايه تفاحة' },
-  { id: 'D1001', nationalId: '4023456789', name: 'د. أحمد خالد' },
-  { id: 'D1002', nationalId: '4098765432', name: 'د. سارة محمود' },
-  { id: 'D1003', nationalId: '4011122233', name: 'د. معاذ حسان' },
-];
-
-export default function DeleteDoctorScreen()
- {
+export default function ToggleDoctorScreen() {
   const [search, setSearch] = useState('');
+  const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const results = DOCTORS.filter(
-    d => d.name.includes(search) || d.nationalId.includes(search)
-  );
+  // 🔍 البحث
+  const handleSearch = async () => {
+    if (!search.trim()) {
+      Alert.alert("تنبيه", "أدخل اسم الطبيب أو رقمه");
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API}/admin/search-doctors`, {
+        params: { q: search.trim() }
+      });
+      setResults(res.data);
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleDelete = () => {
+  // 🚫 تعطيل / تفعيل
+  const handleToggle = () => {
     if (!selected) return;
+    const action = selected.is_active ? "تعطيل" : "تفعيل";
     Alert.alert(
-      'تأكيد الحذف',
-      `هل تريد حذف ${selected.name} (هوية: ${selected.nationalId})؟`,
+      'تأكيد العملية',
+      `هل تريد ${action} ${selected.name} (رقم: ${selected.id})؟`,
       [
         { text: 'إلغاء' },
         {
-          text: 'حذف',
+          text: action,
           style: 'destructive',
-          onPress: () => {
-            Alert.alert('تم الحذف', `${selected.name} تم حذفه بنجاح`);
-            setSelected(null);
-            setSearch('');
+          onPress: async () => {
+            try {
+              const res = await axios.put(`${API}/admin/doctors/${selected.id}/toggle`);
+              Alert.alert('تم', res.data.message);
+
+              // تحديث القائمة
+              setResults(results.map(d =>
+                d.id === selected.id ? { ...d, is_active: res.data.new_status } : d
+              ));
+              setSelected(null);
+              setSearch('');
+            } catch {
+              Alert.alert('خطأ', 'تعذر تنفيذ العملية');
+            }
           },
         },
       ]
@@ -69,7 +93,12 @@ export default function DeleteDoctorScreen()
         />
         <View style={styles.infoBox}>
           <Text style={[styles.name, active && { color: PRIMARY }]}>{item.name}</Text>
-          <Text style={styles.meta}>رقم الهوية: {item.nationalId}</Text>
+          <Text style={styles.meta}>الرقم: {item.id}</Text>
+          <Text style={styles.meta}>الهاتف: {item.phone}</Text>
+          <Text style={styles.meta}>العيادة: {item.clinic}</Text>
+          <Text style={[styles.meta, { color: item.is_active ? 'green' : 'red' }]}>
+            {item.is_active ? '✅ مفعل' : '⛔ معطل'}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -77,39 +106,47 @@ export default function DeleteDoctorScreen()
 
   return (
     <View style={styles.screen}>
-       <StatusBar backgroundColor={PRIMARY} barStyle="dark-content" />
-      
+      <StatusBar backgroundColor={PRIMARY} barStyle="light-content" />
+
+      {/* مربع البحث */}
       <View style={styles.searchRow}>
         <Ionicons name="search" size={18} color="#6B7280" />
         <TextInput
           style={styles.input}
-          placeholder="ابحث بالاسم أو رقم الهوية"
+          placeholder="ابحث بالاسم أو رقم الطبيب"
           placeholderTextColor="#9AA4AF"
           value={search}
           onChangeText={setSearch}
           textAlign="right"
+          onSubmitEditing={handleSearch}
         />
+        <TouchableOpacity onPress={handleSearch} activeOpacity={0.8} style={styles.searchBtn}>
+          <Ionicons name="search-outline" size={18} color="#fff" />
+        </TouchableOpacity>
       </View>
 
+      {loading && <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 20 }} />}
+
+      {/* القائمة */}
       <FlatList
         data={results}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={<Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>}
+        ListEmptyComponent={!loading && <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>}
       />
 
+      {/* زر التعطيل / التفعيل */}
       <TouchableOpacity
-        onPress={handleDelete}
+        onPress={handleToggle}
         disabled={!selected}
         activeOpacity={0.9}
-        style={[
-          styles.deleteBtn,
-          !selected && { opacity: 0.5 },
-        ]}
+        style={[styles.disableBtn, !selected && { opacity: 0.5 }]}
       >
-        <Ionicons name="trash-outline" size={16} color="#fff" />
-        <Text style={styles.deleteText}>حذف الطبيب</Text>
+        <Ionicons name={selected?.is_active ? "close-circle-outline" : "checkmark-circle-outline"} size={16} color="#fff" />
+        <Text style={styles.disableText}>
+          {selected?.is_active ? "تعطيل الحساب" : "إلغاء التعطيل"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -138,6 +175,14 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
     fontSize: 15,
     textAlign: 'right',
+  },
+  searchBtn: {
+    backgroundColor: PRIMARY,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   listContainer: {
     paddingVertical: 8,
@@ -180,7 +225,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 16,
   },
-  deleteBtn: {
+  disableBtn: {
     backgroundColor: PRIMARY,
     borderRadius: 999,
     paddingVertical: 10,
@@ -192,9 +237,9 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: 6,
     minWidth: 180,
-    marginBottom:100
+    marginBottom: 100,
   },
-  deleteText: {
+  disableText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '800',

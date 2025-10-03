@@ -10,45 +10,50 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';   // ✅ أضف استيراد axios
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
-const API = 'http://192.168.1.14:8000';
+const API = 'http://192.168.1.9:8000';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    try {
-      // ✅ استخدام axios بدلاً من fetch
-      const res = await axios.post(`${API}/auth/login`, {
-        username,
-        password,
-      });
+ const handleLogin = async () => {
+  try {
+    const res = await axios.post(`${API}/auth/login`, { username, password });
+    const data = res.data;
 
-      // axios يرجع data مباشرة بدون res.json()
-      const data = res.data;
-
-      // ✅ احفظ رقم المستخدم العام (users.id)
-      await AsyncStorage.setItem('user_id', String(data.id));
-
-      // احفظ doctor_id فقط إن كان طبيبًا
-      if (data.role === 'DOCTOR') {
-        await AsyncStorage.setItem('doctor_id', String(data.id));
-        console.log('doctor_id saved:', data.id);
-      } else {
-        await AsyncStorage.removeItem('doctor_id');
-      }
-
-      navigation.replace(data.route);
-    } catch (e) {
-      // axios يلقي خطأ في حال status ليس 2xx
-      console.error('Login error:', e);
-      Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+    // ✅ تحقق محلي من is_active
+    if (data.is_active === 0) {
+      Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+      setPassword("");
+      return; // 👈 يوقف هون وما يدخل
     }
-  };
+
+    await AsyncStorage.setItem("user_id", String(data.id));
+
+    if (data.role === "DOCTOR") {
+      await AsyncStorage.setItem("doctor_id", String(data.id));
+    } else {
+      await AsyncStorage.removeItem("doctor_id");
+    }
+
+    navigation.replace(data.route);
+
+  } catch (e) {
+    if (e.response?.status === 403) {
+      Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+    } else if (e.response?.status === 401) {
+      Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
+    } else {
+      Alert.alert("خطأ", "تعذر الاتصال بالخادم");
+    }
+    setPassword("");
+  }
+};
+
 
   return (
     <View style={styles.container}>
