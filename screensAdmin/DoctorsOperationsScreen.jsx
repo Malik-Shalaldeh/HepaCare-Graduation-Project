@@ -47,7 +47,7 @@ export default function DoctorsScreen() {
         <TouchableOpacity style={[styles.btn , styles.btnPrimary]} onPress={onDelete} activeOpacity={0.9}>
           <View style={styles.btnContent}>
             <Ionicons name="trash-outline" size={24} color="#fff" />
-            <Text style={styles.btnText}>حذف طبيب</Text>
+            <Text style={styles.btnText}>تعطيل /تفعيل حساب طبيب</Text>
           </View>
         </TouchableOpacity>
 
