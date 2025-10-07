@@ -1,5 +1,5 @@
 // screensAdmin/AddNewDoctorScreen.js
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,26 +12,25 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.9:8000';
+const API = 'http://192.168.1.14:8000'; // ← غيّرها إذا اختلف IP السيرفر
 
 export default function AddNewDoctorScreen() {
-  const [doctorId, setDoctorId] = useState('');    // 👈 رقم الهوية (سيُخزّن كـ doctor_id)
+  const [doctorId, setDoctorId] = useState('');
   const [name, setName] = useState('');
   const [clinicName, setClinicName] = useState('');
   const [phone, setPhone] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // دالة التحقق من المدخلات
   const validate = () => {
     if (!doctorId.trim() || !name.trim() || !clinicName.trim() || !phone.trim()) {
       Alert.alert('تنبيه', 'رجاءً املأ جميع الحقول');
       return false;
     }
-    // رقم الهوية: أرقام فقط وطول معقول
     if (!/^\d{6,15}$/.test(doctorId.trim())) {
       Alert.alert('تنبيه', 'رقم الهوية يجب أن يتكون من أرقام فقط (6 إلى 15 رقم).');
       return false;
     }
-    // هاتف فلسطيني 10 خانات يبدأ بـ 05
     const p = phone.trim();
     if (!(p.length === 10 && p.startsWith('05') && /^\d+$/.test(p))) {
       Alert.alert('تنبيه', 'رقم الهاتف يجب أن يكون 10 أرقام ويبدأ بـ 05');
@@ -40,24 +39,37 @@ export default function AddNewDoctorScreen() {
     return true;
   };
 
+  // إرسال البيانات إلى السيرفر
   const onSave = async () => {
     if (!validate()) return;
     try {
       setSaving(true);
-      const res = await axios.post(`${API}/admin/doctors`, {
-        doctor_id: doctorId.trim(),         // 👈 نرسل رقم الهوية كـ doctor_id
-        full_name: name.trim(),
-        clinic_name: clinicName.trim(),
-        phone: phone.trim(),
-      });
-      Alert.alert('تم الحفظ', `تمت إضافة: ${res.data.full_name} (رقم: ${res.data.doctor_id})`);
+      const res = await axios.post(
+        `${API}/admin/doctors`,
+        {
+          doctor_id: doctorId.trim(),
+          full_name: name.trim(),
+          clinic_name: clinicName.trim(),
+          phone: phone.trim(),
+        },
+        {
+          headers: { 'Content-Type': 'application/json' }, // ← مهم جدًا لتفادي 422
+        }
+      );
+
+      Alert.alert(
+        'تم الحفظ',
+        `تمت إضافة الطبيب: ${res.data.doctor_id || doctorId}\n${res.data.message || ''}`
+      );
+
+      // تفريغ الحقول
       setDoctorId('');
       setName('');
       setClinicName('');
       setPhone('');
     } catch (e) {
-      console.error(e);
-      const msg = e?.response?.data?.detail || 'تعذر إضافة الطبيب';
+      console.error(e?.response?.data || e.message);
+      const msg = e?.response?.data?.detail || e?.response?.data?.message || 'تعذر إضافة الطبيب';
       Alert.alert('خطأ', msg);
     } finally {
       setSaving(false);
@@ -90,7 +102,7 @@ export default function AddNewDoctorScreen() {
       <Text style={styles.label}>اسم العيادة</Text>
       <TextInput
         style={styles.input}
-        placeholder="مثال: Main Clinic أو عيادة السلام"
+        placeholder="مثال: عيادة السلام أو Main Clinic"
         placeholderTextColor="#9AA4AF"
         value={clinicName}
         onChangeText={setClinicName}
@@ -115,7 +127,7 @@ export default function AddNewDoctorScreen() {
         disabled={saving}
         style={[styles.saveBtn, saving && { opacity: 0.6 }]}
       >
-        <Ionicons name="save-outline" size={16} color="#fff" />
+        <Ionicons name="save-outline" size={18} color="#fff" />
         <Text style={styles.saveText}>{saving ? 'جارٍ الحفظ...' : 'حفظ الطبيب'}</Text>
       </TouchableOpacity>
     </View>
@@ -150,13 +162,13 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARY,
     borderRadius: 999,
     paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: 18,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
     marginTop: 12,
-    minWidth: 150,
+    minWidth: 160,
   },
-  saveText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800', marginStart: 6 },
+  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
 });

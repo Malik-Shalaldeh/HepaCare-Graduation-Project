@@ -1,26 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 
-const API = 'http://192.168.1.14:8000'; // عدّل العنوان حسب السيرفر
+const API = 'http://192.168.1.14:8000'; 
 
 export default function TestResultsScreen() {
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      const id = await AsyncStorage.getItem('user_id');
-      if (!id) return;
-      try {
-        const res = await axios.get(`${API}/patient/lab-results/${id}`);
-        setData(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
+ useEffect(() => {
+  const fetchResults = async () => {
+    const id = await AsyncStorage.getItem('user_id');
+    if (!id) return;
+
+    try {
+      const response = await axios.get(`${API}/patient/lab-results/${id}`);
+      setData(response.data);
+    } catch (error) {
+      console.error("خطأ في جلب البيانات:", error);
+    }
+  };
+
+  fetchResults(); 
   }, []);
+
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>

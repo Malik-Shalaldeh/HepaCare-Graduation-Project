@@ -9,7 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-const API = "http://192.168.1.9:8000";
+const API = 'http://192.168.1.14:8000';
 
 export default function AllDoctorsScreen() {
   const [search, setSearch] = useState('');
