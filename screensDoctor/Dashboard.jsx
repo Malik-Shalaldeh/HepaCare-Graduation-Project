@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
-const API = 'http://192.168.1.9:8000';
+const API = 'http://192.168.1.14:8000';
 
 const { width } = Dimensions.get('window');
 

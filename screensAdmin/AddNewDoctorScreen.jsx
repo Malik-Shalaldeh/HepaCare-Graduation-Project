@@ -1,4 +1,3 @@
-// screensAdmin/AddNewDoctorScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -12,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.14:8000'; // ← غيّرها إذا اختلف IP السيرفر
+const API = 'http://192.168.1.14:8000'; // ← تأكد إنه نفس IP السيرفر عندك
 
 export default function AddNewDoctorScreen() {
   const [doctorId, setDoctorId] = useState('');
@@ -44,22 +43,23 @@ export default function AddNewDoctorScreen() {
     if (!validate()) return;
     try {
       setSaving(true);
-      const res = await axios.post(
-        `${API}/admin/doctors`,
+        const res = await axios.post(`${API}/admin/doctors/add`,
         {
           doctor_id: doctorId.trim(),
           full_name: name.trim(),
           clinic_name: clinicName.trim(),
           phone: phone.trim(),
         },
-        {
-          headers: { 'Content-Type': 'application/json' }, // ← مهم جدًا لتفادي 422
-        }
+        { headers: { 'Content-Type': 'application/json' } }
       );
 
+      const msg = res.data.message || 'تمت العملية بنجاح';
+      const username = res.data.username || doctorId;
+      const password = res.data.password || doctorId;
+
       Alert.alert(
-        'تم الحفظ',
-        `تمت إضافة الطبيب: ${res.data.doctor_id || doctorId}\n${res.data.message || ''}`
+        '✅ تم الحفظ بنجاح',
+        `${msg}\n\n👤 اسم المستخدم: ${username}\n🔑 كلمة المرور: ${password}`
       );
 
       // تفريغ الحقول
@@ -102,7 +102,7 @@ export default function AddNewDoctorScreen() {
       <Text style={styles.label}>اسم العيادة</Text>
       <TextInput
         style={styles.input}
-        placeholder="مثال: عيادة السلام أو Main Clinic"
+        placeholder="مثال: عيادة السلام"
         placeholderTextColor="#9AA4AF"
         value={clinicName}
         onChangeText={setClinicName}

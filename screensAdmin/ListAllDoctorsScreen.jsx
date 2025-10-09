@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   FlatList,
   StyleSheet,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
-const API = 'http://192.168.1.14:8000';
+const API = "http://192.168.1.14:8000";
 
 export default function AllDoctorsScreen() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [doctors, setDoctors] = useState([]);
 
-  // جلب البيانات من الباك اند
+  // جلب الأطباء من الباك-إند
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -28,14 +28,15 @@ export default function AllDoctorsScreen() {
     fetchDoctors();
   }, []);
 
-  // فلترة محلية بالاسم أو رقم الهوية أو العيادة
-  const results = doctors.filter(d =>
-    d.name.includes(search) ||
-    d.nationalId.includes(search) ||
-    d.clinic.includes(search)
+  // فلترة محلية بالاسم أو رقم الهاتف أو العيادة
+  const results = doctors.filter(
+    (d) =>
+      (d.name && d.name.includes(search)) ||
+      (d.phone && d.phone.includes(search)) ||
+      (d.clinic && d.clinic.includes(search))
   );
 
-  // عنصر بطاقة الطبيب
+  // بطاقة الطبيب
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Ionicons
@@ -46,8 +47,16 @@ export default function AllDoctorsScreen() {
       />
       <View style={styles.infoBox}>
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.meta}>رقم الهوية: {item.nationalId}</Text>
+        <Text style={styles.meta}>رقم الهاتف: {item.phone}</Text>
         <Text style={styles.meta}>العيادة: {item.clinic}</Text>
+        <Text
+          style={[
+            styles.status,
+            { color: item.active ? "#00b29c" : "#D32F2F" },
+          ]}
+        >
+          {item.active ? "مفعّل" : "غير مفعّل"}
+        </Text>
       </View>
     </View>
   );
@@ -64,7 +73,7 @@ export default function AllDoctorsScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="ابحث بالاسم أو رقم الهوية أو العيادة"
+          placeholder="ابحث بالاسم أو الهاتف أو العيادة"
           placeholderTextColor="#9AA4AF"
           value={search}
           onChangeText={setSearch}
@@ -78,96 +87,89 @@ export default function AllDoctorsScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={<Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>}
+        ListEmptyComponent={
+          <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>
+        }
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  screen: { 
-    flex: 1, 
-    backgroundColor: '#FFFFFF', 
-    padding: 16, 
-    alignItems: 'center' 
+  screen: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+    alignItems: "center",
   },
-
-  searchRow: { 
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 12, 
-    borderWidth: 1, 
-    borderColor: '#E6E8EC', 
-    paddingVertical: 8, 
-    paddingHorizontal: 10, 
-    flexDirection: 'row-reverse', 
-    alignItems: 'center', 
-    marginBottom: 12, 
-    width: '85%' 
+  searchRow: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    marginBottom: 12,
+    width: "85%",
   },
-
-  input: { 
-    flex: 1, 
-    color: '#2C3E50', 
-    fontSize: 14, 
-    textAlign: 'right' 
+  input: {
+    flex: 1,
+    color: "#2C3E50",
+    fontSize: 14,
+    textAlign: "right",
   },
-
-  listContainer: { 
-    paddingTop: 4, 
-    paddingBottom: 16, 
-    rowGap: 10, 
-    width: '100%', 
-    alignItems: 'center' 
+  listContainer: {
+    paddingTop: 4,
+    paddingBottom: 16,
+    rowGap: 10,
+    width: "100%",
+    alignItems: "center",
   },
-
-  card: { 
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 12, 
-    borderWidth: 1, 
-    borderColor: '#E6E8EC', 
-    paddingVertical: 12, 
-    paddingHorizontal: 12, 
-    flexDirection: 'row-reverse', 
-    alignItems: 'center', 
-    gap: 8, 
-    width: '85%', 
-    shadowColor: '#000', 
-    shadowOpacity: 0.05, 
-    shadowRadius: 4, 
-    elevation: 2 
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    width: "85%",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-
-  cardIcon: { 
-    marginLeft: 6 
+  cardIcon: { marginLeft: 6 },
+  infoBox: { flex: 1, alignItems: "flex-end" },
+  name: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#2C3E50",
+    marginBottom: 2,
+    textAlign: "right",
+    width: "100%",
   },
-
-  infoBox: { 
-    flex: 1, 
-    alignItems: 'flex-end' 
+  meta: {
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "right",
+    width: "100%",
   },
-
-  name: { 
-    fontSize: 15, 
-    fontWeight: '700', 
-    color: '#2C3E50', 
-    marginBottom: 2, 
-    textAlign: 'right', 
-    width: '100%' 
+  status: {
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 4,
+    textAlign: "right",
+    width: "100%",
   },
-
-  meta: { 
-    fontSize: 13, 
-    color: '#6B7280', 
-    textAlign: 'right', 
-    width: '100%' 
+  empty: {
+    textAlign: "center",
+    color: "#6B7280",
+    marginTop: 16,
+    fontSize: 14,
   },
-
-  empty: { 
-    textAlign: 'center', 
-    color: '#6B7280', 
-    marginTop: 16, 
-    fontSize: 14 
-  },
-
 });
