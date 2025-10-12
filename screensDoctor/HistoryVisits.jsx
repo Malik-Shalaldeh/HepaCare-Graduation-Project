@@ -1,10 +1,23 @@
 // By sami: شاشة سجل الزيارات كملف مستقل
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, Modal, Pressable, TextInput } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  FlatList, 
+  Modal, 
+  Pressable, 
+  TextInput, 
+  Platform,
+  Alert
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ScreenWithDrawer from './ScreenWithDrawer';
-import { useVisitData } from '../contexts/VisitDataContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 // استخدام نفس بيانات المرضى من قائمة المرضى
 const patientsData = [
@@ -21,145 +34,60 @@ const patientsData = [
 const primary = '#00b29c';
 
 const HistoryVisits = () => {
-  // By sami: إضافة بحث المريض قبل عرض السجل أو التقييم
   const navigation = useNavigation();
   const route = useRoute();
   const { patientId = null, patientName = '' } = route.params || {};
-  const { getVisitsForPatient } = useVisitData();
-  const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://127.0.0.1:8000';
+  
+  const BASE_URL = Platform.OS === 'android' 
+    ? 'http://10.0.2.2:8000' 
+    : 'http://127.0.0.1:8000';
 
-  // حالة البحث
-  const [searchText, setSearchText] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState(null);
-
-  // ترشيح المرضى
-  const filteredPatients = patientsData.filter(p =>
-    p.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    p.id.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  // إذا لم يتم تمرير patientId، اعرض واجهة البحث أولاً
-  if (!patientId) {
-    return (
-      <ScreenWithDrawer title="بحث مريض">
-        <SafeAreaView style={{ flex: 1 }}>
-          {/* حقل البحث */}
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="أدخل اسم أو رقم المريض..."
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-          </View>
-
-          <FlatList
-            data={filteredPatients}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.resultItem}
-                onPress={() => setSelectedPatient(item)}
-              >
-                <Text style={styles.resultText}>{item.name} ({item.id})</Text>
-              </TouchableOpacity>
-            )}
-            ListEmptyComponent={
-              searchText.trim().length > 0 && filteredPatients.length === 0 ? (
-                <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
-              ) : null
-            }
-          />
-
-          {/* إذا تم اختيار مريض، أظهر الأزرار */}
-          {selectedPatient && (
-            <View style={{ padding: 16 }}>
-              <TouchableOpacity
-                style={styles.actionBtn}
-                onPress={() => {
-                  navigation.navigate('تقييم الزيارة', {
-                    patientId: selectedPatient.id,
-                    patientName: selectedPatient.name,
-                  });
-                }}
-              >
-                <Text style={styles.actionBtnText}>تقييم الزيارة</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: primary, marginTop: 12 }]}
-                onPress={() => {
-                  navigation.navigate('سجل الزيارات', {
-                    patientId: selectedPatient.id,
-                    patientName: selectedPatient.name,
-                  });
-                }}
-              >
-                <Text style={styles.actionBtnText}>عرض سجل الزيارات</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </SafeAreaView>
-      </ScreenWithDrawer>
-    );
-  }
-
-  // *** الكود السابق للسجل في حال توفر patientId أو استعراض الجميع ***
-
+  const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // الحصول على بيانات الزيارات
   const [serverVisits, setServerVisits] = useState([]);
 
   useEffect(() => {
-    const load = async () => {
+    const loadVisitsHistory = async () => {
       if (!patientId) return;
+      
       try {
-        const res = await fetch(`${BASE_URL}/visits/history?patient_id=${patientId}`);
-        const data = await res.json();
-        // expected array of visits
-        setServerVisits(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.warn('Failed to load visits history', e);
+        const response = await axios.get(`${BASE_URL}/visits/history`, {
+          params: { patient_id: patientId }
+        });
+        
+        const visitsData = response.data || [];
+        setServerVisits(visitsData);
+      } catch (error) {
+        console.error('خطأ في جلب سجل الزيارات:', error);
+        Alert.alert('خطأ', 'تعذر جلب سجل الزيارات');
       }
     };
-    load();
-  }, [patientId]);
 
-  const allVisitsData = useMemo(() => serverVisits, [serverVisits]);
+    loadVisitsHistory();
+  }, [patientId]);
 
   // ترشيح بيانات الزيارات بناءً على البحث
   const filteredVisitsData = useMemo(() => {
-    if (!searchQuery.trim()) return allVisitsData;
+    if (!searchQuery.trim()) return serverVisits;
     
     const query = searchQuery.toLowerCase();
-    return allVisitsData.filter(visit => 
+    return serverVisits.filter(visit => 
       (visit.patientName && visit.patientName.toLowerCase().includes(query)) ||
       visit.date.includes(query) ||
       (visit.summary && visit.summary.toLowerCase().includes(query)) ||
       (visit.condition && visit.condition.toLowerCase().includes(query))
     );
-  }, [allVisitsData, searchQuery]);
+  }, [serverVisits, searchQuery]);
 
   const openVisit = (item) => {
     setSelectedVisit(item);
     setModalVisible(true);
   };
 
-  // إغلاق Modal عند الضغط خارجه
-  const handleOverlayPress = (event) => {
-    if (event.target === event.currentTarget) {
-      setModalVisible(false);
-    }
-  };
-
   return (
     <ScreenWithDrawer title="سجل الزيارات">
       <SafeAreaView style={{ flex: 1 }}>
-        {/* سهم الرجوع للخلف */}
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -171,7 +99,6 @@ const HistoryVisits = () => {
           <Text style={styles.patientHeader}>{`المريض: ${patientName}`}</Text>
         ) : null}
 
-        {/* حقل البحث الموحد */}
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
@@ -189,11 +116,12 @@ const HistoryVisits = () => {
           ListEmptyComponent={
             searchQuery.trim() !== '' ? (
               <Text style={styles.noResults}>لا توجد نتائج مطابقة للبحث</Text>
-            ) : null
+            ) : (
+              <Text style={styles.noResults}>لا توجد زيارات سابقة</Text>
+            )
           }
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.card} onPress={() => openVisit(item)}>
-              {/* إظهار اسم المريض إذا لم يكن في سياق مريض محدد */}
               {!patientName && item.patientName && (
                 <Text style={styles.patientNameInVisit}>{`المريض: ${item.patientName}`}</Text>
               )}
@@ -205,16 +133,6 @@ const HistoryVisits = () => {
             </TouchableOpacity>
           )}
         />
-
-        {/* FAB لإضافة تقييم جديد */}
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() =>
-            navigation.navigate('تقييم الزيارة')
-          }
-        >
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
 
         {/* Modal تفاصيل الزيارة */}
         <Modal
@@ -234,10 +152,10 @@ const HistoryVisits = () => {
                   <Text style={styles.modalTitle}>{`زيارة ${selectedVisit.date} في ${selectedVisit.time}`}</Text>
                   
                   <Text style={styles.sectionHeader}>الحالة العامة</Text>
-                  <Text style={styles.multiLine}>{selectedVisit.condition}</Text>
+                  <Text style={styles.multiLine}>{selectedVisit.condition || 'غير محدد'}</Text>
                   
                   <Text style={styles.sectionHeader}>الالتزام بالعلاج</Text>
-                  <Text style={styles.multiLine}>{selectedVisit.adherence}</Text>
+                  <Text style={styles.multiLine}>{selectedVisit.adherence || 'غير محدد'}</Text>
                   
                   <Text style={styles.sectionHeader}>الملاحظات التفصيلية</Text>
                   <Text style={styles.multiLine}>{selectedVisit.notes || 'لا توجد ملاحظات'}</Text>
@@ -245,8 +163,8 @@ const HistoryVisits = () => {
                   <Text style={styles.sectionHeader}>الجوانب النفسية والاجتماعية</Text>
                   <Text style={styles.multiLine}>{selectedVisit.psychosocial || 'لا توجد معلومات'}</Text>
                   
-                  <Text style={styles.sectionHeader}>تعليمات الطبيب</Text>
-                  <Text style={styles.multiLine}>{selectedVisit.instructions || 'لا توجد تعليمات'}</Text>
+                  <Text style={styles.sectionHeader}>الطبيب المعالج</Text>
+                  <Text style={styles.multiLine}>{selectedVisit.doctorName || 'غير محدد'}</Text>
                 </>
               )}
               
