@@ -26,6 +26,7 @@ const HistoryVisits = () => {
   const route = useRoute();
   const { patientId = null, patientName = '' } = route.params || {};
   const { getVisitsForPatient } = useVisitData();
+  const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://127.0.0.1:8000';
 
   // حالة البحث
   const [searchText, setSearchText] = useState('');
@@ -111,17 +112,24 @@ const HistoryVisits = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // الحصول على بيانات الزيارات
-  const allVisitsData = useMemo(() => 
-    patientId 
-      ? getVisitsForPatient(patientId)
-      : Object.values(patientsData).flatMap(patient => 
-          getVisitsForPatient(patient.id).map(visit => ({
-            ...visit,
-            patientName: patient.name
-          }))
-        ),
-    [patientId, getVisitsForPatient]
-  );
+  const [serverVisits, setServerVisits] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!patientId) return;
+      try {
+        const res = await fetch(`${BASE_URL}/visits/history?patient_id=${patientId}`);
+        const data = await res.json();
+        // expected array of visits
+        setServerVisits(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.warn('Failed to load visits history', e);
+      }
+    };
+    load();
+  }, [patientId]);
+
+  const allVisitsData = useMemo(() => serverVisits, [serverVisits]);
 
   // ترشيح بيانات الزيارات بناءً على البحث
   const filteredVisitsData = useMemo(() => {
@@ -176,7 +184,7 @@ const HistoryVisits = () => {
 
         <FlatList
           data={filteredVisitsData}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingBottom: 20 }}
           ListEmptyComponent={
             searchQuery.trim() !== '' ? (

@@ -1,7 +1,7 @@
 //sami
 
 // PatientListScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,30 +11,53 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
+  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const INITIAL_PATIENTS = [
-  { id: '3', name: 'علاء سمير', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
-  { id: '2', name: 'عبد الجندي', nationalId: '0987654321', age: 32, lastVisit: '2025-05-15' },
-  { id: '33', name: 'محمود علي', nationalId: '5678901234', age: 58, lastVisit: '2025-05-10' },
-  { id: '4', name: 'فاطمة أحمد', nationalId: '4321098765', age: 27, lastVisit: '2025-05-05' },
-  { id: '5', name: 'خالد عمر', nationalId: '9012345678', age: 63, lastVisit: '2025-04-30' },
-  { id: '6', name: 'ريم الخطيب', nationalId: '3456789012', age: 41, lastVisit: '2025-04-25' },
-  { id: '7', name: 'عمر حسن', nationalId: '6789012345', age: 36, lastVisit: '2025-04-20' },
-  { id: '8', name: 'ليلى كريم', nationalId: '2109876543', age: 29, lastVisit: '2025-04-15' },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const PatientListScreen = () => {
   const navigation = useNavigation();
 
-  const [patients, setPatients] = useState(INITIAL_PATIENTS);
+  const [patients, setPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPatients, setFilteredPatients] = useState(INITIAL_PATIENTS);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+
+  const BASE_URL = Platform.OS === 'android' 
+    ? 'http://10.0.2.2:8000' 
+    : 'http://127.0.0.1:8000';
+
+  useEffect(() => {
+    const loadPatients = async () => {
+      try {
+        // جلب معرف الطبيب من AsyncStorage
+        const doctorId = await AsyncStorage.getItem('doctor_id');
+        
+        if (!doctorId) {
+          Alert.alert('خطأ', 'يرجى تسجيل الدخول مرة أخرى');
+          return;
+        }
+
+        // استدعاء الـ API الجديد
+        const response = await axios.get(`${BASE_URL}/doctor/patients`, {
+          params: { doctor_id: doctorId }
+        });
+
+        const patientsData = response.data || [];
+        
+        setPatients(patientsData);
+        setFilteredPatients(patientsData);
+      } catch (error) {
+        console.error('خطأ في جلب المرضى:', error);
+        Alert.alert('خطأ', 'تعذر جلب قائمة المرضى');
+      }
+    };
+
+    loadPatients();
+  }, []);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -48,6 +71,7 @@ const PatientListScreen = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'غير محدد';
     return new Date(dateString).toLocaleDateString('ar-EG', {
       year: 'numeric',
       month: 'short',
@@ -73,8 +97,12 @@ const PatientListScreen = () => {
             <Text style={styles.detailLabel}>آخر زيارة:</Text>
           </View>
           <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.otherConditions || 'غير محدد'}</Text>
-            <Text style={styles.detailLabel}>الأمراض الأخرى:</Text>
+            <Text style={styles.detailValue}>{item.symptoms}</Text>
+            <Text style={styles.detailLabel}>الأعراض:</Text>
+          </View>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.medications}</Text>
+            <Text style={styles.detailLabel}>الأدوية:</Text>
           </View>
           {item.phone && (
             <View style={styles.detailItem}>
@@ -88,19 +116,10 @@ const PatientListScreen = () => {
               <Text style={styles.detailLabel}>العنوان:</Text>
             </View>
           )}
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.symptoms && item.symptoms.length > 0 ? item.symptoms.join('، ') : 'غير محدد'}</Text>
-            <Text style={styles.detailLabel}>الأعراض:</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.medications && item.medications.length > 0 ? item.medications.join('، ') : 'غير محدد'}</Text>
-            <Text style={styles.detailLabel}>الأدوية:</Text>
-          </View>
         </View>
       </View>
 
       <View style={styles.cardActions}>
-        {/* زر الدردشة */}
         <TouchableOpacity
           style={styles.chatIconBtn}
           onPress={() =>
@@ -114,14 +133,12 @@ const PatientListScreen = () => {
           <Ionicons name="chatbubble-ellipses-outline" size={22} color="#00b29c" />
         </TouchableOpacity>
 
-        {/* زر  حالة المريض الشارت */}
         <TouchableOpacity
           style={styles.medicalFileButton}
           onPress={() =>
-            navigation.navigate('PatientChartScreen', 
-            {
+            navigation.navigate('PatientChartScreen', {
               patientId: item.id,
-              patientName:item.name
+              patientName: item.name
             })
           }
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -129,7 +146,6 @@ const PatientListScreen = () => {
           <Text style={styles.medicalFileButtonText}>حالة المريض</Text>
         </TouchableOpacity>
 
-        {/* زر سجل الزيارات - By sami */}
         <TouchableOpacity
           style={styles.visitHistoryButton}
           onPress={() =>
@@ -149,7 +165,6 @@ const PatientListScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      {/* زر الرجوع */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
@@ -177,11 +192,15 @@ const PatientListScreen = () => {
       <FlatList
         data={filteredPatients}
         renderItem={renderPatientItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => String(item.id)}
         contentContainerStyle={styles.patientList}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>لا يوجد مرضى</Text>
+          </View>
+        }
       />
-
     </SafeAreaView>
   );
 };
@@ -317,6 +336,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   addButtonText: { color: '#333', fontWeight: 'bold', fontSize: 16 },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666'
+  }
 });
 
 export default PatientListScreen;
