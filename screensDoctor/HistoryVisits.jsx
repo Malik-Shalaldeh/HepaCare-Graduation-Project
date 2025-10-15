@@ -18,18 +18,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import ScreenWithDrawer from './ScreenWithDrawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
-// استخدام نفس بيانات المرضى من قائمة المرضى
-const patientsData = [
-  { id: '1', name: 'مالك شلالدة', nationalId: '1234567890', age: 45, lastVisit: '2025-05-20' },
-  { id: '2', name: 'عبد الجندي', nationalId: '0987654321', age: 32, lastVisit: '2025-05-15' },
-  { id: '3', name: 'محمود علي', nationalId: '5678901234', age: 58, lastVisit: '2025-05-10' },
-  { id: '4', name: 'فاطمة أحمد', nationalId: '4321098765', age: 27, lastVisit: '2025-05-05' },
-  { id: '5', name: 'خالد عمر', nationalId: '9012345678', age: 63, lastVisit: '2025-04-30' },
-  { id: '6', name: 'ريم الخطيب', nationalId: '3456789012', age: 41, lastVisit: '2025-04-25' },
-  { id: '7', name: 'عمر حسن', nationalId: '6789012345', age: 36, lastVisit: '2025-04-20' },
-  { id: '8', name: 'ليلى كريم', nationalId: '2109876543', age: 29, lastVisit: '2025-04-15' },
-];
+import ENDPOINTS from '../samiendpoint';
 
 const primary = '#00b29c';
 
@@ -38,21 +27,19 @@ const HistoryVisits = () => {
   const route = useRoute();
   const { patientId = null, patientName = '' } = route.params || {};
   
-  const BASE_URL = Platform.OS === 'android' 
-    ? 'http://10.0.2.2:8000' 
-    : 'http://127.0.0.1:8000';
-
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [serverVisits, setServerVisits] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadVisitsHistory = async () => {
       if (!patientId) return;
       
+      setLoading(true);
       try {
-        const response = await axios.get(`${BASE_URL}/visits/history`, {
+        const response = await axios.get(ENDPOINTS.visitsHistory, {
           params: { patient_id: patientId }
         });
         
@@ -61,6 +48,8 @@ const HistoryVisits = () => {
       } catch (error) {
         console.error('خطأ في جلب سجل الزيارات:', error);
         Alert.alert('خطأ', 'تعذر جلب سجل الزيارات');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -109,30 +98,36 @@ const HistoryVisits = () => {
           <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
         </View>
 
-        <FlatList
-          data={filteredVisitsData}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          ListEmptyComponent={
-            searchQuery.trim() !== '' ? (
-              <Text style={styles.noResults}>لا توجد نتائج مطابقة للبحث</Text>
-            ) : (
-              <Text style={styles.noResults}>لا توجد زيارات سابقة</Text>
-            )
-          }
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => openVisit(item)}>
-              {!patientName && item.patientName && (
-                <Text style={styles.patientNameInVisit}>{`المريض: ${item.patientName}`}</Text>
-              )}
-              <View style={styles.cardRow}>
-                <Text style={styles.date}>{`${item.date} | ${item.time}`}</Text>
-                <Ionicons name="chevron-back" size={22} color="#000" />
-              </View>
-              <Text style={styles.summary}>{item.summary}</Text>
-            </TouchableOpacity>
-          )}
-        />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text>جار التحميل...</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredVisitsData}
+            keyExtractor={(item) => String(item.id)}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ListEmptyComponent={
+              searchQuery.trim() !== '' ? (
+                <Text style={styles.noResults}>لا توجد نتائج مطابقة للبحث</Text>
+              ) : (
+                <Text style={styles.noResults}>لا توجد زيارات سابقة</Text>
+              )
+            }
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.card} onPress={() => openVisit(item)}>
+                {!patientName && item.patientName && (
+                  <Text style={styles.patientNameInVisit}>{`المريض: ${item.patientName}`}</Text>
+                )}
+                <View style={styles.cardRow}>
+                  <Text style={styles.date}>{`${item.date} | ${item.time}`}</Text>
+                  <Ionicons name="chevron-back" size={22} color="#000" />
+                </View>
+                <Text style={styles.summary}>{item.summary}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
 
         {/* Modal تفاصيل الزيارة */}
         <Modal
@@ -327,6 +322,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   closeBtn: { alignSelf: 'flex-start' },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResults: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#666',
+    fontFamily: 'Tajawal',
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+    fontFamily: 'Tajawal',
+  },
+  multiLine: {
+    fontSize: 16,
+    marginBottom: 12,
+    textAlign: 'right',
+    fontFamily: 'Tajawal',
+    lineHeight: 24,
+  },
 });
 
 export default HistoryVisits;

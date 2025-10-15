@@ -2,9 +2,27 @@
 // Add new endpoints here and import this file wherever needed.
 // This makes maintaining URL changes easy and avoids hard-coding strings.
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.example.com';
+import { Platform } from 'react-native';
+
+// تحديد الـ BASE URL بناءً على المنصة
+const BASE_URL = Platform.OS === 'android' 
+  ? 'http://10.0.2.2:8000'   // للأندرويد
+  : 'http://127.0.0.1:8000'; // للماك/ويندوز
 
 const ENDPOINTS = {
+  // الاتصال الأساسي
+  BASE_URL,
+
+  // Visits
+  visitsHistory: `${BASE_URL}/visits/history`,
+  searchPatients: `${BASE_URL}/doctor/search-patients`,
+  
+  // Patients
+  patientsList: `${BASE_URL}/doctor/patients`,
+  
+  // Authentication
+  login: `${BASE_URL}/auth/login`,
+  
   // Messaging
   sendMessage: `${BASE_URL}/messages`,
   fetchMessages: `${BASE_URL}/messages`,
@@ -21,7 +39,10 @@ const ENDPOINTS = {
   // Patient Appointments
   patientAppointments: `${BASE_URL}/patients/appointments`,
 
-  // TODO: add more endpoints as you implement new features
+  // Lab Results
+  labResults: `${BASE_URL}/patient/lab-results`,
+
+  // TODO: أضف المزيد من endpoints حسب الحاجة
 };
 
 export default ENDPOINTS;

@@ -10,38 +10,76 @@ import {
   TextInput,
   SafeAreaView,
   ScrollView,
+  Platform,
+  Alert
 } from 'react-native';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import ENDPOINTS from '../samiendpoint';
 
 const primary = '#00b29c';
-
-const patientsData = [
-  { id: '3', name: 'علاء سمير' },
-  { id: '2', name: 'عبد الجندي' },
-  { id: '10', name: 'محمود علي' },
-  { id: '4', name: 'فاطمة أحمد' },
-  { id: '5', name: 'خالد عمر' },
-  { id: '6', name: 'ريم الخطيب' },
-  { id: '7', name: 'عمر حسن' },
-  { id: '8', name: 'ليلى كريم' },
-];
 
 const Visits = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // تأكد أن selectedPatient يبدأ null عند دخول الشاشة
+  // جلب معرف الطبيب عند تحميل الشاشة
   useEffect(() => {
-    setSelectedPatient(null);
+    const fetchDoctorId = async () => {
+      try {
+        const doctorId = await AsyncStorage.getItem('doctor_id');
+        if (!doctorId) {
+          Alert.alert('خطأ', 'يرجى تسجيل الدخول مرة أخرى');
+          return;
+        }
+        
+        // جلب المرضى
+        await searchPatients(doctorId);
+      } catch (error) {
+        console.error('خطأ في جلب معرف الطبيب:', error);
+        Alert.alert('خطأ', 'تعذر جلب بيانات الطبيب');
+      }
+    };
+
+    fetchDoctorId();
   }, []);
 
-  const filteredPatients = patientsData.filter(p =>
+  // البحث عن المرضى
+  const searchPatients = async (doctorId, query = '') => {
+    setLoading(true);
+    try {
+      const response = await axios.get(ENDPOINTS.searchPatients, {
+        params: { 
+          query: query,
+          doctor_id: doctorId 
+        }
+      });
+      
+      setPatients(response.data || []);
+    } catch (error) {
+      console.error('خطأ في البحث عن المرضى:', error);
+      Alert.alert('خطأ', 'تعذر جلب قائمة المرضى');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // تصفية المرضى محليًا
+  const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchText.toLowerCase()) ||
     p.id.includes(searchText)
   );
+
+  // إعادة تعيين selectedPatient عند دخول الشاشة
+  useEffect(() => {
+    setSelectedPatient(null);
+  }, []);
 
   return (
     <ScreenWithDrawer title="الزيارات">
@@ -53,30 +91,42 @@ const Visits = () => {
                 style={styles.searchInput}
                 placeholder="ابحث عن المريض..."
                 value={searchText}
-                onChangeText={setSearchText}
+                onChangeText={async (text) => {
+                  setSearchText(text);
+                  const doctorId = await AsyncStorage.getItem('doctor_id');
+                  if (doctorId) {
+                    searchPatients(doctorId, text);
+                  }
+                }}
               />
               <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
             </View>
 
-            {searchText.trim().length > 0 && (
-              <FlatList
-                data={filteredPatients}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.resultItem}
-                    onPress={() => setSelectedPatient(item)}
-                  >
-                    <Text style={styles.resultText}>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-                ListEmptyComponent={
-                  filteredPatients.length === 0 ? (
-                    <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
-                  ) : null
-                }
-                contentContainerStyle={{ paddingBottom: 10 }}
-              />
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text>جار التحميل...</Text>
+              </View>
+            ) : (
+              searchText.trim().length > 0 && (
+                <FlatList
+                  data={filteredPatients}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.resultItem}
+                      onPress={() => setSelectedPatient(item)}
+                    >
+                      <Text style={styles.resultText}>{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                  ListEmptyComponent={
+                    filteredPatients.length === 0 ? (
+                      <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
+                    ) : null
+                  }
+                  contentContainerStyle={{ paddingBottom: 10 }}
+                />
+              )
             )}
           </>
         ) : (
@@ -119,8 +169,6 @@ const Visits = () => {
     </ScreenWithDrawer>
   );
 };
-
-export default Visits;
 
 const styles = StyleSheet.create({
   searchContainer: {
@@ -181,4 +229,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
+export default Visits;
