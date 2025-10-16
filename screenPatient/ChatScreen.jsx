@@ -2,35 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Channel, MessageList, MessageInput, Chat } from 'stream-chat-expo';
 import { useChat } from '../contexts/ChatContext';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ENDPOINTS from '../samiendpoint';
 
-const ChatScreen = () => {
+const ChatScreenPatient = () => {
   const { chatClient, isReady, getChannel } = useChat();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
-  const route = useRoute();
-  const navigation = useNavigation();
-  
-  const { channelId, patientName } = route.params || {};
 
   useEffect(() => {
-    // تعيين عنوان الشاشة
-    navigation.setOptions({
-      title: patientName || 'المحادثة',
-      headerTitleAlign: 'center',
-    });
-
     initializeChannel();
-  }, [channelId, isReady]);
+  }, [isReady]);
 
   const initializeChannel = async () => {
-    if (!isReady || !chatClient || !channelId) {
+    if (!isReady || !chatClient) {
       setLoading(false);
       return;
     }
 
     try {
-      const ch = await getChannel(channelId);
+      const patientId = await AsyncStorage.getItem('patientId');
+      
+      // جلب معلومات القناة من Backend
+      const response = await axios.get(
+        `${ENDPOINTS.BASE_URL}/chat/patient-channel`,
+        { params: { patient_id: patientId } }
+      );
+
+      const { channel_id } = response.data;
+      
+      // الحصول على القناة من Stream
+      const ch = await getChannel(channel_id);
       setChannel(ch);
     } catch (error) {
       console.error('Error initializing channel:', error);
@@ -85,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+export default ChatScreenPatient;

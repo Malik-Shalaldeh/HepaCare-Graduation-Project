@@ -150,6 +150,27 @@ export default function AddPatientsComponent() {
       });
       if (!res.ok) throw new Error("save failed");
 
+      const patientData = await res.json();
+      const patientId = patientData.patient_id || patientData.id;
+
+      // إنشاء قناة Chat بين الطبيب والمريض
+      try {
+        await fetch(`${API}/chat/create-channel`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            doctor_id: parseInt(doctorId),
+            patient_id: patientId
+          }),
+        });
+        console.log('✅ Chat channel created for new patient');
+      } catch (chatError) {
+        console.error('❌ Error creating chat channel:', chatError);
+        // يمكن الاستمرار بدون إنشاء القناة
+      }
+
       Alert.alert("تم", "تمت إضافة المريض بنجاح.");
       setNewPatient({
         fullName: "",

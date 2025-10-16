@@ -17,7 +17,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import ENDPOINTS from '../samiendpoint';
+
 
 const PatientListScreen = () => {
   const navigation = useNavigation();
@@ -26,10 +27,7 @@ const PatientListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPatients, setFilteredPatients] = useState([]);
 
-  const BASE_URL = Platform.OS === 'android' 
-    ? 'http://10.0.2.2:8000' 
-    : 'http://127.0.0.1:8000';
-
+  
   useEffect(() => {
     const loadPatients = async () => {
       try {
@@ -41,15 +39,18 @@ const PatientListScreen = () => {
           return;
         }
 
-        // استدعاء الـ API الجديد
-        const response = await axios.get(`${BASE_URL}/doctor/patients`, {
-          params: { doctor_id: doctorId }
-        });
-
-        const patientsData = response.data || [];
+        // استدعاء الـ API باستخدام fetch
+        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`;
+        const response = await fetch(url);
         
-        setPatients(patientsData);
-        setFilteredPatients(patientsData);
+        if (!response.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+
+        const patientsData = await response.json();
+        
+        setPatients(patientsData || []);
+        setFilteredPatients(patientsData || []);
       } catch (error) {
         console.error('خطأ في جلب المرضى:', error);
         Alert.alert('خطأ', 'تعذر جلب قائمة المرضى');

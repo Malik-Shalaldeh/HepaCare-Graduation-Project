@@ -19,13 +19,13 @@ import PatientsStack from './PatientsStack';
 import MedicationsStackScreen from './medicationStack';
 import AppointmentsStack from './AppointmentsStack';
 import EducationalContentStack from './EducationalContentStack';
-import ChatScreen from '../screensDoctor/ChatScreen';
 import Dashboard from '../screensDoctor/Dashboard';
 import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
 import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
 import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
 import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
 import ChangePasswordScreen from '../Login/restPassword';
+import ChatListScreen from '../screensDoctor/ChatListScreen';
 
 const primary = '#00b29c';
 
@@ -75,7 +75,7 @@ function MainTabs() {
             'لوحة التحكم': 'home',
             الزيارات: 'calendar',
             الأدوية: 'medkit',
-            الرسائل: 'chatbubble-outline',
+            الرسائل: 'chatbubbles-outline',
           };
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
         },
@@ -95,7 +95,7 @@ function MainTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen name="لوحة التحكم" component={Dashboard} />
-      <Tab.Screen name="الرسائل" component={ChatScreen} />
+      <Tab.Screen name="الرسائل" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }

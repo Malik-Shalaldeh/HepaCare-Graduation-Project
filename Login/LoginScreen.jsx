@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import { useChat } from '../contexts/ChatContext';
 
 const { width } = Dimensions.get('window');
 const API = 'http://192.168.1.122:8000';
@@ -19,37 +19,90 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { connectUser } = useChat();
 
  const handleLogin = async () => {
   try {
-    const res = await axios.post(`${API}/auth/login`, { username, password });
-    const data = res.data;
+    const response = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+      } else if (response.status === 401) {
+        Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
+      } else {
+        Alert.alert("خطأ", "حدث خطأ في تسجيل الدخول");
+      }
+      setPassword("");
+      return;
+    }
+
+    const data = await response.json();
 
     // ✅ تحقق محلي من is_active
     if (data.is_active === 0) {
       Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
       setPassword("");
-      return; // 👈 يوقف هون وما يدخل
+      return;
     }
 
     await AsyncStorage.setItem("user_id", String(data.id));
 
     if (data.role === "DOCTOR") {
       await AsyncStorage.setItem("doctor_id", String(data.id));
-    } else {
+      await AsyncStorage.setItem("patientId", ""); // Clear patient ID for doctor
+    } else if (data.role === "PATIENT") {
       await AsyncStorage.removeItem("doctor_id");
+      await AsyncStorage.setItem("patientId", String(data.id));
+    }
+
+    // الاتصال بـ Stream Chat (فقط للأطباء والمرضى)
+    if (data.role === "DOCTOR" || data.role === "PATIENT") {
+      try {
+        const userType = data.role === "DOCTOR" ? "doctor" : "patient";
+        
+        const chatResponse = await fetch(`${API}/chat/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: data.id,
+            user_type: userType
+          }),
+        });
+
+        if (chatResponse.ok) {
+          const chatData = await chatResponse.json();
+          
+          // حفظ بيانات Stream
+          await AsyncStorage.setItem('stream_token', chatData.token);
+          await AsyncStorage.setItem('stream_api_key', chatData.api_key);
+          await AsyncStorage.setItem('stream_user_id', chatData.user_id);
+
+          // الاتصال بـ Stream Chat
+          await connectUser(
+            chatData.user_id,
+            chatData.token,
+            chatData.api_key,
+            chatData.user_name
+          );
+
+          console.log('✅ Connected to Stream Chat');
+        }
+      } catch (chatError) {
+        console.error('❌ Error connecting to chat:', chatError);
+        // يمكن الاستمرار بدون Chat إذا فشل
+      }
     }
 
     navigation.replace(data.route);
 
   } catch (e) {
-    if (e.response?.status === 403) {
-      Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
-    } else if (e.response?.status === 401) {
-      Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
-    } else {
-      Alert.alert("خطأ", "تعذر الاتصال بالخادم");
-    }
+    console.error("Login error:", e);
+    Alert.alert("خطأ", "تعذر الاتصال بالخادم");
     setPassword("");
   }
 };
