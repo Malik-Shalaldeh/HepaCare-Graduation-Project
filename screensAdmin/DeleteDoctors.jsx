@@ -1,4 +1,3 @@
-// screensAdmin/ToggleDoctorScreen.js
 import { useState } from 'react';
 import {
   View,
@@ -75,7 +74,11 @@ export default function ToggleDoctorScreen() {
   };
 
   const renderItem = ({ item }) => {
-    const active = selected?.id === item.id;
+    let active = false;
+    if (selected && selected.id === item.id) {
+      active = true;
+    }
+
     return (
       <TouchableOpacity
         onPress={() => setSelected(item)}
@@ -85,12 +88,14 @@ export default function ToggleDoctorScreen() {
           active && { borderColor: PRIMARY, backgroundColor: '#E6FFFA' },
         ]}
       >
+
         <Ionicons
           name="person-outline"
           size={18}
           color={active ? PRIMARY : '#6B7280'}
           style={styles.cardIcon}
         />
+
         <View style={styles.infoBox}>
           <Text style={[styles.name, active && { color: PRIMARY }]}>{item.name}</Text>
           <Text style={styles.meta}>الرقم: {item.id}</Text>
@@ -100,6 +105,8 @@ export default function ToggleDoctorScreen() {
             {item.is_active ? '✅ مفعل' : '⛔ معطل'}
           </Text>
         </View>
+
+
       </TouchableOpacity>
     );
   };
@@ -110,7 +117,9 @@ export default function ToggleDoctorScreen() {
 
       {/* مربع البحث */}
       <View style={styles.searchRow}>
+
         <Ionicons name="search" size={18} color="#6B7280" />
+
         <TextInput
           style={styles.input}
           placeholder="ابحث بالاسم أو رقم الطبيب"
@@ -120,9 +129,11 @@ export default function ToggleDoctorScreen() {
           textAlign="right"
           onSubmitEditing={handleSearch}
         />
+
         <TouchableOpacity onPress={handleSearch} activeOpacity={0.8} style={styles.searchBtn}>
           <Ionicons name="search-outline" size={18} color="#fff" />
         </TouchableOpacity>
+
       </View>
 
       {loading && <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 20 }} />}
@@ -143,10 +154,12 @@ export default function ToggleDoctorScreen() {
         activeOpacity={0.9}
         style={[styles.disableBtn, !selected && { opacity: 0.5 }]}
       >
+
         <Ionicons name={selected?.is_active ? "close-circle-outline" : "checkmark-circle-outline"} size={16} color="#fff" />
         <Text style={styles.disableText}>
           {selected?.is_active ? "تعطيل الحساب" : "إلغاء التعطيل"}
         </Text>
+        
       </TouchableOpacity>
     </View>
   );

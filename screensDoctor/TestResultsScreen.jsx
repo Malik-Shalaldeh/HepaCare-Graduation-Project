@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API = 'http://192.168.1.14:8000';
+const API = 'http://192.168.1.12:8000';
 
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');

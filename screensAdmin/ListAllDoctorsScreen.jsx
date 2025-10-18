@@ -18,46 +18,60 @@ export default function AllDoctorsScreen() {
   // جلب الأطباء من الباك-إند
   useEffect(() => {
     const fetchDoctors = async () => {
+
       try {
         const res = await axios.get(`${API}/admin/doctors`);
         setDoctors(res.data);
       } catch (err) {
         console.error("خطأ في جلب الأطباء:", err);
       }
+      
     };
     fetchDoctors();
   }, []);
 
-  // فلترة محلية بالاسم أو رقم الهاتف أو العيادة
-  const results = doctors.filter(
-    (d) =>
-      (d.name && d.name.includes(search)) ||
-      (d.phone && d.phone.includes(search)) ||
-      (d.clinic && d.clinic.includes(search))
-  );
+  // فلترة محلية بالاسم أو رقم الهوية أو العيادة
+
+  const results = doctors.filter((d) => {
+    const query = search.trim();
+    if (!query) return true;
+
+    const nameMatch = d.name && d.name.includes(query);
+    const idMatch = d.id && d.id.toString().includes(query); 
+    const clinicMatch = d.clinic && d.clinic.includes(query);
+
+    return nameMatch || idMatch || clinicMatch;
+  });
+
 
   // بطاقة الطبيب
   const renderItem = ({ item }) => (
     <View style={styles.card}>
+
       <Ionicons
         name="medkit-outline"
         size={20}
         color="#00b29c"
         style={styles.cardIcon}
       />
+
       <View style={styles.infoBox}>
         <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.meta}>رقم الهوية: {item.id}</Text>
         <Text style={styles.meta}>رقم الهاتف: {item.phone}</Text>
         <Text style={styles.meta}>العيادة: {item.clinic}</Text>
+
         <Text
           style={[
             styles.status,
             { color: item.active ? "#00b29c" : "#D32F2F" },
           ]}
         >
+          
           {item.active ? "مفعّل" : "غير مفعّل"}
         </Text>
       </View>
+
     </View>
   );
 
@@ -73,7 +87,7 @@ export default function AllDoctorsScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="ابحث بالاسم أو الهاتف أو العيادة"
+          placeholder="ابحث بالاسم أو رقم الهوية أو العيادة"
           placeholderTextColor="#9AA4AF"
           value={search}
           onChangeText={setSearch}

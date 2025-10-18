@@ -11,6 +11,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Visits from '../screensDoctor/Visits';
+import LoginScreen from '../Login/LoginScreen';
 import LabsScreen from '../screensDoctor/LabsScreen'; // sami: شاشة المختبرات المعتمدة
 import HistoryVisits from '../screensDoctor/HistoryVisits';
 import Settings from '../screensDoctor/Settings';
@@ -216,6 +217,15 @@ function NavigatorDoctor() {
         <Drawer.Screen
         name="اعادة تعيين كلمة المرور"
         component={ChangePasswordScreen}
+        options={{
+          drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
+          headerShown: false,             // يخفي العنوان العلوي
+       }}
+      />
+      
+       <Drawer.Screen
+        name="LoginScreen"
+        component={LoginScreen}
         options={{
           drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
           headerShown: false,             // يخفي العنوان العلوي

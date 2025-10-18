@@ -8,7 +8,7 @@ import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
-const API = 'http://192.168.1.14:8000';   
+const API = 'http://192.168.1.12:8000';   
 
 export default function PatientDashboard() {
   const [name, setName] = useState('');
@@ -54,7 +54,7 @@ export default function PatientDashboard() {
           />
 
           <View>
-            <Text style={styles.title}>مرحباً يا {name || 'مستخدم'} 👋</Text>
+            <Text style={styles.title}>مرحباً يا {name || 'مستخدم'} </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
 
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 20,
+    paddingHorizontal:25,
     borderRadius: 20,
     marginBottom: 20,
     shadowColor: '#000',
@@ -103,10 +104,10 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   icon: {
-    marginRight: 12,
+    marginRight: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     color: primary,
     marginBottom: 4,

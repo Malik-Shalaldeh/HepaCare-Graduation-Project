@@ -1,85 +1,93 @@
-import  { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
-const API = 'http://192.168.1.122:8000';
 
-const { width } = Dimensions.get('window');
+const API = 'http://192.168.1.12:8000';
 
 const Dashboard = () => {
+  const navigation = useNavigation();
 
-  const [doctorName, setDoctorName] = useState('');
-  const [patientsCount, setPatientsCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [doctorName, setDoctorName] = useState('');   
+  const [patientsCount, setPatientsCount] = useState(0); 
 
   const today = new Date();
   const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
   useEffect(() => {
+    let active = true;
+
     const fetchDashboard = async () => {
       try {
         const doctor_id = await AsyncStorage.getItem('doctor_id');
         if (!doctor_id) {
           Alert.alert('خطأ', 'لم يتم العثور على رقم الطبيب، يرجى تسجيل الدخول مجددًا.');
-          setLoading(false);
           return;
         }
 
         const res = await fetch(`${API}/doctor/dashboard?doctor_id=${doctor_id}`);
-        if (!res.ok) throw new Error('خطأ في الاتصال');
+        if (!res.ok) 
+          throw new Error('خطأ في الاتصال');
 
         const data = await res.json();
+        if (!active) return;
+
         setDoctorName(data.doctor_name);
-        setPatientsCount(data.patients_count);
+        setPatientsCount(Number(data.patients_count) || 0);
       } catch (err) {
         console.error(err);
-        Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
-      } finally {
-        setLoading(false);
+        if (active) Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
+        navigation.navigate('LoginScreen');
+
       }
     };
 
     fetchDashboard();
-  }, []);
 
-  if (loading) {
-    return (
-      <ScreenWithDrawer title="لوحة التحكم">
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color={accent} />
-        </View>
-      </ScreenWithDrawer>
-    );
-  }
+    // إعادة الجلب عند رجوع الفوكس للشاشة
+    const unsubscribe = navigation.addListener('focus', fetchDashboard);
+
+    return () => {
+      active = false;
+      if (unsubscribe) 
+        unsubscribe();
+
+    };
+  }, [navigation]);
 
   return (
     <ScreenWithDrawer title="لوحة التحكم">
-      {/* ✅ Header */}
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Hepacare</Text>
       </View>
 
       <View style={styles.container}>
-        {/* ✅ بطاقة الترحيب */}
+        {/* بطاقة الترحيب */}
         <View style={styles.card}>
           <Ionicons name="person-circle-outline" size={40} color={accent} style={styles.icon} />
           <View>
-            <Text style={styles.title}>مرحباً {doctorName} 👨‍⚕️</Text>
+            <Text style={styles.title}>
+               مرحباً د.{doctorName ? doctorName : '...'} 👨‍⚕️
+            </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
         </View>
 
-        {/* ✅ بطاقة عدد المرضى */}
+        {/* بطاقة عدد المرضى */}
         <View style={styles.card}>
           <Ionicons name="people-outline" size={40} color={accent} style={styles.icon} />
           <View>
-            <Text style={styles.title}>{patientsCount} مريض</Text>
+            <Text style={styles.title}>
+              {patientsCount} مريض
+            </Text>
             <Text style={styles.subtitle}>عدد المرضى المشرف عليهم</Text>
           </View>
         </View>
@@ -110,19 +118,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
-  icon: {
-    marginEnd: 12,
-  },
+  icon: { marginEnd: 12 },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: primary,
     marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 14,
-    color: textColor,
-  },
+  subtitle: { fontSize: 14, color: textColor },
   header: {
     width: '100%',
     backgroundColor: accent,
@@ -142,11 +145,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     letterSpacing: 3,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
