@@ -16,7 +16,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ScreenWithDrawer from './ScreenWithDrawer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ENDPOINTS from '../samiendpoint';
 

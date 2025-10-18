@@ -13,12 +13,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useChat } from '../contexts/ChatContext';
 
-<<<<<<< HEAD
-const { width } = Dimensions.get('window');
-const API = 'http://192.168.1.122:8000';
-=======
+
 const API = 'http://192.168.1.12:8000';
->>>>>>> 213b03c (comitt malik)
+
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');

@@ -54,7 +54,7 @@ export default function PatientDashboard() {
           />
 
           <View>
-            <Text style={styles.title}>مرحباً يا {name || 'مستخدم'} </Text>
+            <Text style={styles.title}> {name || 'مستخدم'} </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
 
