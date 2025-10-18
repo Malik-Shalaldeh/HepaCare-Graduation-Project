@@ -28,10 +28,6 @@ const PatientListScreen = () => {
   const [filteredPatients, setFilteredPatients] = useState([]);
 
 
-  const BASE_URL = Platform.OS === 'android' 
-    ? 'http://192.168.1.12:8000' 
-    : 'http://127.0.0.1:8000';
-
   useEffect(() => {
     const loadPatients = async () => {
       try {
