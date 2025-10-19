@@ -1,6 +1,6 @@
 // componentDoctor/HealthMedComponent.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,32 +17,79 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
+const API = "http://192.168.1.122:8000"; // عدّل إذا لزم
+
 export default function HealthMedComponent() {
   const navigation = useNavigation();
 
-  const medsList = [
-    "Lamivudine 100mg (3TC)",
-    "Tenofovir Disoproxil fumarate (TDF) 300 mg",
-    "Entecavir 0.5mg",
-    "Entecavir 1mg",
-    "Adefovir 10mg",
-  ];
-  const [availableMeds, setAvailableMeds] = useState(
-    medsList.reduce((acc, med) => ({ ...acc, [med]: true }), {})
-  );
+  // === الحالة القادمة من السيرفر ===
+  const [meds, setMeds] = useState([]); // [{id, Name, isAvailable, ...}]
+  const [availableMedsMap, setAvailableMedsMap] = useState({}); // {id: bool}
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleToggle = (med) => {
-    setAvailableMeds((prev) => {
-      const newValue = !prev[med];
-      if (newValue) {
-        Alert.alert("دواء متوفر", `دواء ${med} متوفر الآن في الصحة`);
-      }
-      return { ...prev, [med]: newValue };
-    });
+  // تحميل جميع الأدوية مع الحالة
+  const loadMeds = async () => {
+    try {
+      const res = await fetch(`${API}/health-meds?only_available=0`);
+      const data = await res.json();
+      const safe = Array.isArray(data) ? data : [];
+      setMeds(safe);
+      const map = {};
+      safe.forEach((m) => {
+        if (m && typeof m.id !== "undefined") map[m.id] = !!m.isAvailable;
+      });
+      setAvailableMedsMap(map);
+    } catch (e) {
+      console.log("Load meds error:", e);
+      Alert.alert("خطأ", "فشل تحميل الأدوية من السيرفر");
+      setMeds([]);
+      setAvailableMedsMap({});
+    }
   };
 
-  const displayedMeds = medsList.filter((med) => availableMeds[med]);
+  useEffect(() => {
+    loadMeds();
+  }, []);
+
+  // تبديل الحالة عبر API ثم تحديث الحالة المحلية
+  const handleToggle = async (med) => {
+    if (!med || typeof med.id === "undefined" || med.id === null) {
+      Alert.alert("تنبيه", "معرّف الدواء غير متوفر");
+      return;
+    }
+    const current = !!availableMedsMap[med.id];
+    const newValue = !current;
+
+    try {
+      const url = `${API}/health-meds/set-availability?med_id=${encodeURIComponent(
+        med.id
+      )}&available=${newValue ? 1 : 0}`;
+      const res = await fetch(url, { method: "PATCH" });
+      if (!res.ok) throw new Error("PATCH failed");
+
+      // تحديث الحالة محليًا
+      setAvailableMedsMap((prev) => ({ ...(prev || {}), [med.id]: newValue }));
+      setMeds((prev) =>
+        Array.isArray(prev)
+          ? prev.map((m) =>
+              m?.id === med.id ? { ...m, isAvailable: newValue ? 1 : 0 } : m
+            )
+          : []
+      );
+      if (newValue) {
+        Alert.alert("دواء متوفر", `دواء ${String(med?.Name ?? "")} متوفر الآن في الصحة`);
+      }
+    } catch (e) {
+      console.log("Toggle error:", e);
+      Alert.alert("خطأ", "تعذّر تحديث حالة الدواء");
+    }
+  };
+
+  // قائمة العرض الرئيسية: أسماء الأدوية المتاحة فقط كنصوص (مطابقة لطريقة العرض الأصلية)
+  const displayedMeds = Array.isArray(meds)
+    ? meds.filter((m) => m && typeof m.id !== "undefined" && availableMedsMap[m.id])
+    : [];
+  const displayedMedNames = displayedMeds.map((m) => String(m?.Name ?? ""));
 
   return (
     <>
@@ -62,7 +109,7 @@ export default function HealthMedComponent() {
       <View style={styles.container}>
         <View style={styles.headerSection}>
           <Text style={[styles.subtitle, styles.rtlText]}>
-            إجمالي الأدوية: {displayedMeds.length}
+            إجمالي الأدوية: {displayedMedNames.length}
           </Text>
           <TouchableOpacity
             style={[styles.actionBtn, styles.addButton]}
@@ -73,14 +120,16 @@ export default function HealthMedComponent() {
           </TouchableOpacity>
         </View>
 
-        {displayedMeds.length === 0 ? (
+        {displayedMedNames.length === 0 ? (
           <Text style={[styles.noMedsText, styles.rtlText]}>
             لا توجد أدوية متوفرة حالياً
           </Text>
         ) : (
           <FlatList
-            data={displayedMeds}
-            keyExtractor={(item) => item}
+            data={Array.isArray(displayedMedNames) ? displayedMedNames : []}
+            keyExtractor={(item, index) =>
+              typeof item === "string" && item ? `${item}__${index}` : String(index)
+            }
             renderItem={({ item }) => (
               <View style={styles.medItem}>
                 <Ionicons
@@ -89,7 +138,7 @@ export default function HealthMedComponent() {
                   color="#4CAF50"
                   style={{ marginLeft: 8 }}
                 />
-                <Text style={[styles.medName, styles.rtlText]}>{item}</Text>
+                <Text style={[styles.medName, styles.rtlText]}>{String(item ?? "")}</Text>
               </View>
             )}
             contentContainerStyle={{ paddingBottom: 100 }}
@@ -106,15 +155,19 @@ export default function HealthMedComponent() {
                 إدارة الأدوية
               </Text>
               <FlatList
-                data={medsList}
-                keyExtractor={(item) => item}
+                data={Array.isArray(meds) ? meds : []}
+                keyExtractor={(item, index) =>
+                  typeof item?.id !== "undefined" && item?.id !== null
+                    ? String(item.id)
+                    : `med__${index}`
+                }
                 renderItem={({ item }) => (
                   <View style={styles.switchRow}>
                     <Text style={[styles.patientNameText, styles.rtlText]}>
-                      {item}
+                      {String(item?.Name ?? "")}
                     </Text>
                     <Switch
-                      value={availableMeds[item]}
+                      value={!!availableMedsMap?.[item?.id]}
                       onValueChange={() => handleToggle(item)}
                     />
                   </View>
@@ -141,18 +194,17 @@ export default function HealthMedComponent() {
   );
 }
 
+// ====== نفس الستايل تمامًا بدون أي تعديل ======
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     paddingHorizontal: 16,
-    paddingTop:
-      Platform.OS === "android" ? StatusBar.currentHeight + 20 : 20,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 20,
   },
   rtlText: {
     writingDirection: "rtl",
     textAlign: "right",
-    
   },
   backArrow: {
     top: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 0,
@@ -161,12 +213,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     borderRadius: 16,
   },
-   headerSection: {
-    
+  headerSection: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12, // مسافة بسيطة تحت العنوان
+    marginBottom: 12,
   },
   subtitle: {
     fontSize: 20,
@@ -262,5 +313,4 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "#F44336",
   },
-
 });

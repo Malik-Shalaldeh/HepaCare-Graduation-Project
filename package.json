@@ -28,15 +28,19 @@
     "react-native": "0.79.2",
     "react-native-chart-kit": "^6.12.0",
     "react-native-dropdown-picker": "^5.4.6",
-    "react-native-gesture-handler": "~2.24.0",
-    "react-native-reanimated": "~4.1.0",
-    "react-native-safe-area-context": "^5.4.1",
-    "react-native-screens": "~4.10.0",
-    "react-native-svg": "^15.12.0",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-get-random-values": "^1.11.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-url-polyfill": "^3.0.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
     "stream-chat": "^9.24.0",
-    "stream-chat-expo": "^8.6.2"
+    "stream-chat-expo": "^8.6.2",
+    "stream-chat-react-native": "^8.6.2",
+    "undefined": "\\"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

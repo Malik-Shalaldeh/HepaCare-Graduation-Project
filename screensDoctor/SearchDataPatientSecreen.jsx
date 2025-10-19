@@ -1,6 +1,6 @@
 // PatientsListScreen.jsx
 import { useNavigation } from "@react-navigation/native";
-import  { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const API = 'http://192.168.1.122:8000';
+const API = "http://192.168.1.122:8000";
 
 export default function DataPatientsListScreen() {
   const navigation = useNavigation();
@@ -28,14 +28,19 @@ export default function DataPatientsListScreen() {
     setSearchTerm(text);
     setSelectedPatient(null);
     const q = text.trim();
-    if (!q) { setPatients([]); return; }
+    if (!q) {
+      setPatients([]);
+      return;
+    }
     try {
-      const res = await fetch(`${API}/patient/search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(
+        `${API}/patient/search?q=${encodeURIComponent(q)}`
+      );
       const data = await res.json();
       setPatients(
-        (data.patients || []).map(p => ({
+        (data.patients || []).map((p) => ({
           id: String(p.patient_id),
-          name: p.full_name
+          name: p.full_name,
         }))
       );
     } catch {
@@ -53,21 +58,29 @@ export default function DataPatientsListScreen() {
         try {
           const pid = Number(item.id);
           const [detail, labs] = await Promise.all([
-            fetch(`${API}/patient/patients/${pid}`).then(r => r.json()),
-            fetch(`${API}/lab/results/${pid}`).then(r => r.json()).catch(() => ({results: []})),
+            fetch(`${API}/patient/patients/${pid}`).then((r) => r.json()),
+            fetch(`${API}/lab/results/${pid}`)
+              .then((r) => r.json())
+              .catch(() => ({ results: [] })),
           ]);
 
-          const meds = (detail.medications || []).map(m => ({
+          const meds = (detail.medications || []).map((m) => ({
             name: m.brand_name,
             dosage: m.dose_text,
             frequency: m.frequency_text,
           }));
-          const visits = (detail.visits || []).map(v => ({
+
+          const visits = (detail.visits || []).map((v) => ({
             date: v.visit_date,
             doctorNotes: v.doctor_notes || "",
           }));
-          const symptoms = (detail.symptoms || []).map(s => s.name).join("، ");
-          const tests = (labs.results || []).slice(0,5).map(r => r.test_name).join("، ");
+          const symptoms = (detail.symptoms || [])
+            .map((s) => s.name)
+            .join("، ");
+          const tests = (labs.results || [])
+            .slice(0, 5)
+            .map((r) => r.test_name)
+            .join("، ");
 
           setSelectedPatient({
             id: String(pid),
@@ -91,7 +104,11 @@ export default function DataPatientsListScreen() {
     >
       <View style={styles.patientRow}>
         <View style={styles.patientLeft}>
-          <Ionicons name="person-circle-outline" size={26} color={styles.patientName.color} />
+          <Ionicons
+            name="person-circle-outline"
+            size={26}
+            color={styles.patientName.color}
+          />
           <Text style={styles.patientName}>{item.name}</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color={styles.arrow.color} />
@@ -102,13 +119,21 @@ export default function DataPatientsListScreen() {
   return (
     <>
       <View style={styles.container}>
-          <TouchableOpacity style={{marginBottom:5}} onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color="#000" />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={{ marginBottom: 5 }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
 
         {/* ====== حقل البحث عن المريض ====== */}
         <View style={styles.searchSection}>
-          <Ionicons name="search" size={22} color={styles.searchIcon.color} style={styles.searchIcon} />
+          <Ionicons
+            name="search"
+            size={22}
+            color={styles.searchIcon.color}
+            style={styles.searchIcon}
+          />
           <TextInput
             style={[styles.input, styles.rtlText]}
             placeholder="ابحث عن مريض"
@@ -138,8 +163,15 @@ export default function DataPatientsListScreen() {
           <ScrollView style={styles.detailsContainer}>
             {/* اسم المريض */}
             <View style={styles.sectionHeader}>
-              <Ionicons name="person-outline" size={22} color={styles.sectionTitle.color} style={styles.sectionIcon} />
-              <Text style={[styles.sectionTitle, styles.rtlText]}>اسم المريض</Text>
+              <Ionicons
+                name="person-outline"
+                size={22}
+                color={styles.sectionTitle.color}
+                style={styles.sectionIcon}
+              />
+              <Text style={[styles.sectionTitle, styles.rtlText]}>
+                اسم المريض
+              </Text>
             </View>
             <Text style={[styles.sectionContent, styles.rtlText]}>
               {selectedPatient.name}
@@ -147,7 +179,12 @@ export default function DataPatientsListScreen() {
 
             {/* الأعراض */}
             <View style={styles.sectionHeader}>
-              <Ionicons name="alert-circle-outline" size={22} color={styles.sectionTitle.color} style={styles.sectionIcon} />
+              <Ionicons
+                name="alert-circle-outline"
+                size={22}
+                color={styles.sectionTitle.color}
+                style={styles.sectionIcon}
+              />
               <Text style={[styles.sectionTitle, styles.rtlText]}>الأعراض</Text>
             </View>
             <Text style={[styles.sectionContent, styles.rtlText]}>
@@ -156,8 +193,15 @@ export default function DataPatientsListScreen() {
 
             {/* الفحوصات */}
             <View style={styles.sectionHeader}>
-              <Ionicons name="document-text-outline" size={22} color={styles.sectionTitle.color} style={styles.sectionIcon} />
-              <Text style={[styles.sectionTitle, styles.rtlText]}>الفحوصات</Text>
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color={styles.sectionTitle.color}
+                style={styles.sectionIcon}
+              />
+              <Text style={[styles.sectionTitle, styles.rtlText]}>
+                الفحوصات
+              </Text>
             </View>
             <Text style={[styles.sectionContent, styles.rtlText]}>
               {selectedPatient.tests || "لا يوجد"}
@@ -165,7 +209,12 @@ export default function DataPatientsListScreen() {
 
             {/* الأدوية */}
             <View style={styles.sectionHeader}>
-              <Ionicons name="medkit-outline" size={22} color={styles.sectionTitle.color} style={styles.sectionIcon} />
+              <Ionicons
+                name="medkit-outline"
+                size={22}
+                color={styles.sectionTitle.color}
+                style={styles.sectionIcon}
+              />
               <Text style={[styles.sectionTitle, styles.rtlText]}>الأدوية</Text>
             </View>
             {selectedPatient.medications.length === 0 ? (
@@ -175,7 +224,12 @@ export default function DataPatientsListScreen() {
             ) : (
               selectedPatient.medications.map((med, index) => (
                 <View key={index} style={styles.medItem}>
-                  <Ionicons name="ellipse-outline" size={12} color={styles.medText.color} style={{ marginRight: 6 }} />
+                  <Ionicons
+                    name="ellipse-outline"
+                    size={12}
+                    color={styles.medText.color}
+                    style={{ marginRight: 6 }}
+                  />
                   <Text style={[styles.medText, styles.rtlText]}>
                     {med.name} — {med.dosage} — {med.frequency}
                   </Text>
@@ -185,8 +239,15 @@ export default function DataPatientsListScreen() {
 
             {/* الزيارات السابقة */}
             <View style={styles.sectionHeader}>
-              <Ionicons name="calendar-outline" size={22} color={styles.sectionTitle.color} style={styles.sectionIcon} />
-              <Text style={[styles.sectionTitle, styles.rtlText]}>الزيارات السابقة</Text>
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color={styles.sectionTitle.color}
+                style={styles.sectionIcon}
+              />
+              <Text style={[styles.sectionTitle, styles.rtlText]}>
+                الزيارات السابقة
+              </Text>
             </View>
             {selectedPatient.visits.length === 0 ? (
               <Text style={[styles.sectionContent, styles.rtlText]}>
@@ -196,7 +257,12 @@ export default function DataPatientsListScreen() {
               selectedPatient.visits.map((visit, index) => (
                 <View key={index} style={styles.visitItem}>
                   <View style={styles.visitHeader}>
-                    <Ionicons name="time-outline" size={18} color={styles.visitDate.color} style={{ marginRight: 6 }} />
+                    <Ionicons
+                      name="time-outline"
+                      size={18}
+                      color={styles.visitDate.color}
+                      style={{ marginRight: 6 }}
+                    />
                     <Text style={[styles.visitDate, styles.rtlText]}>
                       {visit.date}
                     </Text>
@@ -214,7 +280,12 @@ export default function DataPatientsListScreen() {
               activeOpacity={0.8}
               onPress={() => setSelectedPatient(null)}
             >
-              <Ionicons name="close-circle-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+              <Ionicons
+                name="close-circle-outline"
+                size={20}
+                color="#fff"
+                style={{ marginRight: 8 }}
+              />
               <Text style={styles.backButtonText}>إغلاق التفاصيل</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -336,7 +407,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 5,
     elevation: 3,
-    marginBottom:2
+    marginBottom: 2,
   },
 
   // ====== عناوين الأقسام ======

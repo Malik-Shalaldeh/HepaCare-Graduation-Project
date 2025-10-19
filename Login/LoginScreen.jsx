@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useChat } from '../contexts/ChatContext';
 
 
-const API = 'http://192.168.1.12:8000';
+const API = 'http://192.168.1.122:8000';
 
 
 export default function LoginScreen({ navigation }) {
