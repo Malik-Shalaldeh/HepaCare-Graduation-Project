@@ -73,7 +73,7 @@ const Visits = () => {
   // تصفية المرضى محليًا
   const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    p.id.includes(searchText)
+    String(p.id).includes(searchText)
   );
 
   // إعادة تعيين selectedPatient عند دخول الشاشة

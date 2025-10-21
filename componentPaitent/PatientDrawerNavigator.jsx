@@ -17,7 +17,6 @@ import LabsScreen from "../screenPatient/LabsScreen"; // sami: شاشة المخ
 import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen"; // sami: شاشة مواعيدي
 import PatientMedications from "../screenPatient/PatientMedications";
 import PatientDashboard from "../screenPatient/PatientDashboard";
-import ChatScreenPatient from "../screenPatient/ChatScreen";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
@@ -74,7 +73,6 @@ function MainTabs() {
             الفحوصات: "flask-outline",
             الأدوية: "medkit",
             "لوحة التحكم": "home-outline",
-            الرسائل: "chatbubbles-outline",
           };
           return (
             <Ionicons name={icons[route.name]} size={size} color={color} />
@@ -92,7 +90,6 @@ function MainTabs() {
       <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
       <Tab.Screen name="الأدوية" component={PatientMedications} />
       <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
-      <Tab.Screen name="الرسائل" component={ChatScreenPatient} />
     </Tab.Navigator>
   );
 }

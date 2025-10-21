@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 
-const API = "http://192.168.1.12:8000";
+const API = "http://192.168.1.122:8000";
 
 const commonDiseases = [
   "Diabetes",
@@ -152,24 +152,6 @@ export default function AddPatientsComponent() {
 
       const patientData = await res.json();
       const patientId = patientData.patient_id || patientData.id;
-
-      // إنشاء قناة Chat بين الطبيب والمريض
-      try {
-        await fetch(`${API}/chat/create-channel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            doctor_id: parseInt(doctorId),
-            patient_id: patientId
-          }),
-        });
-        console.log('✅ Chat channel created for new patient');
-      } catch (chatError) {
-        console.error('❌ Error creating chat channel:', chatError);
-        // يمكن الاستمرار بدون إنشاء القناة
-      }
 
       Alert.alert("تم", "تمت إضافة المريض بنجاح.");
       setNewPatient({

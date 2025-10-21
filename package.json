@@ -36,11 +36,7 @@
     "react-native-svg": "15.12.1",
     "react-native-url-polyfill": "^3.0.0",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-web": "^0.20.0",
-    "stream-chat": "^9.24.0",
-    "stream-chat-expo": "^8.6.2",
-    "stream-chat-react-native": "^8.6.2",
-    "undefined": "\\"
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

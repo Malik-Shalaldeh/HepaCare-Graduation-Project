@@ -26,7 +26,6 @@ import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
 import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
 import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
 import ChangePasswordScreen from '../Login/restPassword';
-import ChatListScreen from '../screensDoctor/ChatListScreen';
 
 const primary = '#00b29c';
 
@@ -76,7 +75,6 @@ function MainTabs() {
             'لوحة التحكم': 'home',
             الزيارات: 'calendar',
             الأدوية: 'medkit',
-            الرسائل: 'chatbubbles-outline',
           };
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
         },
@@ -96,7 +94,6 @@ function MainTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen name="لوحة التحكم" component={Dashboard} />
-      <Tab.Screen name="الرسائل" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }

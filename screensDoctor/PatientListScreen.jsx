@@ -122,19 +122,6 @@ const PatientListScreen = () => {
 
       <View style={styles.cardActions}>
         <TouchableOpacity
-          style={styles.chatIconBtn}
-          onPress={() =>
-            navigation.navigate('ChatScreen', {
-              patient: item,
-              fromPatientCard: true
-            })
-          }
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="chatbubble-ellipses-outline" size={22} color="#00b29c" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={styles.medicalFileButton}
           onPress={() =>
             navigation.navigate('PatientChartScreen', {
@@ -263,7 +250,6 @@ const styles = StyleSheet.create({
   detailLabel: { fontSize: 14, color: '#666', marginLeft: 4 },
   detailValue: { fontSize: 14, color: '#333', fontWeight: '500', marginLeft: 4 },
   cardActions: { flexDirection: 'row-reverse', alignItems: 'center', marginTop: 10 },
-  chatIconBtn: { marginLeft: 12 },
   medicalFileButton: {
     backgroundColor: '#A8E6A1',
     borderRadius: 8,

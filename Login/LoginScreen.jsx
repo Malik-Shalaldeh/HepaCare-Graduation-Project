@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useChat } from '../contexts/ChatContext';
 
 
 const API = 'http://192.168.1.122:8000';
@@ -21,7 +20,6 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { connectUser } = useChat();
 
  const handleLogin = async () => {
   try {
@@ -60,44 +58,6 @@ export default function LoginScreen({ navigation }) {
     } else if (data.role === "PATIENT") {
       await AsyncStorage.removeItem("doctor_id");
       await AsyncStorage.setItem("patientId", String(data.id));
-    }
-
-    // الاتصال بـ Stream Chat (فقط للأطباء والمرضى)
-    if (data.role === "DOCTOR" || data.role === "PATIENT") {
-      try {
-        const userType = data.role === "DOCTOR" ? "doctor" : "patient";
-        
-        const chatResponse = await fetch(`${API}/chat/token`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: data.id,
-            user_type: userType
-          }),
-        });
-
-        if (chatResponse.ok) {
-          const chatData = await chatResponse.json();
-          
-          // حفظ بيانات Stream
-          await AsyncStorage.setItem('stream_token', chatData.token);
-          await AsyncStorage.setItem('stream_api_key', chatData.api_key);
-          await AsyncStorage.setItem('stream_user_id', chatData.user_id);
-
-          // الاتصال بـ Stream Chat
-          await connectUser(
-            chatData.user_id,
-            chatData.token,
-            chatData.api_key,
-            chatData.user_name
-          );
-
-          console.log('✅ Connected to Stream Chat');
-        }
-      } catch (chatError) {
-        console.error('❌ Error connecting to chat:', chatError);
-        // يمكن الاستمرار بدون Chat إذا فشل
-      }
     }
 
     navigation.replace(data.route);
