@@ -16,7 +16,7 @@ const Patients = () => {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
       {/* زر الرجوع */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack("MainTabs")}>
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
 

@@ -39,7 +39,7 @@ export default function PatientChartScreen() {
     async function loadData() {
       try {
         const response = await axios.get(
-          `http://192.168.1.12:8000/patient-chart?patient_id=${patientId}`
+          `http://192.168.1.8:8000/patient-chart?patient_id=${patientId}`
         );
         setRecords(response.data);
       } catch (error) {

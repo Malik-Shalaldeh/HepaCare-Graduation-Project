@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const primary = '#00b29c';
-const API_URL = 'http://192.168.1.122:8000/auth/change-password';
+const API_URL = 'http://192.168.1.8:8000/auth/change-password';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
