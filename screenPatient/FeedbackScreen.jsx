@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import RatingStars from "../componentsHealth/RatingStars";
 import {
   submitRating,
@@ -17,33 +18,72 @@ import {
 } from "../utils/ratings";
 
 const primary = "#00b29c";
+const API = "http://192.168.1.122:8000";
 
 const FeedbackScreen = () => {
   const navigation = useNavigation();
   const [appValue, setAppValue] = useState(0);
   const [comment, setComment] = useState("");
+  const [patientId, setPatientId] = useState(null);
+  const [patientName, setPatientName] = useState("مريض");
   const clinicId = getCurrentPatientClinicId();
   const clinicName =
     MOCK_CLINICS.find((c) => c.id === clinicId)?.name || "عيادة الصحة";
+
+  // جلب بيانات المريض من AsyncStorage
+  useEffect(() => {
+    const loadPatientData = async () => {
+      try {
+        const id = await AsyncStorage.getItem("patientId");
+        if (id) {
+          setPatientId(parseInt(id));
+          
+          // جلب اسم المريض من API
+          const response = await fetch(`${API}/patient/dashboard/${id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setPatientName(data.full_name || "مريض");
+          }
+        }
+      } catch (error) {
+        console.error("Error loading patient data:", error);
+      }
+    };
+    
+    loadPatientData();
+  }, []);
 
   const handleSubmit = async () => {
     if (!appValue) {
       Alert.alert("تنبيه", "الرجاء اختيار تقييم للتطبيق");
       return;
     }
+    
+    if (!patientId) {
+      Alert.alert("خطأ", "لم يتم العثور على معرف المريض");
+      return;
+    }
+    
     try {
-      await submitRating({
-        patientName: "مريض",
+      const result = await submitRating({
+        patientId,
+        patientName,
         clinicId,
         clinicName,
         appRating: appValue,
         clinicRating: 0,
         comment,
       });
-      Alert.alert("تم", "تم إرسال تقييمك بنجاح");
-      navigation.goBack();
+      
+      if (result.success) {
+        Alert.alert("تم", result.message || "تم إرسال تقييمك بنجاح");
+        navigation.goBack();
+      } else {
+        Alert.alert("تنبيه", result.message || "لا يمكن إرسال تقييم جديد الآن");
+      }
     } catch (e) {
       Alert.alert("خطأ", "تعذر إرسال التقييم");
+      console.error("Error submitting rating:", e);
     }
   };
 

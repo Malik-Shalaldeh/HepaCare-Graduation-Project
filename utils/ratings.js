@@ -1,52 +1,17 @@
 // sami
 // جميع التعليقات داخل الكود باللغة العربية فقط.
 
+import ENDPOINTS from '../samiendpoint';
+
 // ملاحظات:
-// - هذا الملف يوفّر دوال وهمية (Mock) للتعامل مع التقييمات بحيث يسهل لاحقاً استبدالها باستدعاءات API حقيقية.
-// - تم استخدام Promise و setTimeout لمحاكاة التزامن.
+// - تم تحويل الدوال لاستخدام API حقيقية بدلاً من البيانات الوهمية
+// - جميع الدوال الآن تستدعي Backend الحقيقي
 
-// بيانات وهمية للتقييمات (يمكن استبدالها لاحقاً ببيانات من السيرفر)
-let MOCK_RATINGS = [
-  {
-    id: "r1",
-    patientId: "p1",
-    patientName: "محمد أحمد",
-    clinicId: "c1",
-    clinicName: "عيادة الصحة - رام الله",
-    appRating: 5,
-    clinicRating: 4,
-    comment: "تجربة ممتازة والتطبيق سهل الاستخدام",
-    createdAt: "2025-07-01T09:30:00Z",
-  },
-  {
-    id: "r2",
-    patientId: "p2",
-    patientName: "سارة علي",
-    clinicId: "c2",
-    clinicName: "عيادة الصحة - نابلس",
-    appRating: 4,
-    clinicRating: 5,
-    comment: "خدمة العيادة رائعة والانتظار قليل",
-    createdAt: "2025-07-05T12:10:00Z",
-  },
-  {
-    id: "r3",
-    patientId: "p3",
-    patientName: "محمود يوسف",
-    clinicId: "c1",
-    clinicName: "عيادة الصحة - رام الله",
-    appRating: 3,
-    clinicRating: 4,
-    comment: "جيد إجمالاً لكن يمكن تحسين سرعة التطبيق",
-    createdAt: "2025-07-12T15:45:00Z",
-  },
-];
-
-// قائمة عيادات وهمية للمساعدة في الفلترة
+// قائمة العيادات من قاعدة البيانات (يمكن جلبها من API لاحقاً)
 export const MOCK_CLINICS = [
-  { id: "c1", name: "عيادة الصحة - رام الله" },
-  { id: "c2", name: "عيادة الصحة - نابلس" },
-  { id: "c3", name: "عيادة الصحة - الخليل" },
+  { id: 1, name: "Main Clinic" },
+  { id: 2, name: "سعير" },
+  { id: 3, name: "عيادة السلام" },
 ];
 
 // دالة مساعدة لحساب المتوسط الآمن
@@ -57,74 +22,79 @@ const safeAverage = (arr) => {
 };
 
 // إرجاع تجميعي لمتوسط تقييم التطبيق والعيادات
-export const getAggregates = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const appAvg = safeAverage(MOCK_RATINGS.map((r) => r.appRating));
-      const clinicAvg = safeAverage(MOCK_RATINGS.map((r) => r.clinicRating));
-      resolve({
-        appAverage: appAvg,
-        clinicAverage: clinicAvg,
-        count: MOCK_RATINGS.length,
-      });
-    }, 300);
-  });
+export const getAggregates = async () => {
+  try {
+    const response = await fetch(ENDPOINTS.ratingsAggregates);
+    if (!response.ok) throw new Error('Failed to fetch aggregates');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching aggregates:', error);
+    return { appAverage: 0, clinicAverage: 0, count: 0 };
+  }
 };
 
 // إرجاع أحدث التقييمات (عام)
-export const getPublicRatings = ({ limit = 20 } = {}) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const sorted = [...MOCK_RATINGS].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      resolve(sorted.slice(0, limit));
-    }, 300);
-  });
+export const getPublicRatings = async ({ limit = 20 } = {}) => {
+  try {
+    const response = await fetch(ENDPOINTS.ratingsAll);
+    if (!response.ok) throw new Error('Failed to fetch ratings');
+    const data = await response.json();
+    return data.slice(0, limit);
+  } catch (error) {
+    console.error('Error fetching public ratings:', error);
+    return [];
+  }
 };
 
 // إرجاع جميع التقييمات (لحساب الصحة)
-export const getAllRatings = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const sorted = [...MOCK_RATINGS].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      resolve(sorted);
-    }, 300);
-  });
+export const getAllRatings = async () => {
+  try {
+    const response = await fetch(ENDPOINTS.ratingsAll);
+    if (!response.ok) throw new Error('Failed to fetch all ratings');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching all ratings:', error);
+    return [];
+  }
 };
 
 // إرجاع أحدث تقييم للمريض للمساعدة في القيود الزمنية
-export const getLatestPatientRating = (patientId) => {
+export const getLatestPatientRating = async (patientId) => {
   if (!patientId) return null;
-  const items = [...MOCK_RATINGS]
-    .filter((r) => r.patientId === patientId)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  return items[0] || null;
+  try {
+    const response = await fetch(ENDPOINTS.ratingsPatientLatest(patientId));
+    if (!response.ok) throw new Error('Failed to fetch patient rating');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching patient rating:', error);
+    return null;
+  }
 };
 
 // التحقق إن كان المريض يستطيع التقييم خلال هذا الشهر
-export const canSubmitRatingThisMonth = (patientId) => {
-  // القاعدة: مسموح تقييم واحد كل 30 يوم تقريباً
-  const latest = getLatestPatientRating(patientId);
-  if (!latest) return { allowed: true };
-  const last = new Date(latest.createdAt).getTime();
-  const now = Date.now();
-  const days = (now - last) / (1000 * 60 * 60 * 24);
-  if (days >= 30) return { allowed: true };
-  const nextEligible = new Date(last + 30 * 24 * 60 * 60 * 1000);
-  return { allowed: false, nextEligible };
+export const canSubmitRatingThisMonth = async (patientId) => {
+  try {
+    const response = await fetch(ENDPOINTS.ratingsPatientCanSubmit(patientId));
+    if (!response.ok) throw new Error('Failed to check rating eligibility');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error checking rating eligibility:', error);
+    return { allowed: true };
+  }
 };
 
 // تحديد عيادة المريض الحالية (لاحقاً تُجلب من السيرفر بعد تسجيل الدخول)
 export const getCurrentPatientClinicId = () => {
   // يمكن لاحقاً قراءة العيادة من سياق المستخدم/التوكن
-  return "c1";
+  return 1; // تم تغيير من "c1" إلى 1 لمطابقة قاعدة البيانات
 };
 
-// إرسال تقييم جديد وحفظه في الذاكرة مؤقتاً
-export const submitRating = ({
+// إرسال تقييم جديد
+export const submitRating = async ({
   patientId,
   patientName,
   clinicId,
@@ -133,48 +103,58 @@ export const submitRating = ({
   clinicRating,
   comment,
 }) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newItem = {
-        id: `r${Date.now()}`,
-        patientId: patientId || "unknown",
-        patientName: patientName || "مستخدم",
-        clinicId: clinicId || "c1",
-        clinicName: clinicName || "عيادة الصحة - رام الله",
-        appRating: Number(appRating) || 0,
-        clinicRating: Number(clinicRating) || 0,
+  try {
+    const response = await fetch(ENDPOINTS.ratingsSubmit, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patient_id: patientId,
+        patient_name: patientName || "مستخدم",
+        clinic_id: clinicId || 1,
+        clinic_name: clinicName || "عيادة الصحة",
+        app_rating: Number(appRating) || 0,
+        clinic_rating: Number(clinicRating) || 0,
         comment: comment || "",
-        createdAt: new Date().toISOString(),
-      };
-      MOCK_RATINGS = [newItem, ...MOCK_RATINGS];
-      resolve(newItem);
-    }, 400);
-  });
+      }),
+    });
+    
+    if (!response.ok) throw new Error('Failed to submit rating');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error submitting rating:', error);
+    throw error;
+  }
 };
 
 // فلترة التقييمات بحسب العيادة والمدى الزمني
-export const filterRatings = ({ clinicId, startDate, endDate } = {}) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      let data = [...MOCK_RATINGS];
-      if (clinicId && clinicId !== "all") {
-        data = data.filter((r) => r.clinicId === clinicId);
-      }
-      if (startDate) {
-        const s = new Date(startDate).getTime();
-        data = data.filter((r) => new Date(r.createdAt).getTime() >= s);
-      }
-      if (endDate) {
-        const e = new Date(endDate).getTime();
-        data = data.filter((r) => new Date(r.createdAt).getTime() <= e);
-      }
-      const appAverage = safeAverage(data.map((r) => r.appRating));
-      const clinicAverage = safeAverage(data.map((r) => r.clinicRating));
-      resolve({ items: data, appAverage, clinicAverage, count: data.length });
-    }, 300);
-  });
+export const filterRatings = async ({ clinicId, startDate, endDate } = {}) => {
+  try {
+    const params = new URLSearchParams();
+    if (clinicId && clinicId !== "all") {
+      params.append('clinic_id', clinicId);
+    }
+    if (startDate) {
+      params.append('start_date', startDate);
+    }
+    if (endDate) {
+      params.append('end_date', endDate);
+    }
+    
+    const url = `${ENDPOINTS.ratingsFilter}?${params.toString()}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) throw new Error('Failed to filter ratings');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error filtering ratings:', error);
+    return { items: [], appAverage: 0, clinicAverage: 0, count: 0 };
+  }
 };
 
-// ملاحظات الربط مع الـ API لاحقاً:
-// - يمكن إنشاء Axios instance وتمريره هنا واستخدامه عوضاً عن البيانات الوهمية.
-// - يُفضّل تجزئة الخدمات (auth/patients/ratings) ضمن مجلد services.
+// ملاحظات:
+// - تم تحويل جميع الدوال لاستخدام API حقيقية من Backend
+// - البيانات تُخزن وتُجلب من قاعدة البيانات MySQL

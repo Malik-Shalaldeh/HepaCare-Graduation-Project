@@ -1,19 +1,11 @@
 // sami - واجهة المختبرات المعتمدة
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { View, Text, FlatList, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// بيانات تجريبية لمختبرات معتمدة
-const LABS_DATA = [
-  { id: '1', name: 'مختبر القدس الطبي', city: 'الخليل', location: 'شارع الجامعة', phone: '0599000001' },
-  { id: '2', name: 'مختبر رام الله المركزي', city: 'رام الله', location: 'دوار المنارة', phone: '0599000002' },
-  { id: '3', name: 'مختبر نابلس الحديث', city: 'نابلس', location: 'شارع فيصل', phone: '0599000003' },
-  { id: '4', name: 'مختبر الخليل الحديث', city: 'الخليل', location: 'الحاووز', phone: '0599000004' },
-  { id: '5', name: 'مختبر بيت لحم الوطني', city: 'بيت لحم', location: 'قرب المستشفى', phone: '0599000005' },
-];
+import ENDPOINTS from '../samiendpoint';
 
 const LabsScreen = ({ route }) => {
 
@@ -21,19 +13,49 @@ const LabsScreen = ({ route }) => {
   // لو جتنا المدينة من الباراميتر، بنفلتر المختبرات
   const cityParam = route?.params?.city;
   const [search, setSearch] = useState(cityParam || '');
+  const [labs, setLabs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // جلب المختبرات من API
+  useEffect(() => {
+    fetchLabs();
+  }, []);
+
+  const fetchLabs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // استدعاء API لجلب المختبرات
+      const response = await fetch(ENDPOINTS.labsList);
+      
+      if (!response.ok) {
+        throw new Error('فشل في جلب البيانات');
+      }
+      
+      const data = await response.json();
+      setLabs(data);
+    } catch (err) {
+      console.error('Error fetching labs:', err);
+      setError('حدث خطأ في جلب المختبرات');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // فلترة المختبرات حسب المدينة
   const filteredLabs = search.trim()
-    ? LABS_DATA.filter(lab => lab.city.trim() === search.trim())
-    : LABS_DATA;
+    ? labs.filter(lab => lab.city && typeof lab.city === 'string' && lab.city.trim() === search.trim())
+    : labs;
 
   // بطاقة المختبر
   const renderLabCard = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.labName}>{item.name}</Text>
-      <Text style={styles.labInfo}>الموقع: {item.location}</Text>
-      <Text style={styles.labInfo}>رقم التواصل: {item.phone}</Text>
-      <Text style={styles.labCity}>({item.city})</Text>
+      <Text style={styles.labName}>{item.name || 'غير محدد'}</Text>
+      <Text style={styles.labInfo}>الموقع: {item.location || 'غير محدد'}</Text>
+      <Text style={styles.labInfo}>رقم التواصل: {item.phone || 'غير محدد'}</Text>
+      <Text style={styles.labCity}>({item.city || 'غير محدد'})</Text>
     </View>
   );
 
@@ -53,13 +75,28 @@ const LabsScreen = ({ route }) => {
           value={search}
           onChangeText={setSearch}
         />
-        <FlatList
-          data={filteredLabs}
-          keyExtractor={item => item.id}
-          renderItem={renderLabCard}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={<Text style={styles.emptyText}>لا يوجد مختبرات مطابقة</Text>}
-        />
+        
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#00b29c" />
+            <Text style={styles.loadingText}>جاري تحميل المختبرات...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={fetchLabs} style={styles.retryButton}>
+              <Text style={styles.retryText}>إعادة المحاولة</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredLabs}
+            keyExtractor={item => item.id?.toString() || Math.random().toString()}
+            renderItem={renderLabCard}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={<Text style={styles.emptyText}>لا يوجد مختبرات مطابقة</Text>}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -133,6 +170,39 @@ const styles = StyleSheet.create({
     color: '#aaa',
     marginTop: 30,
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d32f2f',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: '#00b29c',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

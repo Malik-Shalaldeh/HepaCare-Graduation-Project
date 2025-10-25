@@ -42,6 +42,18 @@ const ENDPOINTS = {
   // Lab Results
   labResults: `${BASE_URL}/patient/lab-results`,
 
+  // Labs
+  labsList: `${BASE_URL}/labs/list`,
+  labsSearch: `${BASE_URL}/labs/search`,
+
+  // Ratings (التقييمات)
+  ratingsAll: `${BASE_URL}/ratings/all`,
+  ratingsAggregates: `${BASE_URL}/ratings/aggregates`,
+  ratingsSubmit: `${BASE_URL}/ratings/submit`,
+  ratingsFilter: `${BASE_URL}/ratings/filter`,
+  ratingsPatientLatest: (patientId) => `${BASE_URL}/ratings/patient/${patientId}/latest`,
+  ratingsPatientCanSubmit: (patientId) => `${BASE_URL}/ratings/patient/${patientId}/can-submit`,
+
   // TODO: أضف المزيد من endpoints حسب الحاجة
 };
 
