@@ -107,6 +107,8 @@ function NavigatorDoctor() {
         barStyle="light-content"
         translucent={false}
       />
+
+      
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         initialRouteName="MainTabs"

@@ -17,6 +17,10 @@ const PatientsStack = () => {
       <Stack.Screen name="Medications" component={Medications} />
       <Stack.Screen name="EvaluationVisitScreen" component={EvaluationVisitScreen} />  
       <Stack.Screen name="PatientChartScreen" component={PatientChartScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="PatientsStack" component={PatientsStack} options={{ headerShown: false }} />
+      
+
+      
     </Stack.Navigator>
   );
 };

@@ -126,17 +126,6 @@ function NavigatorPatient() {
           }}
         />
 
-        {/* شاشات القائمة الجانبية */}
-        <Drawer.Screen
-          name="الرئيسية"
-          component={MainTabs}
-          options={{
-            headerShown: false,
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
-            ),
-          }}
-        />
         <Drawer.Screen
           name="المحتوى التثقيفي"
           component={EducationalContentScreen}

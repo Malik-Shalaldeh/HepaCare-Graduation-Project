@@ -155,7 +155,7 @@ const PatientListScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate("PatientsStack")}
       >
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>

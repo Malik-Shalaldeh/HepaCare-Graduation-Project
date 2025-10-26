@@ -55,6 +55,7 @@ const AppointmentListScreen = () => {
         <Ionicons name="add" size={20} color="#fff" style={{ marginEnd: 4 }} />
         <Text style={styles.addText}>إضافة موعد جديد</Text>
       </TouchableOpacity>
+      
       <FlatList
         data={appointments}
         keyExtractor={(item) => item.id.toString()}
