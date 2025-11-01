@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HelpButton from '../componentHelp/ButtonHelp';
 
 const API = 'http://192.168.1.122:8000';
 
@@ -99,6 +100,10 @@ export default function TestResultsScreen() {
             <Text style={styles.emptyText}>لا يوجد نتائج</Text>
           ) : null
         }
+      />
+      <HelpButton
+        title="شاشة عرض النتائج"
+        info="تُستخدم هذه الشاشة للاستعلام عن نتائج الفحوصات للمرضى، وذلك بإدخال اسم المريض أو رقمه، ثم عرض التفاصيل وفتح ملف الفحص عند توفره."
       />
     </View>
   );
