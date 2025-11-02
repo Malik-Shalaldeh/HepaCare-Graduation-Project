@@ -17,7 +17,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
-const API = "http://192.168.1.122:8000"; // عدّل إذا لزم
+const API = "http://192.168.1.120:8000"; // عدّل إذا لزم
 
 export default function HealthMedComponent() {
   const navigation = useNavigation();

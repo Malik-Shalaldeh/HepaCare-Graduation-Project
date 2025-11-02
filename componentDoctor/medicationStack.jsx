@@ -8,6 +8,7 @@ import Medications from "../screensDoctor/Medications";
 import MedPatientsScreen from "../screensDoctor/MedPatientsScreen";
 import PatientMedicationsScreen from "../screensDoctor/PatientMedicationsScreen";
 import MedicationFormScreen from "../screensDoctor/MedicationFormScreen";
+import HealthMedicationsDisplay from "../screensDoctor/HealthMedicationsDisplay";
 
 const Stack = createStackNavigator();
 
@@ -30,10 +31,10 @@ const MedicationsStackScreen = () => {
         name="PatientMedications"
         component={PatientMedicationsScreen}
       />
-      {/* اسمك القديم HealthMedicationsDisplay بيروح لنفس الشاشة عشان ما يكسر شيء */}
       <Stack.Screen
+        component={HealthMedicationsDisplay}
         name="HealthMedicationsDisplay"
-        component={PatientMedicationsScreen}
+        options={{ headerShown: false }}
       />
 
       {/* 3) شاشة إضافة/تعديل دواء */}

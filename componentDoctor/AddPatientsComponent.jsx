@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 
-const API = "http://192.168.1.122:8000";
+const API = "http://192.168.1.120:8000";
 
 const commonDiseases = [
   "Diabetes",
