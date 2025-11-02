@@ -9,7 +9,7 @@ const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
 
-const API = 'http://192.168.1.122:8000';
+const API = 'http://192.168.1.120:8000';
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -45,7 +45,6 @@ const Dashboard = () => {
         console.error(err);
         if (active) Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
         navigation.navigate('LoginScreen');
-
       }
     };
 

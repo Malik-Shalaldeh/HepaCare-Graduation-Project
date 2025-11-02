@@ -1,5 +1,3 @@
-
-
 import { useState } from 'react';
 import {
   View,
@@ -12,64 +10,65 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const API = 'http://192.168.1.122:8000';
-
-
+const API = 'http://192.168.1.120:8000';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
- const handleLogin = async () => {
-  try {
-    const response = await fetch(`${API}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    });
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (!response.ok) {
-      if (response.status === 403) {
-        Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
-      } else if (response.status === 401) {
-        Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
-      } else {
-        Alert.alert("خطأ", "حدث خطأ في تسجيل الدخول");
+      if (!response.ok) {
+        if (response.status === 403) {
+          Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+        } else if (response.status === 401) {
+          Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
+        } else {
+          Alert.alert("خطأ", "حدث خطأ في تسجيل الدخول");
+        }
+        setPassword("");
+        return;
       }
+
+      const data = await response.json();
+
+      if (data.is_active === 0) {
+        Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+        setPassword("");
+        return;
+      }
+
+      await AsyncStorage.setItem("user_id", String(data.id));
+
+      if (data.role === "DOCTOR") {
+        await AsyncStorage.setItem("doctor_id", String(data.id));
+        await AsyncStorage.removeItem("lab_id");
+        await AsyncStorage.setItem("patientId", "");
+      } else if (data.role === "PATIENT") {
+        await AsyncStorage.removeItem("doctor_id");
+        await AsyncStorage.removeItem("lab_id");
+        await AsyncStorage.setItem("patientId", String(data.id));
+      } else if (data.role === "LAB") {
+        await AsyncStorage.removeItem("doctor_id");
+        await AsyncStorage.removeItem("patientId");
+        await AsyncStorage.setItem("lab_id", String(data.id));
+      }
+
+      navigation.replace(data.route);
+
+    } catch (e) {
+      console.error("Login error:", e);
+      Alert.alert("خطأ", "تعذر الاتصال بالخادم");
       setPassword("");
-      return;
     }
-
-    const data = await response.json();
-
-    // ✅ تحقق محلي من is_active
-    if (data.is_active === 0) {
-      Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
-      setPassword("");
-      return;
-    }
-
-    await AsyncStorage.setItem("user_id", String(data.id));
-
-    if (data.role === "DOCTOR") {
-      await AsyncStorage.setItem("doctor_id", String(data.id));
-      await AsyncStorage.setItem("patientId", ""); // Clear patient ID for doctor
-    } else if (data.role === "PATIENT") {
-      await AsyncStorage.removeItem("doctor_id");
-      await AsyncStorage.setItem("patientId", String(data.id));
-    }
-
-    navigation.replace(data.route);
-
-  } catch (e) {
-    console.error("Login error:", e);
-    Alert.alert("خطأ", "تعذر الاتصال بالخادم");
-    setPassword("");
-  }
-};
-
+  };
 
   return (
     <View style={styles.container}>

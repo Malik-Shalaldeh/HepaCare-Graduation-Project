@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+const API_BASE = "http://192.168.1.123:8000";
+
 export default function AvailableMedicationsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
@@ -24,22 +26,66 @@ export default function AvailableMedicationsScreen() {
     "لورازيبام",
     "أوميبرازول",
   ];
-  const displayedMeds =
-    route.params?.displayedMeds?.length > 0
-      ? route.params.displayedMeds
-      : dummyMeds;
+
+  const [meds, setMeds] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fromParams =
+      route.params &&
+      route.params.displayedMeds &&
+      route.params.displayedMeds.length > 0
+        ? route.params.displayedMeds
+        : null;
+
+    if (fromParams) {
+      setMeds(fromParams);
+      setLoading(false);
+      return;
+    }
+
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/medications/`);
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        const names =
+          Array.isArray(data) && data.length > 0
+            ? data
+                .map((m) => {
+                  return (
+                    m.brand_name ||
+                    m.brandName ||
+                    m.generic_name ||
+                    m.genericName ||
+                    ""
+                  );
+                })
+                .filter((x) => x && x.trim().length > 0)
+            : [];
+        if (names.length > 0) setMeds(names);
+        else setMeds(dummyMeds);
+      } catch (e) {
+        setMeds(dummyMeds);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [route.params]);
+
+  const displayedMeds = meds.length > 0 ? meds : dummyMeds;
 
   return (
     <ScreenWithDrawer>
       <SafeAreaView style={styles.safeArea}>
-        {/* Dark Status Bar */}
         <StatusBar
           barStyle="dark-content"
           backgroundColor="transparent"
           translucent
         />
         <View style={styles.container}>
-          {/* Header */}
           <View style={styles.headerContainer}>
             <TouchableOpacity
               style={styles.backButton}
@@ -49,12 +95,18 @@ export default function AvailableMedicationsScreen() {
             >
               <Ionicons name="arrow-back" size={24} color="#ffffff" />
             </TouchableOpacity>
-            <Ionicons name="medkit-outline" size={36} color="#ffffff" style={{ marginBottom: 8 }} />
+            <Ionicons
+              name="medkit-outline"
+              size={36}
+              color="#ffffff"
+              style={{ marginBottom: 8 }}
+            />
             <Text style={styles.headerTitle}>الأدوية المتوفرة</Text>
           </View>
 
-          {/* Medication List */}
-          {displayedMeds.length === 0 ? (
+          {loading ? (
+            <Text style={styles.noMedsText}>جاري التحميل...</Text>
+          ) : displayedMeds.length === 0 ? (
             <Text style={styles.noMedsText}>لا توجد أدوية متاحة</Text>
           ) : (
             <FlatList
@@ -63,11 +115,7 @@ export default function AvailableMedicationsScreen() {
               renderItem={({ item }) => (
                 <View style={styles.medCard}>
                   <View style={styles.iconWrapper}>
-                    <Ionicons
-                      name="bandage-outline"
-                      size={20}
-                      color="#16A085"
-                    />
+                    <Ionicons name="bandage-outline" size={20} color="#16A085" />
                   </View>
                   <Text style={styles.medName}>{item}</Text>
                 </View>
@@ -115,7 +163,6 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "rgba(255,255,255,0.3)",
     borderRadius: 20,
-  
   },
   headerTitle: {
     fontSize: 22,

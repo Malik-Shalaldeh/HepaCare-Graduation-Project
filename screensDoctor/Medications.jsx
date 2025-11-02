@@ -46,7 +46,7 @@ export default function Medications() {
       <View style={styles.content}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: COLORS.secondary }]}
-          onPress={() => navigation.navigate('Medicationschedule')}
+          onPress={() => navigation.navigate('MedPatientsScreen')}
           activeOpacity={0.8}
         >
           <Ionicons name="calendar-outline" size={24} color="#fff" style={styles.icon} />

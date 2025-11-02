@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -9,10 +9,12 @@ import {
   FlatList,
   Switch,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const PRIMARY = "#00b29c";
+const API = "http://192.168.1.120:8000/labs";
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -21,52 +23,48 @@ const CITIES = [
   { id: 4, name: "نابلس" },
 ];
 
-const MOCK_LABS = [
-  {
-    id: 1,
-    name: "مختبر القدس",
-    city_id: 1,
-    address: "حي...",
-    phone: "0599000000",
-    email: "lab1@mail.com",
-    location_url: "",
-    is_accredited: true,
-    is_active: true,
-  },
-  {
-    id: 2,
-    name: "مختبر الشفاء",
-    city_id: 3,
-    address: "",
-    phone: "0599111111",
-    email: "",
-    location_url: "https://maps.google.com/..",
-    is_accredited: false,
-    is_active: true,
-  },
-  {
-    id: 3,
-    name: "مختبر النجاح",
-    city_id: 4,
-    address: "شارع...",
-    phone: "",
-    email: "",
-    location_url: "",
-    is_accredited: true,
-    is_active: false,
-  },
-];
-
 const cityName = (id) => CITIES.find((c) => c.id === id)?.name || "—";
 
 export default function LabsListScreen() {
   const [q, setQ] = useState("");
   const [onlyAccredited, setOnlyAccredited] = useState(false);
   const [onlyActive, setOnlyActive] = useState(false);
+  const [labs, setLabs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setLoadError("");
+        const res = await fetch(API);
+        const json = await res.json();
+        // نتأكد من وجود الحقول
+        const normalized = (json || []).map((l) => ({
+          id: l.id,
+          name: l.name || "",
+          city_id: l.city_id || 0,
+          address: l.address || "",
+          phone: l.phone || "",
+          email: l.email || "",
+          location_url: l.location_url || "",
+          is_accredited: typeof l.is_accredited === "boolean" ? l.is_accredited : false,
+          is_active: typeof l.is_active === "boolean" ? l.is_active : true,
+        }));
+        setLabs(normalized);
+      } catch (e) {
+        setLoadError("تعذر جلب بيانات المختبرات.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
   const data = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return MOCK_LABS.filter((l) => {
+    return labs.filter((l) => {
       if (onlyAccredited && !l.is_accredited) return false;
       if (onlyActive && !l.is_active) return false;
       if (!s) return true;
@@ -79,7 +77,7 @@ export default function LabsListScreen() {
         cityName(l.city_id).toLowerCase().includes(s)
       );
     });
-  }, [q, onlyAccredited, onlyActive]);
+  }, [q, onlyAccredited, onlyActive, labs]);
 
   const openLocation = (url) => url && Linking.openURL(url).catch(() => {});
 
@@ -109,6 +107,11 @@ export default function LabsListScreen() {
           <Text style={styles.filterText}>فقط الفعّال</Text>
         </View>
       </View>
+      {!!loadError && (
+        <Text style={{ color: "#EF4444", marginTop: 4, width: "88%", textAlign: "right" }}>
+          {loadError}
+        </Text>
+      )}
     </View>
   );
 
@@ -174,23 +177,32 @@ export default function LabsListScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => String(item.id)}
-        ListHeaderComponent={Header}
-        renderItem={renderItem}
-        contentContainerStyle={{
-          paddingTop: 6,
-          paddingBottom: 20,
-          alignItems: "center",
-        }}
-        ListEmptyComponent={
-          <Text style={{ marginTop: 16, color: "#64748B", fontWeight: "600" }}>
-            لا توجد نتائج مطابقة
-          </Text>
-        }
-        keyboardShouldPersistTaps="handled"
-      />
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={PRIMARY} />
+          <Text style={{ marginTop: 8, color: "#64748B" }}>جاري تحميل المختبرات...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => String(item.id)}
+          ListHeaderComponent={Header}
+          renderItem={renderItem}
+          contentContainerStyle={{
+            paddingTop: 6,
+            paddingBottom: 20,
+            alignItems: "center",
+          }}
+          ListEmptyComponent={
+            <Text
+              style={{ marginTop: 16, color: "#64748B", fontWeight: "600" }}
+            >
+              لا توجد نتائج مطابقة
+            </Text>
+          }
+          keyboardShouldPersistTaps="handled"
+        />
+      )}
     </SafeAreaView>
   );
 }
