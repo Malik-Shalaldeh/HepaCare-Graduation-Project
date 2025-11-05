@@ -14,8 +14,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
-
-const API = "http://192.168.1.120:8000";
+import AbedEndPoint from "../AbedEndPoint";
 
 const commonDiseases = [
   "Diabetes",
@@ -98,7 +97,6 @@ export default function AddPatientsComponent() {
     });
   };
 
-  // === ربط الحفظ بالباك-إند (بدون تعديل الستايل) ===
   const handleSave = async () => {
     const { fullName, idNumber, phone, address, dob, gender, clinic } =
       newPatient;
@@ -122,7 +120,7 @@ export default function AddPatientsComponent() {
       if (!doctorId) {
         return Alert.alert(
           "خطأ",
-          "لا يوجد doctor_id مخزّن. تأكد أن الحساب طبيب أو أعد تسجيل الدخول."
+          "لا يوجد doctor_id مخزّن. تأكد من الحساب أو أعد تسجيل الدخول."
         );
       }
 
@@ -133,18 +131,17 @@ export default function AddPatientsComponent() {
         address,
         birth_date: dob,
         clinic_name: clinic || "Main Clinic",
-        // ⛔ تم حذف doctor_id من الـ body — الإرسال عبر الهيدر فقط
         username: idNumber,
         password: "1234",
         diseases: finalDiseases,
         medications: finalMedications,
       };
 
-      const res = await fetch(`${API}/patient/patients`, {
+      const res = await fetch(AbedEndPoint.patientCreate, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Doctor-Id": String(doctorId), // <-- نرسل الدكتور من AsyncStorage
+          "X-Doctor-Id": String(doctorId),
         },
         body: JSON.stringify(body),
       });
@@ -198,7 +195,6 @@ export default function AddPatientsComponent() {
 
         {step === 1 && (
           <>
-            {/* ====== بيانات أساسية ====== */}
             <TextInput
               style={styles.input}
               placeholder="الاسم الرباعي"
@@ -329,7 +325,6 @@ export default function AddPatientsComponent() {
 
         {step === 2 && (
           <>
-            {/* ====== اختيار الأمراض ====== */}
             <TextInput
               style={styles.input}
               placeholder="ابحث عن مرض..."
@@ -337,7 +332,11 @@ export default function AddPatientsComponent() {
               onChangeText={setSearchDisease}
             />
             {filteredDiseases.map((disease) => (
-              <View className="switchRow" style={styles.switchRow} key={disease}>
+              <View
+                className="switchRow"
+                style={styles.switchRow}
+                key={disease}
+              >
                 <Text>{disease}</Text>
                 <Switch
                   value={newPatient.diseases.includes(disease)}
@@ -390,7 +389,6 @@ export default function AddPatientsComponent() {
 
         {step === 3 && (
           <>
-            {/* ====== اختيار الأدوية ====== */}
             <TextInput
               style={styles.input}
               placeholder="ابحث عن دواء..."
@@ -427,10 +425,7 @@ export default function AddPatientsComponent() {
                   } else {
                     updated[index] = t;
                   }
-                  setNewPatient({
-                    ...newPatient,
-                    customMedications: updated,
-                  });
+                  setNewPatient({ ...newPatient, customMedications: updated });
                 }}
               />
             ))}
@@ -458,7 +453,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     paddingTop: Platform.OS === "ios" ? 10 : 20,
-    paddingBottom: Platform.OS === "android" ? 60 : 20, // مساحة أسفل المحتوى
+    paddingBottom: Platform.OS === "android" ? 60 : 20,
   },
   title: {
     fontSize: 22,

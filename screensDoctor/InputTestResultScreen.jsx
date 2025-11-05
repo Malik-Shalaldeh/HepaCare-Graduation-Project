@@ -1,3 +1,4 @@
+// screens/InputTestResultScreen.jsx
 import React, { useState, useLayoutEffect, useEffect } from "react";
 import {
   View,
@@ -18,8 +19,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API = 'http://192.168.1.8:8000';
+import AbedEndPoint from "../AbedEndPoint"; // <-- استخدام الايندبوينت
 
 function toYMD(d) {
   const yyyy = d.getFullYear();
@@ -68,7 +68,7 @@ export default function InputTestResultScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API}/tests/list`);
+        const res = await fetch(AbedEndPoint.testsList);
         if (!res.ok) throw new Error();
         const data = await res.json(); // نتوقع [{id,name}]
         if (Array.isArray(data)) {
@@ -91,7 +91,7 @@ export default function InputTestResultScreen() {
       if (!doctorId) {
         return Alert.alert("تنبيه", "لم يتم التعرّف على هوية الطبيب. أعد تسجيل الدخول.");
       }
-      const url = `${API}/patients/search?query=${encodeURIComponent(
+      const url = `${AbedEndPoint.patientsSearch}?query=${encodeURIComponent(
         searchInput.trim()
       )}&doctor_id=${doctorId}`;
       const res = await fetch(url);
@@ -114,7 +114,6 @@ export default function InputTestResultScreen() {
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-      // دعم الشكلين القديم والجديد لنتيجة DocumentPicker
       if (result?.assets?.length) {
         const f = result.assets[0];
         setFile({
@@ -157,14 +156,11 @@ export default function InputTestResultScreen() {
     try {
       const form = new FormData();
       form.append("patient_id", String(selectedPatient.id));
-      form.append("test_id", String(selectedTestId)); // <-- حسب الباك إند
+      form.append("test_id", String(selectedTestId));
       form.append("test_date", toYMD(date));
       form.append("is_normal", isNormal ? "1" : "0");
       form.append("doctor_id", String(doctorId));
       if (note) form.append("comments", note);
-
-      // يمكن إرسال result_value إن أردت الاحتفاظ به بالواجهة،
-      // ولن يؤثر إن كان الباك إند يتجاهله حاليًا:
       if (resultValue !== "") form.append("result_value", String(resultValue));
 
       if (file && file.uri) {
@@ -175,7 +171,7 @@ export default function InputTestResultScreen() {
         });
       }
 
-      const res = await fetch(`${API}/input-result/save`, {
+      const res = await fetch(AbedEndPoint.inputResultSave, {
         method: "POST",
         headers: { "Content-Type": "multipart/form-data" },
         body: form,

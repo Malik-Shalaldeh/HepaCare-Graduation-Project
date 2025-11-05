@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -14,15 +14,12 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import AbedEndPoint from "../AbedEndPoint";
 
 const PRIMARY = "#00b29c";
-const API = "http://192.168.1.120:8000";
 
-const CITIES = [
-  { id: 1, name: "القدس" },
-  { id: 2, name: "رام الله" },
-  { id: 3, name: "الخليل" },
-  { id: 4, name: "نابلس" },
+const FALLBACK_CITIES = [
+  { id: 1, name: "Hebron" }, // مطابق لقاعدة البيانات الحالية
 ];
 
 export default function LabAddScreen() {
@@ -35,6 +32,22 @@ export default function LabAddScreen() {
   const [isAccredited, setIsAccredited] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const [cities, setCities] = useState(FALLBACK_CITIES);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(AbedEndPoint.labsCities);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length) setCities(data);
+        }
+      } catch {
+        // تجاهل: نستخدم FALLBACK_CITIES
+      }
+    })();
+  }, []);
 
   const validateEmail = (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const validateUrl = (v) => !v || /^https?:\/\/.+/i.test(v);
@@ -71,15 +84,20 @@ export default function LabAddScreen() {
 
     try {
       setSaving(true);
-      const res = await fetch(`${API}/labs/add`, {
+      const res = await fetch(AbedEndPoint.labsAdd, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
+
       if (!res.ok) {
         return Alert.alert("خطأ", data?.detail || "تعذر حفظ المختبر");
       }
+      if (!data?.lab_id) {
+        return Alert.alert("خطأ", "تعذر تحديد المعرّف بعد الحفظ");
+      }
+
       Alert.alert("تم", data?.message || "تم حفظ المختبر بنجاح");
       resetForm();
     } catch (err) {
@@ -124,12 +142,12 @@ export default function LabAddScreen() {
             <Ionicons name="business-outline" size={18} color={PRIMARY} />
             <View style={{ flex: 1 }}>
               <Picker
-                selectedValue={cityId}
-                onValueChange={(v) => setCityId(v)}
+                selectedValue={cityId ?? null}
+                onValueChange={(v) => setCityId(v || undefined)}
                 style={{ color: "#0F172A" }}
               >
-                <Picker.Item label="اختر المدينة" value={undefined} />
-                {CITIES.map((c) => (
+                <Picker.Item label="اختر المدينة" value={null} />
+                {cities.map((c) => (
                   <Picker.Item key={c.id} label={c.name} value={c.id} />
                 ))}
               </Picker>

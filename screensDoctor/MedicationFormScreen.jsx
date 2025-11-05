@@ -17,8 +17,7 @@ import ScreenWithDrawer from "./ScreenWithDrawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API = "http://192.168.1.120:8000";
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function MedicationFormScreen({ route, navigation }) {
   const { mode, patientId, patientName, medication } = route.params;
@@ -36,7 +35,7 @@ export default function MedicationFormScreen({ route, navigation }) {
   const [timeFocused, setTimeFocused] = useState(false);
 
   const medicationNameRef = useRef(null);
-  const scrollRef = useRef(null); // ✅ عشان ننزل الشاشة
+  const scrollRef = useRef(null);
 
   const [form, setForm] = useState({
     id: medication?.id || null,
@@ -67,12 +66,13 @@ export default function MedicationFormScreen({ route, navigation }) {
   // جلب الأدوية من الباك اند
   const fetchMedNames = async (text) => {
     try {
-      const res = await fetch(
-        `${API}/patient-medications/medications?q=${encodeURIComponent(text)}`
-      );
+      const url = `${
+        AbedEndPoint.patientMedsMedications
+      }?q=${encodeURIComponent(text)}`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error("err");
       const data = await res.json();
-      const list = data.map((d) => ({
+      const list = (Array.isArray(data) ? data : []).map((d) => ({
         id: d.id,
         name: d.name || d.label || "",
         label: d.label || d.name || "",
@@ -108,7 +108,6 @@ export default function MedicationFormScreen({ route, navigation }) {
     setShowMedNames(false);
     setShowOtherMedFields(true);
 
-    // ✅ بعد ما يختار الدواء، ننزل شوية عشان يشوف الحقول
     requestAnimationFrame(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     });
@@ -195,27 +194,27 @@ export default function MedicationFormScreen({ route, navigation }) {
 
     try {
       if (mode === "edit" && form.id) {
-        const res = await fetch(
-          `${API}/patient-medications/${form.id}?doctor_id=${doctorId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }
-        );
+        const url = `${AbedEndPoint.patientMedicationById(
+          form.id
+        )}?doctor_id=${encodeURIComponent(doctorId)}`;
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
         if (!res.ok) {
           const txt = await res.text();
           throw new Error(txt || "تعذر تعديل الدواء");
         }
       } else {
-        const res = await fetch(
-          `${API}/patient-medications/?doctor_id=${doctorId}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          }
-        );
+        const url = `${
+          AbedEndPoint.patientMedsList
+        }?doctor_id=${encodeURIComponent(doctorId)}`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
         if (!res.ok) {
           const txt = await res.text();
           throw new Error(txt || "تعذر إضافة الدواء");
@@ -237,7 +236,7 @@ export default function MedicationFormScreen({ route, navigation }) {
       />
       <SafeAreaView style={styles.safeArea} />
       <ScrollView
-        ref={scrollRef} // ✅
+        ref={scrollRef}
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 60 }}
         keyboardShouldPersistTaps="handled"
@@ -345,7 +344,6 @@ export default function MedicationFormScreen({ route, navigation }) {
 
                 setShowTimePicker(true);
 
-                // ✅ ننزل تحت عشان البيكر ما يختفي
                 requestAnimationFrame(() => {
                   scrollRef.current?.scrollToEnd({ animated: true });
                 });
@@ -360,9 +358,7 @@ export default function MedicationFormScreen({ route, navigation }) {
               <Text
                 style={[
                   styles.rtlText,
-                  {
-                    color: form.timeToTake ? "#000" : "#888",
-                  },
+                  { color: form.timeToTake ? "#000" : "#888" },
                 ]}
               >
                 {form.timeToTake || "اختر الساعة"}
@@ -415,7 +411,6 @@ export default function MedicationFormScreen({ route, navigation }) {
               }
               onFocus={() => {
                 onFocusInput();
-                // ✅ أهم سطر: لما يضغط على آخر فيلد ننزل تحت
                 requestAnimationFrame(() => {
                   scrollRef.current?.scrollToEnd({ animated: true });
                 });

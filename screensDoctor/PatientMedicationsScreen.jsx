@@ -15,8 +15,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-
-const API = "http://192.168.1.120:8000";
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function PatientMedicationsScreen({ route, navigation }) {
   const { patientId, patientName } = route.params;
@@ -42,12 +41,16 @@ export default function PatientMedicationsScreen({ route, navigation }) {
     if (!doctorId || !patientId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API}/patient-medications/?patient_id=${patientId}&doctor_id=${doctorId}`
-      );
+      const url =
+        `${AbedEndPoint.patientMedsList}` +
+        `?patient_id=${encodeURIComponent(patientId)}` +
+        `&doctor_id=${encodeURIComponent(doctorId)}`;
+
+      const res = await fetch(url);
       if (!res.ok) throw new Error("err");
       const data = await res.json();
-      const mapped = data.map((item) => ({
+
+      const mapped = (Array.isArray(data) ? data : []).map((item) => ({
         id: item.id,
         patientName: item.patient_name,
         patientId: item.patient_id,
@@ -98,12 +101,11 @@ export default function PatientMedicationsScreen({ route, navigation }) {
       return;
     }
     try {
-      const res = await fetch(
-        `${API}/patient-medications/${med.id}?doctor_id=${doctorId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const url =
+        `${AbedEndPoint.patientMedicationById(med.id)}` +
+        `?doctor_id=${encodeURIComponent(doctorId)}`;
+
+      const res = await fetch(url, { method: "DELETE" });
       if (!res.ok && res.status !== 204) {
         const txt = await res.text();
         throw new Error(txt || "تعذر حذف الدواء");

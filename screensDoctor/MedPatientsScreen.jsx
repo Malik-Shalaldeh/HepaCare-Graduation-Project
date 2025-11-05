@@ -15,8 +15,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API = "http://192.168.1.120:8000";
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function MedPatientsScreen({ navigation }) {
   const [doctorId, setDoctorId] = useState(null);
@@ -24,7 +23,6 @@ export default function MedPatientsScreen({ navigation }) {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // جلب رقم الدكتور
   useEffect(() => {
     const loadDoctor = async () => {
       try {
@@ -42,14 +40,16 @@ export default function MedPatientsScreen({ navigation }) {
     if (!doctorId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API}/patient-medications/patients?q=${encodeURIComponent(
-          text
-        )}&doctor_id=${doctorId}`
-      );
+      const url =
+        `${AbedEndPoint.patientMedsPatients}` +
+        `?q=${encodeURIComponent(text)}&doctor_id=${encodeURIComponent(
+          doctorId
+        )}`;
+
+      const res = await fetch(url);
       if (!res.ok) throw new Error("err");
       const data = await res.json();
-      setPatients(data);
+      setPatients(Array.isArray(data) ? data : []);
     } catch (err) {
       setPatients([]);
       Alert.alert("خطأ", "تعذر جلب المرضى.");
@@ -81,7 +81,10 @@ export default function MedPatientsScreen({ navigation }) {
   };
 
   const renderPatient = ({ item }) => (
-    <TouchableOpacity style={styles.patientItem} onPress={() => openPatient(item)}>
+    <TouchableOpacity
+      style={styles.patientItem}
+      onPress={() => openPatient(item)}
+    >
       <View style={styles.patientRight}>
         <View style={styles.iconCircle}>
           <Ionicons name="person-outline" size={20} color="#00b29c" />
@@ -106,7 +109,6 @@ export default function MedPatientsScreen({ navigation }) {
       />
       <SafeAreaView style={styles.safeArea} />
       <View style={styles.container}>
-        {/* البحث */}
         <View style={styles.searchSection}>
           <Ionicons
             name="search"
@@ -123,7 +125,6 @@ export default function MedPatientsScreen({ navigation }) {
           />
         </View>
 
-        {/* لستة المرضى */}
         <FlatList
           data={patients}
           keyExtractor={(item, index) =>

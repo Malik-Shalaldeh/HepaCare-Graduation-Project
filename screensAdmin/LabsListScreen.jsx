@@ -12,9 +12,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import AbedEndPoint from "../AbedEndPoint";
 
 const PRIMARY = "#00b29c";
-const API = "http://192.168.1.120:8000/labs";
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -38,9 +38,11 @@ export default function LabsListScreen() {
       try {
         setLoading(true);
         setLoadError("");
-        const res = await fetch(API);
+        const res = await fetch(`${AbedEndPoint.labsList}?_=${Date.now()}`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error("failed");
         const json = await res.json();
-        // نتأكد من وجود الحقول
         const normalized = (json || []).map((l) => ({
           id: l.id,
           name: l.name || "",
@@ -49,7 +51,10 @@ export default function LabsListScreen() {
           phone: l.phone || "",
           email: l.email || "",
           location_url: l.location_url || "",
-          is_accredited: typeof l.is_accredited === "boolean" ? l.is_accredited : false,
+          is_accredited:
+            typeof l.is_accredited === "boolean"
+              ? l.is_accredited
+              : !!l.is_approved,
           is_active: typeof l.is_active === "boolean" ? l.is_active : true,
         }));
         setLabs(normalized);
@@ -108,7 +113,14 @@ export default function LabsListScreen() {
         </View>
       </View>
       {!!loadError && (
-        <Text style={{ color: "#EF4444", marginTop: 4, width: "88%", textAlign: "right" }}>
+        <Text
+          style={{
+            color: "#EF4444",
+            marginTop: 4,
+            width: "88%",
+            textAlign: "right",
+          }}
+        >
           {loadError}
         </Text>
       )}
@@ -178,9 +190,13 @@ export default function LabsListScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       {loading ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={PRIMARY} />
-          <Text style={{ marginTop: 8, color: "#64748B" }}>جاري تحميل المختبرات...</Text>
+          <Text style={{ marginTop: 8, color: "#64748B" }}>
+            جاري تحميل المختبرات...
+          </Text>
         </View>
       ) : (
         <FlatList

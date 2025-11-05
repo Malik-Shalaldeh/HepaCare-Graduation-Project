@@ -1,5 +1,4 @@
 // componentDoctor/HealthMedComponent.jsx
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -16,21 +15,20 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-
-const API = "http://192.168.1.120:8000"; // عدّل إذا لزم
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function HealthMedComponent() {
   const navigation = useNavigation();
 
-  // === الحالة القادمة من السيرفر ===
   const [meds, setMeds] = useState([]); // [{id, Name, isAvailable, ...}]
   const [availableMedsMap, setAvailableMedsMap] = useState({}); // {id: bool}
   const [modalVisible, setModalVisible] = useState(false);
 
-  // تحميل جميع الأدوية مع الحالة
   const loadMeds = async () => {
     try {
-      const res = await fetch(`${API}/health-meds?only_available=0`);
+      const res = await fetch(`${AbedEndPoint.healthMeds}?only_available=0`, {
+        headers: { Accept: "application/json" },
+      });
       const data = await res.json();
       const safe = Array.isArray(data) ? data : [];
       setMeds(safe);
@@ -51,7 +49,6 @@ export default function HealthMedComponent() {
     loadMeds();
   }, []);
 
-  // تبديل الحالة عبر API ثم تحديث الحالة المحلية
   const handleToggle = async (med) => {
     if (!med || typeof med.id === "undefined" || med.id === null) {
       Alert.alert("تنبيه", "معرّف الدواء غير متوفر");
@@ -61,13 +58,10 @@ export default function HealthMedComponent() {
     const newValue = !current;
 
     try {
-      const url = `${API}/health-meds/set-availability?med_id=${encodeURIComponent(
-        med.id
-      )}&available=${newValue ? 1 : 0}`;
-      const res = await fetch(url, { method: "PATCH" });
+      const url = AbedEndPoint.setHealthMedAvailability(med.id, newValue);
+      const res = await fetch(url, { method: "PATCH", headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("PATCH failed");
 
-      // تحديث الحالة محليًا
       setAvailableMedsMap((prev) => ({ ...(prev || {}), [med.id]: newValue }));
       setMeds((prev) =>
         Array.isArray(prev)
@@ -85,7 +79,6 @@ export default function HealthMedComponent() {
     }
   };
 
-  // قائمة العرض الرئيسية: أسماء الأدوية المتاحة فقط كنصوص (مطابقة لطريقة العرض الأصلية)
   const displayedMeds = Array.isArray(meds)
     ? meds.filter((m) => m && typeof m.id !== "undefined" && availableMedsMap[m.id])
     : [];
@@ -93,7 +86,6 @@ export default function HealthMedComponent() {
 
   return (
     <>
-      {/* سهم الرجوع */}
       <TouchableOpacity
         style={styles.backArrow}
         onPress={() => navigation.goBack()}
@@ -105,7 +97,6 @@ export default function HealthMedComponent() {
         />
       </TouchableOpacity>
 
-      {/* المحتوى الرئيسي */}
       <View style={styles.container}>
         <View style={styles.headerSection}>
           <Text style={[styles.subtitle, styles.rtlText]}>
@@ -147,7 +138,6 @@ export default function HealthMedComponent() {
           />
         )}
 
-        {/* مودال إدارة الأدوية */}
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -256,7 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: ({ width: 0, height: 1 }),
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -312,5 +302,10 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: "#F44336",
+  },
+  btnText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

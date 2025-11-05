@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -12,9 +12,9 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import AbedEndPoint from "../AbedEndPoint";
 
 const PRIMARY = "#00b29c";
-const API = "http://192.168.1.120:8000";
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -27,85 +27,119 @@ const cityName = (id) => CITIES.find((c) => c.id === id)?.name || "—";
 
 export default function LabDeleteScreen() {
   const [q, setQ] = useState("");
-  const [lab, setLab] = useState(null);
+  const [allLabs, setAllLabs] = useState([]);
+  const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const normalizeLab = (data) => {
-    let item = data;
+  const normalizeLabs = (data) => {
+    let items = [];
+    if (Array.isArray(data)) items = data;
+    else if (data && data.lab) items = [data.lab];
+    else if (data && data.result)
+      items = Array.isArray(data.result) ? data.result : [data.result];
+    else if (data && typeof data === "object") items = [data];
 
-    // لو رجع مصفوفة
-    if (Array.isArray(data)) {
-      item = data[0];
-    }
-
-    // لو رجع { lab: {...} }
-    if (data && data.lab) {
-      item = data.lab;
-    }
-
-    // لو رجع { result: {...} }
-    if (data && data.result) {
-      item = data.result;
-    }
-
-    if (!item || !item.id) {
-      return null;
-    }
-
-    return {
-      id: item.id,
-      name: item.name,
-      city_id: item.city_id,
-      city_name: item.city_name,
-      address: item.address || "",
-      phone: item.phone || "",
-      email: item.email || "",
-      location_url: item.location_url || "",
-      is_accredited: item.is_accredited === true,
-      is_active: item.is_active !== false,
-    };
+    return items
+      .filter((it) => it && (it.id !== undefined && it.id !== null))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        city_id: item.city_id,
+        city_name: item.city_name,
+        address: item.address || "",
+        phone: item.phone || "",
+        email: item.email || "",
+        location_url: item.location_url || "",
+        is_accredited:
+          item.is_accredited === true ||
+          item.is_approved === true ||
+          item.isAccredited === true,
+        is_active:
+          item.is_active !== false &&
+          item.isActive !== false,
+      }));
   };
 
-  const onSearch = async () => {
-    if (!q.trim())
-      return Alert.alert("تنبيه", "أدخل رقم المختبر أو جزء من الاسم");
+  const filterLabs = (source, query) => {
+    const t = (query || "").trim().toLowerCase();
+    if (!t) return source;
+    return source.filter((x) => {
+      const name = (x.name || "").toLowerCase();
+      const idStr = String(x.id || "");
+      return name.includes(t) || idStr.includes(t);
+    });
+  };
 
+  const fetchAllLabs = async () => {
     setLoading(true);
     try {
-      // لاحظ: بدون / في الآخر لأن الباك عندك قبل شوي رجّع 307 لما كان في /
-      const res = await fetch(
-        `${API}/labs/search?q=${encodeURIComponent(q.trim())}`
-      );
+      const url = `${AbedEndPoint.labsList}?_=${Date.now()}`;
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
 
       if (!res.ok) {
-        if (res.status === 404) {
-          setLab(null);
-          Alert.alert("غير موجود", "لا يوجد مختبر مطابق");
-        } else {
-          Alert.alert("خطأ", "تعذر جلب بيانات المختبر");
-        }
+        Alert.alert("خطأ", "تعذر جلب قائمة المختبرات");
+        setAllLabs([]);
+        setLabs([]);
         return;
       }
 
       const data = await res.json();
-      const clean = normalizeLab(data);
-      if (!clean) {
-        setLab(null);
-        Alert.alert("غير موجود", "الرد من الخادم لا يحتوي على معرف المختبر");
-        return;
-      }
-
-      setLab(clean);
+      const list = normalizeLabs(data);
+      setAllLabs(list);
+      setLabs(filterLabs(list, q));
     } catch (err) {
-      console.log("search lab err:", err);
+      console.log("fetchAllLabs err:", err);
       Alert.alert("خطأ", "تعذر الاتصال بالخادم");
     } finally {
       setLoading(false);
     }
   };
 
-  const onDelete = () => {
+  useEffect(() => {
+    fetchAllLabs();
+  }, []);
+
+  const handleChangeQuery = (text) => {
+    setQ(text);
+    setLabs(filterLabs(allLabs, text));
+  };
+
+  const onSearch = async () => {
+    setLoading(true);
+    try {
+      const term = q.trim();
+      const url = term
+        ? `${AbedEndPoint.labsSearch}?q=${encodeURIComponent(term)}&_=${Date.now()}`
+        : `${AbedEndPoint.labsList}?_=${Date.now()}`;
+
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setLabs([]);
+          Alert.alert("غير موجود", "لا يوجد مختبرات مطابقة");
+        } else {
+          Alert.alert("خطأ", "تعذر جلب بيانات المختبرات");
+        }
+        return;
+      }
+
+      const data = await res.json();
+      const list = normalizeLabs(data);
+      setAllLabs(list);
+      setLabs(filterLabs(list, q));
+    } catch (err) {
+      console.log("search labs err:", err);
+      Alert.alert("خطأ", "تعذر الاتصال بالخادم");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onDelete = (lab) => {
     if (!lab) return;
     Alert.alert("حذف مختبر", `هل تريد حذف "${lab.name}" (ID: ${lab.id})؟`, [
       { text: "إلغاء", style: "cancel" },
@@ -119,8 +153,7 @@ export default function LabDeleteScreen() {
           }
           setDeleting(true);
           try {
-            // لاحظ: بدون / في الآخر لأن السيرفر رجّع 307 لما كان في سلاش
-            const res = await fetch(`${API}/labs/${lab.id}`, {
+            const res = await fetch(AbedEndPoint.labById(lab.id), {
               method: "DELETE",
             });
 
@@ -129,14 +162,13 @@ export default function LabDeleteScreen() {
               try {
                 const body = await res.json();
                 if (body?.detail) msg = body.detail;
-              } catch (_) {}
+              } catch {}
               Alert.alert("خطأ", msg);
               return;
             }
 
-            Alert.alert("تم الحذف", `تم حذف: ${lab.name}`);
-            setLab(null);
-            setQ("");
+            setAllLabs((prev) => prev.filter((x) => x.id !== lab.id));
+            setLabs((prev) => prev.filter((x) => x.id !== lab.id));
           } catch (err) {
             console.log("delete lab err:", err);
             Alert.alert("خطأ", "تعذر الاتصال بالخادم");
@@ -170,7 +202,7 @@ export default function LabDeleteScreen() {
               placeholder="مثال: 2 أو مختبر الشفاء"
               placeholderTextColor="#94A3B8"
               value={q}
-              onChangeText={setQ}
+              onChangeText={handleChangeQuery}
               textAlign="right"
               returnKeyType="search"
               onSubmitEditing={onSearch}
@@ -190,9 +222,17 @@ export default function LabDeleteScreen() {
             </TouchableOpacity>
           </View>
 
-          {lab && (
-            <>
+          {labs.map((lab) => (
+            <View key={lab.id} style={{ width: "100%", alignItems: "center" }}>
               <View style={styles.card}>
+                <TouchableOpacity
+                  onPress={() => onDelete(lab)}
+                  disabled={deleting}
+                  style={{ padding: 4, marginLeft: 6 }}
+                >
+                  <Ionicons name="trash-outline" size={22} color="#ef4444" />
+                </TouchableOpacity>
+
                 <Ionicons
                   name="flask-outline"
                   size={24}
@@ -202,32 +242,18 @@ export default function LabDeleteScreen() {
                 <View style={{ flex: 1, alignItems: "flex-end" }}>
                   <Text style={styles.cardTitle}>{lab.name}</Text>
                   <Text style={styles.cardMeta}>
-                    ID: {lab.id} — المدينة:{" "}
-                    {lab.city_name || cityName(lab.city_id)}
+                    ID: {lab.id} — المدينة: {lab.city_name || cityName(lab.city_id)}
                   </Text>
                   <Text style={styles.cardMeta}>
                     الهاتف: {lab.phone || "—"} — البريد: {lab.email || "—"}
                   </Text>
                   <Text style={styles.cardMeta}>
-                    المعتمد: {lab.is_accredited ? "نعم" : "لا"} — فعال:{" "}
-                    {lab.is_active ? "نعم" : "لا"}
+                    المعتمد: {lab.is_accredited ? "نعم" : "لا"} — فعال: {lab.is_active ? "نعم" : "لا"}
                   </Text>
                 </View>
               </View>
-
-              <TouchableOpacity
-                onPress={onDelete}
-                activeOpacity={0.9}
-                style={styles.deleteBtn}
-                disabled={deleting}
-              >
-                <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
-                <Text style={styles.deleteText}>
-                  {deleting ? "جارٍ الحذف..." : "حذف المختبر"}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
+            </View>
+          ))}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

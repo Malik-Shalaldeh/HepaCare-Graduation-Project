@@ -14,8 +14,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const API = "http://192.168.1.123:8000";
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function MyMedicationsScreen() {
   const navigation = useNavigation();
@@ -48,10 +47,10 @@ export default function MyMedicationsScreen() {
         return;
       }
 
-      const url = `${API}/patient-medications/by-patient/${patientId}`;
+      const url = AbedEndPoint.patientMedsByPatient(patientId);
       console.log("🔗 GET:", url);
 
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
       const data = await res.json();
       console.log("✅ raw data from API:", data);
 
