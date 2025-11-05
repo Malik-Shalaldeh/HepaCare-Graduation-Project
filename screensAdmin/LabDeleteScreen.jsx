@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 const PRIMARY = "#00b29c";
+const API = "http://192.168.1.120:8000";
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -22,48 +23,86 @@ const CITIES = [
   { id: 4, name: "نابلس" },
 ];
 
-const MOCK_LABS = [
-  {
-    id: 1,
-    name: "مختبر القدس",
-    city_id: 1,
-    address: "حي...",
-    phone: "0599000000",
-    email: "lab1@mail.com",
-    location_url: "",
-    is_accredited: true,
-    is_active: true,
-  },
-  {
-    id: 2,
-    name: "مختبر الشفاء",
-    city_id: 3,
-    address: "",
-    phone: "0599111111",
-    email: "",
-    location_url: "https://maps.google.com/..",
-    is_accredited: false,
-    is_active: true,
-  },
-];
-
 const cityName = (id) => CITIES.find((c) => c.id === id)?.name || "—";
 
 export default function LabDeleteScreen() {
   const [q, setQ] = useState("");
   const [lab, setLab] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const onSearch = () => {
+  const normalizeLab = (data) => {
+    let item = data;
+
+    // لو رجع مصفوفة
+    if (Array.isArray(data)) {
+      item = data[0];
+    }
+
+    // لو رجع { lab: {...} }
+    if (data && data.lab) {
+      item = data.lab;
+    }
+
+    // لو رجع { result: {...} }
+    if (data && data.result) {
+      item = data.result;
+    }
+
+    if (!item || !item.id) {
+      return null;
+    }
+
+    return {
+      id: item.id,
+      name: item.name,
+      city_id: item.city_id,
+      city_name: item.city_name,
+      address: item.address || "",
+      phone: item.phone || "",
+      email: item.email || "",
+      location_url: item.location_url || "",
+      is_accredited: item.is_accredited === true,
+      is_active: item.is_active !== false,
+    };
+  };
+
+  const onSearch = async () => {
     if (!q.trim())
       return Alert.alert("تنبيه", "أدخل رقم المختبر أو جزء من الاسم");
-    const query = q.trim().toLowerCase();
-    const num = Number(query);
-    let found = null;
-    if (!Number.isNaN(num)) found = MOCK_LABS.find((l) => l.id === num);
-    if (!found)
-      found = MOCK_LABS.find((l) => l.name.toLowerCase().includes(query));
-    setLab(found || null);
-    if (!found) Alert.alert("غير موجود", "لا يوجد مختبر مطابق");
+
+    setLoading(true);
+    try {
+      // لاحظ: بدون / في الآخر لأن الباك عندك قبل شوي رجّع 307 لما كان في /
+      const res = await fetch(
+        `${API}/labs/search?q=${encodeURIComponent(q.trim())}`
+      );
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setLab(null);
+          Alert.alert("غير موجود", "لا يوجد مختبر مطابق");
+        } else {
+          Alert.alert("خطأ", "تعذر جلب بيانات المختبر");
+        }
+        return;
+      }
+
+      const data = await res.json();
+      const clean = normalizeLab(data);
+      if (!clean) {
+        setLab(null);
+        Alert.alert("غير موجود", "الرد من الخادم لا يحتوي على معرف المختبر");
+        return;
+      }
+
+      setLab(clean);
+    } catch (err) {
+      console.log("search lab err:", err);
+      Alert.alert("خطأ", "تعذر الاتصال بالخادم");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onDelete = () => {
@@ -73,11 +112,37 @@ export default function LabDeleteScreen() {
       {
         text: "حذف",
         style: "destructive",
-        onPress: () => {
-          // TODO: DELETE /labs/:id
-          Alert.alert("تم الحذف", `تم حذف: ${lab.name}`);
-          setLab(null);
-          setQ("");
+        onPress: async () => {
+          if (!lab.id) {
+            Alert.alert("خطأ", "رقم المختبر غير معروف");
+            return;
+          }
+          setDeleting(true);
+          try {
+            // لاحظ: بدون / في الآخر لأن السيرفر رجّع 307 لما كان في سلاش
+            const res = await fetch(`${API}/labs/${lab.id}`, {
+              method: "DELETE",
+            });
+
+            if (!res.ok) {
+              let msg = "تعذر حذف المختبر";
+              try {
+                const body = await res.json();
+                if (body?.detail) msg = body.detail;
+              } catch (_) {}
+              Alert.alert("خطأ", msg);
+              return;
+            }
+
+            Alert.alert("تم الحذف", `تم حذف: ${lab.name}`);
+            setLab(null);
+            setQ("");
+          } catch (err) {
+            console.log("delete lab err:", err);
+            Alert.alert("خطأ", "تعذر الاتصال بالخادم");
+          } finally {
+            setDeleting(false);
+          }
         },
       },
     ]);
@@ -109,13 +174,19 @@ export default function LabDeleteScreen() {
               textAlign="right"
               returnKeyType="search"
               onSubmitEditing={onSearch}
+              editable={!loading && !deleting}
             />
             <TouchableOpacity
               onPress={onSearch}
               activeOpacity={0.85}
               style={styles.iconBtn}
+              disabled={loading || deleting}
             >
-              <Ionicons name="search" size={18} color="#FFFFFF" />
+              <Ionicons
+                name={loading ? "hourglass-outline" : "search"}
+                size={18}
+                color="#FFFFFF"
+              />
             </TouchableOpacity>
           </View>
 
@@ -131,7 +202,8 @@ export default function LabDeleteScreen() {
                 <View style={{ flex: 1, alignItems: "flex-end" }}>
                   <Text style={styles.cardTitle}>{lab.name}</Text>
                   <Text style={styles.cardMeta}>
-                    ID: {lab.id} — المدينة: {cityName(lab.city_id)}
+                    ID: {lab.id} — المدينة:{" "}
+                    {lab.city_name || cityName(lab.city_id)}
                   </Text>
                   <Text style={styles.cardMeta}>
                     الهاتف: {lab.phone || "—"} — البريد: {lab.email || "—"}
@@ -147,9 +219,12 @@ export default function LabDeleteScreen() {
                 onPress={onDelete}
                 activeOpacity={0.9}
                 style={styles.deleteBtn}
+                disabled={deleting}
               >
                 <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
-                <Text style={styles.deleteText}>حذف المختبر</Text>
+                <Text style={styles.deleteText}>
+                  {deleting ? "جارٍ الحذف..." : "حذف المختبر"}
+                </Text>
               </TouchableOpacity>
             </>
           )}
@@ -192,7 +267,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
   card: {
     backgroundColor: "#F8FAFC",
     borderRadius: 12,
@@ -221,7 +295,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
     width: "100%",
   },
-
   deleteBtn: {
     backgroundColor: "#ef4444",
     borderRadius: 999,

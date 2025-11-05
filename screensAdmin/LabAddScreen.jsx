@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 
 const PRIMARY = "#00b29c";
+const API = "http://192.168.1.120:8000";
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -33,11 +34,23 @@ export default function LabAddScreen() {
   const [locationUrl, setLocationUrl] = useState("");
   const [isAccredited, setIsAccredited] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const validateEmail = (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const validateUrl = (v) => !v || /^https?:\/\/.+/i.test(v);
 
-  const onSave = () => {
+  const resetForm = () => {
+    setName("");
+    setCityId(undefined);
+    setAddress("");
+    setPhone("");
+    setEmail("");
+    setLocationUrl("");
+    setIsAccredited(false);
+    setIsActive(true);
+  };
+
+  const onSave = async () => {
     if (!name.trim()) return Alert.alert("تنبيه", "اسم المختبر إلزامي");
     if (!cityId) return Alert.alert("تنبيه", "اختر المدينة");
     if (!validateEmail(email))
@@ -56,22 +69,27 @@ export default function LabAddScreen() {
       is_active: !!isActive,
     };
 
-    // TODO: POST /labs
-    Alert.alert(
-      "تم الحفظ",
-      `سيتم إنشاء مختبر:\n${JSON.stringify(payload, null, 2)}`
-    );
-    setName("");
-    setCityId(undefined);
-    setAddress("");
-    setPhone("");
-    setEmail("");
-    setLocationUrl("");
-    setIsAccredited(false);
-    setIsActive(true);
+    try {
+      setSaving(true);
+      const res = await fetch(`${API}/labs/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return Alert.alert("خطأ", data?.detail || "تعذر حفظ المختبر");
+      }
+      Alert.alert("تم", data?.message || "تم حفظ المختبر بنجاح");
+      resetForm();
+    } catch (err) {
+      Alert.alert("خطأ", "تعذر الاتصال بالسيرفر");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const disabled = !name || !cityId;
+  const disabled = !name || !cityId || saving;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -192,7 +210,9 @@ export default function LabAddScreen() {
             style={[styles.actionBtn, disabled && { opacity: 0.5 }]}
           >
             <Ionicons name="save-outline" size={16} color="#FFFFFF" />
-            <Text style={styles.actionText}>حفظ المختبر</Text>
+            <Text style={styles.actionText}>
+              {saving ? "جاري الحفظ..." : "حفظ المختبر"}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

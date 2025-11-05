@@ -1,12 +1,20 @@
-import { View, Text, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const primary = "#2C3E50";
 const accent = "#2980B9";
 const textColor = "#34495E";
 
+const API = "http://192.168.1.120:8000";
+
 const LapDashboard = () => {
+  const navigation = useNavigation();
+  const [labName, setLabName] = useState("");
+
   const today = new Date();
   const months = [
     "يناير",
@@ -26,6 +34,52 @@ const LapDashboard = () => {
     months[today.getMonth()]
   } ${today.getFullYear()}`;
 
+  useEffect(() => {
+    let active = true;
+
+    const fetchLab = async () => {
+      try {
+        // هذا اللي اللوجن خزّنه، بس غالباً هو user_id مش lab_id
+        const storedLabId = await AsyncStorage.getItem("lab_id");
+
+        // أول محاولة: استخدم اللي متخزن
+        let url = storedLabId
+          ? `${API}/lab/dashboard/${storedLabId}`
+          : `${API}/lab/dashboard/1`;
+
+        let res = await fetch(url);
+
+        // لو المختبر بهذا الرقم مش موجود (404) جرّب أول مختبر فعلي في الداتا (1)
+        if (res.status === 404) {
+          res = await fetch(`${API}/lab/dashboard/1`);
+        }
+
+        if (!res.ok) {
+          throw new Error("failed");
+        }
+
+        const data = await res.json();
+        if (!active) return;
+
+        setLabName(data.lab_name || "");
+      } catch (err) {
+        console.log(err);
+        if (active) {
+          Alert.alert("خطأ", "تعذر جلب بيانات المختبر.");
+          navigation.navigate("LoginScreen");
+        }
+      }
+    };
+
+    fetchLab();
+    const unsub = navigation.addListener("focus", fetchLab);
+
+    return () => {
+      active = false;
+      if (unsub) unsub();
+    };
+  }, [navigation]);
+
   return (
     <ScreenWithDrawer title="لوحة التحكم">
       {/* ✅ Header with Hepacare name */}
@@ -43,7 +97,9 @@ const LapDashboard = () => {
             style={styles.icon}
           />
           <View>
-            <Text style={styles.title}>مرحباً يا عبود 👋</Text>
+            <Text style={styles.title}>
+              مرحباً {labName ? labName : "..."} 👋
+            </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
         </View>

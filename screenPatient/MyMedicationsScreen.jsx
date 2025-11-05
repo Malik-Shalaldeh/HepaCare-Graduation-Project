@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,45 +8,82 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const API = "http://192.168.1.123:8000";
 
 export default function MyMedicationsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const patientName = route.params?.patientName || "محمد أحمد";
-  const dummyMeds = [
-    {
-      name: "باراسيتامول",
-      dosage: "500 مجم",
-      frequency: "مرتين يوميًا",
-      doseTime: "صباحًا ومساءً",
-      timeToTake: "08:00",
-      additionalInstructions: "تناول بعد الأكل بنصف ساعة",
-    },
-    {
-      name: "أموكسيللين",
-      dosage: "250 مجم",
-      frequency: "ثلاث مرات يوميًا",
-      doseTime: "صباحًا، ظهرًا، مساءً",
-      timeToTake: "13:00",
-      additionalInstructions: "اشرب كوب ماء كامل معه",
-    },
-    {
-      name: "ميتفورمين",
-      dosage: "850 مجم",
-      frequency: "مرتين يوميًا",
-      doseTime: "صباحًا ومساءً",
-      timeToTake: "20:00",
-      additionalInstructions: "",
-    },
-  ];
-  const medications = route.params?.medications?.length
-    ? route.params.medications
-    : dummyMeds;
+  const [medications, setMedications] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getStoredPatientId = async () => {
+    const keys = ["patient_id", "patientId", "user_id", "userId", "id"];
+    for (const k of keys) {
+      const v = await AsyncStorage.getItem(k);
+      if (v) return v;
+    }
+    return null;
+  };
+
+  const loadMeds = async () => {
+    try {
+      setLoading(true);
+
+      let patientId = route.params?.patientId || null;
+      if (!patientId) {
+        patientId = await getStoredPatientId();
+      }
+
+      if (!patientId) {
+        console.log("⚠️ ما في patientId");
+        setMedications([]);
+        return;
+      }
+
+      const url = `${API}/patient-medications/by-patient/${patientId}`;
+      console.log("🔗 GET:", url);
+
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log("✅ raw data from API:", data);
+
+      const normalized = Array.isArray(data)
+        ? data.map((x) => ({
+            id: x.id,
+            name: x.name || x.med_name || "دواء",
+            dosage: x.dosage || x.dose_text || "",
+            frequency: x.frequency || x.frequency_text || "",
+            doseTime:
+              x.doseTime ||
+              (x.interval_hours ? `كل ${x.interval_hours} ساعة` : "") ||
+              "",
+            timeToTake: x.timeToTake || "",
+            additionalInstructions:
+              x.additionalInstructions || x.instructions || "",
+          }))
+        : [];
+
+      console.log("🟦 normalized:", normalized);
+      setMedications(normalized);
+    } catch (e) {
+      console.log("❌ error fetching meds:", e);
+      setMedications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMeds();
+  }, []);
 
   const renderMedicationItem = ({ item }) => (
     <View style={styles.medCard}>
@@ -54,27 +91,33 @@ export default function MyMedicationsScreen() {
 
       <View style={styles.infoRow}>
         <Ionicons name="flask-outline" size={20} color="#1ABC9C" />
-        <Text style={styles.value}>الجرعة: {item.dosage}</Text>
+        <Text style={styles.value}>الجرعة: {item.dosage || "-"}</Text>
       </View>
 
       <View style={styles.infoRow}>
         <Ionicons name="repeat-outline" size={20} color="#1ABC9C" />
-        <Text style={styles.value}>التكرار: {item.frequency}</Text>
+        <Text style={styles.value}>التكرار: {item.frequency || "-"}</Text>
       </View>
 
       <View style={styles.infoRow}>
         <Ionicons name="time-outline" size={20} color="#1ABC9C" />
-        <Text style={styles.value}>وقت الجرعة: {item.doseTime}</Text>
+        <Text style={styles.value}>وقت الجرعة: {item.doseTime || "-"}</Text>
       </View>
 
       <View style={styles.infoRow}>
         <Ionicons name="alarm-outline" size={20} color="#1ABC9C" />
-        <Text style={styles.value}>الساعة المخصصة: {item.timeToTake}</Text>
+        <Text style={styles.value}>
+          الساعة المخصصة: {item.timeToTake || "-"}
+        </Text>
       </View>
 
       {item.additionalInstructions ? (
         <View style={styles.infoRow}>
-          <Ionicons name="information-circle-outline" size={20} color="#1ABC9C" />
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color="#1ABC9C"
+          />
           <Text style={styles.value}>
             تعليمات: {item.additionalInstructions}
           </Text>
@@ -86,14 +129,12 @@ export default function MyMedicationsScreen() {
   return (
     <ScreenWithDrawer>
       <SafeAreaView style={styles.safeArea}>
-        {/* Dark Status Bar */}
         <StatusBar
           barStyle="dark-content"
           backgroundColor="transparent"
           translucent
         />
         <View style={styles.container}>
-          {/* ✨ Enhanced Header */}
           <View style={styles.headerContainer}>
             <TouchableOpacity
               style={styles.backButton}
@@ -112,15 +153,29 @@ export default function MyMedicationsScreen() {
             <Text style={styles.headerTitle}>{`أدويتي`}</Text>
           </View>
 
-          {/* Content */}
-          {medications.length === 0 ? (
-            <Text style={styles.noMedsText}>لا توجد أدوية لعرضها</Text>
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color="#16A085"
+              style={{ marginTop: 40 }}
+            />
           ) : (
             <FlatList
               data={medications}
-              keyExtractor={(_, idx) => idx.toString()}
+              keyExtractor={(item, idx) =>
+                item.id ? String(item.id) : String(idx)
+              }
               renderItem={renderMedicationItem}
               contentContainerStyle={styles.medList}
+              ListHeaderComponent={
+                medications.length === 0 ? (
+                  <Text style={styles.noMedsText}>لا توجد أدوية لعرضها</Text>
+                ) : (
+                  <Text style={{ textAlign: "center", marginBottom: 10 }}>
+                    عدد الأدوية: {medications.length}
+                  </Text>
+                )
+              }
               showsVerticalScrollIndicator={false}
             />
           )}
@@ -173,7 +228,8 @@ const styles = StyleSheet.create({
   },
   noMedsText: {
     textAlign: "center",
-    marginTop: 120,
+    marginTop: 30,
+    marginBottom: 10,
     color: "#6b7280",
     fontSize: 16,
     writingDirection: "rtl",
