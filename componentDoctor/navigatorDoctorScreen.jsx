@@ -93,6 +93,11 @@ function MainTabs() {
         component={MedicationsStackScreen}
         options={{ headerShown: false }}
       />
+      <Drawer.Screen
+          name="المرضى"
+          component={PatientsStack}
+          options={{headerShown: false}}
+      />
       <Tab.Screen name="لوحة التحكم" component={Dashboard} />
     </Tab.Navigator>
   );
@@ -129,15 +134,7 @@ function NavigatorDoctor() {
             headerShown: false,
           }}
         />
-        <Drawer.Screen
-          name="المرضى"
-          component={PatientsStack}
-          options={{
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="people-outline" size={size} color={color} />
-            ),
-          }}
-        />
+
         <Drawer.Screen
           name="إدارة المواعيد"
           component={AppointmentsStack}

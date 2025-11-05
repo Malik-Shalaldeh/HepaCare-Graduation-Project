@@ -19,7 +19,7 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API = "http://192.168.1.122:8000";
+const API = 'http://192.168.1.8:8000';
 
 function toYMD(d) {
   const yyyy = d.getFullYear();

@@ -10,17 +10,16 @@ import {
   Alert,
   StatusBar,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-
 const primary = '#00b29c';
 
 const EvaluationVisitScreen = () => {
   const navigation = useNavigation();
-  
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
 
@@ -30,7 +29,6 @@ const EvaluationVisitScreen = () => {
     }
   }, [patientId, navigation]);
 
-  // عند كل مرة تظهر فيها الشاشة نفرّغ الحقول
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setCondition('');
@@ -49,38 +47,37 @@ const EvaluationVisitScreen = () => {
   const [psychosocial, setPsychosocial] = useState('');
 
   const handleSave = async () => {
-  if (!condition || !adherence) {
-    Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
-    return;
-  }
+    if (!condition || !adherence) {
+      Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
+      return;
+    }
 
-  try {
-    await axios.post('http://192.168.1.122:8000/visits/', {
-      patient_id: patientId,
-      visit_date: new Date().toISOString(), // 👈 التاريخ الحالي بصيغة ISO
-      general_state:
-        condition === 'جيدة' ? 'GOOD' :
-        condition === 'متوسطة' ? 'MEDIUM' : 'BAD',
-      adherence:
-        adherence === 'نعم' ? 'YES' :
-        adherence === 'لا' ? 'NO' : 'SOMETIMES',
-      doctor_notes: notes,
-      psychological_notes: psychosocial,
-    });
+    try {
+      await axios.post('http://192.168.1.8:8000/visits/', {
+        patient_id: patientId,
+        visit_date: new Date().toISOString(),
+        general_state:
+          condition === 'جيدة' ? 'GOOD' :
+          condition === 'متوسطة' ? 'MEDIUM' : 'BAD',
+        adherence:
+          adherence === 'نعم' ? 'YES' :
+          adherence === 'لا' ? 'NO' : 'SOMETIMES',
+        doctor_notes: notes,
+        psychological_notes: psychosocial,
+      });
 
-    Alert.alert('✅ تم حفظ التقييم للمريض: ' + patientName);
+      Alert.alert('✅', 'تم حفظ/تعديل التقييم للمريض: ' + patientName);
 
-    setCondition('');
-    setAdherence('');
-    setNotes('');
-    setPsychosocial('');
-    
-  } catch (error) {
-    console.error(error);
-    Alert.alert('خطأ', 'لا يمكن تكرار الزيارة في نفس التاريخ وتاكد من المعلومات المدخلة');
-  }
-};
-
+      setCondition('');
+      setAdherence('');
+      setNotes('');
+      setPsychosocial('');
+      
+    } catch (error) {
+      console.error(error);
+      Alert.alert('خطأ', 'تأكد من الاتصال أو البيانات.');
+    }
+  };
 
   const renderOptionGroup = (label, options, selected, onSelect) => (
     <View style={styles.optionGroup}>
@@ -116,54 +113,76 @@ const EvaluationVisitScreen = () => {
         barStyle="dark-content"
         translucent={false}
       />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
+
+      {/* 👇 أهم تغيير: اللفّة وترتيبها */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={
+          Platform.OS === 'ios'
+            ? 0
+            : (StatusBar.currentHeight || 0)
+        }
+      >
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
         >
-          <Ionicons name="arrow-back" size={26} color={primary} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={26} color={primary} />
+          </TouchableOpacity>
 
-        <Text style={styles.title}>تقييم زيارة المريض 🩺</Text>
-        <Text style={styles.patientInfo}>
-          المريض: {selectedPatient.name} ({selectedPatient.id})
-        </Text>
+          <Text style={styles.title}>تقييم زيارة المريض 🩺</Text>
+          <Text style={styles.patientInfo}>
+            المريض: {selectedPatient.name} ({selectedPatient.id})
+          </Text>
 
-        {renderOptionGroup(
-          '1. الحالة العامة',
-          ['جيدة', 'متوسطة', 'سيئة'],
-          condition,
-          setCondition
-        )}
-        {renderOptionGroup(
-          '2. الالتزام بالعلاج',
-          ['نعم', 'لا', 'أحيانًا'],
-          adherence,
-          setAdherence
-        )}
+          {renderOptionGroup(
+            '1. الحالة العامة',
+            ['جيدة', 'متوسطة', 'سيئة'],
+            condition,
+            setCondition
+          )}
 
-        <Text style={styles.label}>3. ملاحظات الطبيب</Text>
-        <TextInput
-          placeholder="ملاحظات طبية..."
-          style={styles.textInput}
-          multiline
-          value={notes}
-          onChangeText={setNotes}
-        />
+          {renderOptionGroup(
+            '2. الالتزام بالعلاج',
+            ['نعم', 'لا', 'أحيانًا'],
+            adherence,
+            setAdherence
+          )}
 
-        <Text style={styles.label}>4. ملاحظات نفسية / اجتماعية</Text>
-        <TextInput
-          placeholder="مثال: اكتئاب، قلق، دعم عائلي..."
-          style={styles.textInput}
-          multiline
-          value={psychosocial}
-          onChangeText={setPsychosocial}
-        />
+          <Text style={styles.label}>3. ملاحظات الطبيب</Text>
+          <TextInput
+            placeholder="ملاحظات طبية..."
+            style={styles.textInput}
+            multiline
+            value={notes}
+            onChangeText={setNotes}
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <Text style={styles.label}>4. ملاحظات نفسية / اجتماعية</Text>
+          <TextInput
+            placeholder="مثال: اكتئاب، قلق، دعم عائلي..."
+            style={styles.textInput}
+            multiline
+            value={psychosocial}
+            onChangeText={setPsychosocial}
+          />
+
+          {/* مساحة تحت علشان الكيبورد */}
+          <View style={{ height: 40 }} />
+
+          <TouchableOpacity style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
+          </TouchableOpacity>
+
+          {/* كمان شوية padding تحت */}
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -179,6 +198,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 16,
     paddingBottom: 16,
+    flexGrow: 1,               // 👈 مهم عشان السكرول يتمدد
   },
   backButton: {
     alignSelf: 'flex-start',

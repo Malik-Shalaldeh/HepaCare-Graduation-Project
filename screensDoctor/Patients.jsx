@@ -1,104 +1,146 @@
 // Patients.jsx
 
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
+import React, { useLayoutEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+  Platform,
+} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 
-const primary = "#079a8cff"; // لون هادئ وبارد مناسب لتطبيق طبي
+const primary = "#00b29c";
+const STATUS_BAR_HEIGHT =
+  Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0;
 
 const Patients = () => {
   const navigation = useNavigation();
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
+
   return (
-    <ScreenWithDrawer>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+    <View style={styles.wrapper}>
+      {/* نخلي لون الشريط نفس الهيدر */}
+      <StatusBar backgroundColor={primary} barStyle="light-content" />
 
-      {/* زر الرجوع */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack("MainTabs")}>
-        <Ionicons name="arrow-back" size={24} color="#333" />
-      </TouchableOpacity>
+      {/* الهيدر يبدأ من فوق مباشرة ويحتوي ارتفاع الستاتس بار */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.toggleDrawer()}
+          style={styles.menuBtn}
+        >
+          <Ionicons name="menu" size={26} color="#fff" />
+        </TouchableOpacity>
 
-      {/* البحث عن سجل مريض */}
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={() => navigation.navigate("PatientListScreen")}
-        activeOpacity={0.8}
-      >
-        <View style={styles.ButtonContent}>
-          <Ionicons name="search-outline" size={24} color="#fff" />
-          <Text style={styles.ButtonText}>البحث عن سجل مريض</Text>
-        </View>
-      </TouchableOpacity>
+        <Text style={styles.headerTitle}>المرضى</Text>
 
-      {/* عرض بيانات مريض */}
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={() => navigation.navigate("DataPatientsListScreen")}
-        activeOpacity={0.8}
-      >
-        <View style={styles.ButtonContent}>
-          <Ionicons name="person-circle-outline" size={24} color="#fff" />
-          <Text style={styles.ButtonText}>عرض بيانات مريض</Text>
-        </View>
-      </TouchableOpacity>
+        <View style={styles.menuBtn} />
+      </View>
 
-      {/* إضافة مريض */}
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={() => navigation.navigate("إضافة مريض")}
-        activeOpacity={0.8}
-      >
-        <View style={styles.ButtonContent}>
-          <Ionicons name="person-add-outline" size={24} color="#fff" />
-          <Text style={styles.ButtonText}>إضافة مريض</Text>
-        </View>
-      </TouchableOpacity>
+      {/* محتوى الشاشة */}
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("PatientListScreen")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="search-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>البحث عن سجل مريض</Text>
+          </View>
+        </TouchableOpacity>
 
-      {/* تتبع الأعراض */}
-      <TouchableOpacity
-        style={styles.Button}
-        onPress={() => navigation.navigate("تتبع الأعراض")}
-        activeOpacity={0.8}
-      >
-        <View style={styles.ButtonContent}>
-          <Ionicons name="pulse-outline" size={24} color="#fff" />
-          <Text style={styles.ButtonText}>تتبع الأعراض</Text>
-        </View>
-      </TouchableOpacity>
-    </ScreenWithDrawer>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("DataPatientsListScreen")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="person-circle-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>عرض بيانات مريض</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("إضافة مريض")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="person-add-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>إضافة مريض</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("تتبع الأعراض")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="pulse-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>تتبع الأعراض</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  backButton: {
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#f2f2f2",
+  },
+  header: {
+    // نخلي الهيدر يبدأ من فوق ويضيف ارتفاع الستاتس بار
+    paddingTop: STATUS_BAR_HEIGHT,
+    height: 56 + STATUS_BAR_HEIGHT,
+    backgroundColor: primary,
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 16,
-    marginBottom: 24,
-    paddingHorizontal: 16,
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    elevation: 4,
   },
-  Button: {
+  menuBtn: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  container: {
+    flex: 1,
+    padding: 15,
+  },
+  button: {
     backgroundColor: primary,
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 20,
     marginBottom: 16,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.30,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
+    elevation: 3,
   },
-  ButtonContent: {
-    flexDirection: "row-reverse", // لأن النص عربي
+  buttonContent: {
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
   },
-  ButtonText: {
+  buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     marginRight: 8,
   },
