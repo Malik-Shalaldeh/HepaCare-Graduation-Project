@@ -1,4 +1,5 @@
 // Patients.jsx
+
 import React, { useLayoutEffect } from "react";
 import {
   View,
@@ -7,60 +8,51 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
+  SafeAreaView,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import {
-  useSafeAreaInsets,
-  SafeAreaView,
-} from "react-native-safe-area-context";
 
-const primary = "#00b29c";
+const COLORS = {
+  primary: "#00b29c",
+  background: "#f2f2f2",
+};
 
 const Patients = () => {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets(); // يعطي ارتفاع النوتش/الستاتس بار على iOS
 
   useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
+    navigation.setOptions({
+      headerShown: false,
+    });
   }, [navigation]);
 
   return (
-    <View style={styles.wrapper}>
-      {/* على أندرويد نضبط لون الستاتس بار، وعلى iOS فقط الـ barStyle */}
+    <View style={styles.container}>
+      {/* شريط الحالة */}
       <StatusBar
-        backgroundColor={Platform.OS === "android" ? primary : undefined}
+        backgroundColor={COLORS.primary}
         barStyle="light-content"
         translucent={false}
       />
 
-      {/* نخلي الهيدر جوّا SafeArea للجزء العلوي فقط */}
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: primary }}>
-        <View
-          style={[
-            styles.header,
-            {
-              paddingTop: 0, // صار الـ SafeAreaView هو اللي يضيف المساحة العلوية
-              height:
-                56 + (Platform.OS === "ios" ? 0 : StatusBar.currentHeight || 0),
-            },
-          ]}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.toggleDrawer()}
-            style={styles.menuBtn}
-          >
-            <Ionicons name="menu" size={26} color="#fff" />
-          </TouchableOpacity>
+      {/* Safe Area للأعلى (خصوصاً للآيفون) */}
+      <SafeAreaView style={styles.safeAreaTop} />
 
-          <Text style={styles.headerTitle}>المرضى</Text>
+      {/* الهيدر نفس ستايل Medications */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+          <Ionicons name="menu" size={28} color="#fff" />
+        </TouchableOpacity>
 
-          <View style={styles.menuBtn} />
-        </View>
-      </SafeAreaView>
+        <Text style={styles.headerTitle}>المرضى</Text>
+
+        {/* فراغ لموازنة الأيقونة اليسار */}
+        <View style={{ width: 28 }} />
+      </View>
 
       {/* محتوى الشاشة */}
-      <View style={styles.container}>
+      <View style={styles.content}>
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("PatientListScreen")}
@@ -110,30 +102,46 @@ const Patients = () => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: { flex: 1, backgroundColor: "#f2f2f2" },
+  safeAreaTop: {
+    backgroundColor: COLORS.primary,
+    ...Platform.select({
+      ios: {},
+      android: { height: StatusBar.currentHeight },
+    }),
+  },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   header: {
-    backgroundColor: primary,
+    height: 56,
+    backgroundColor: COLORS.primary,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    elevation: 4,
+    paddingHorizontal: 16,
   },
-  menuBtn: {
-    width: 36,
-    height: 36,
-    justifyContent: "center",
-    alignItems: "center",
+  headerTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
   },
-  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  container: { flex: 1, padding: 15 },
+  content: {
+    flex: 1,
+    padding: 15,
+    marginTop: 24,
+  },
   button: {
-    backgroundColor: primary,
+    backgroundColor: COLORS.primary,
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 20,
     marginBottom: 16,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   buttonContent: {
     flexDirection: "row-reverse",
