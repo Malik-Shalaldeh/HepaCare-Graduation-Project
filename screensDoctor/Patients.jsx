@@ -1,5 +1,4 @@
 // Patients.jsx
-
 import React, { useLayoutEffect } from "react";
 import {
   View,
@@ -29,38 +28,16 @@ const Patients = () => {
 
   return (
     <View style={styles.container}>
-      {/* شريط الحالة */}
       <StatusBar
         backgroundColor={COLORS.primary}
         barStyle="light-content"
         translucent={false}
       />
-<<<<<<< HEAD
-      {/* نخلي الهيدر جوّا SafeArea للجزء العلوي فقط */}
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: primary }}>
-        <View
-          style={[
-            styles.header,
-            {
-              paddingTop: 0, // صار الـ SafeAreaView هو اللي يضيف المساحة العلوية
-              height:
-                56 + (Platform.OS === "ios" ? 0 : StatusBar.currentHeight || 0),
-            },
-          ]}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.toggleDrawer()}
-            style={styles.menuBtn}
-          >
-            <Ionicons name="menu" size={26} color="#fff" />
-          </TouchableOpacity>
-=======
 
-      {/* Safe Area للأعلى (خصوصاً للآيفون) */}
+      {/* Safe Area للأعلى */}
       <SafeAreaView style={styles.safeAreaTop} />
->>>>>>> 72e4f8e9a01bef0a7a60e06ed88b09cc95ddddae
 
-      {/* الهيدر نفس ستايل Medications */}
+      {/* الهيدر */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
           <Ionicons name="menu" size={28} color="#fff" />
@@ -68,11 +45,10 @@ const Patients = () => {
 
         <Text style={styles.headerTitle}>المرضى</Text>
 
-        {/* فراغ لموازنة الأيقونة اليسار */}
         <View style={{ width: 28 }} />
       </View>
 
-      {/* محتوى الشاشة */}
+      {/* المحتوى */}
       <View style={styles.content}>
         <TouchableOpacity
           style={styles.button}
