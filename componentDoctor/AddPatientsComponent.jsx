@@ -166,7 +166,10 @@ export default function AddPatientsComponent() {
         customMedications: [""],
       });
       setStep(1);
-      navigation.navigate("المرضى");
+      navigation.navigate("MainTabs", {
+        screen: "المرضى",
+        params: { screen: "Patients" },
+      });
     } catch (e) {
       Alert.alert("خطأ", "تعذر حفظ المريض. حاول مرة أخرى.");
     }
@@ -282,7 +285,12 @@ export default function AddPatientsComponent() {
             <View style={styles.rowBetween}>
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={() => navigation.navigate("المرضى")}
+                onPress={() =>
+                  navigation.navigate("MainTabs", {
+                    screen: "المرضى",
+                    params: { screen: "Patients" },
+                  })
+                }
               >
                 <Text style={styles.cancelText}>إلغاء</Text>
               </TouchableOpacity>

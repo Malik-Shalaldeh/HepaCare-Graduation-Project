@@ -1,5 +1,4 @@
 // Patients.jsx
-
 import React, { useLayoutEffect } from "react";
 import {
   View,
@@ -11,38 +10,54 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import {
+  useSafeAreaInsets,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
 const primary = "#00b29c";
-const STATUS_BAR_HEIGHT =
-  Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0;
 
 const Patients = () => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets(); // يعطي ارتفاع النوتش/الستاتس بار على iOS
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
+    navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
   return (
     <View style={styles.wrapper}>
-      {/* نخلي لون الشريط نفس الهيدر */}
-      <StatusBar backgroundColor={primary} barStyle="light-content" />
+      {/* على أندرويد نضبط لون الستاتس بار، وعلى iOS فقط الـ barStyle */}
+      <StatusBar
+        backgroundColor={Platform.OS === "android" ? primary : undefined}
+        barStyle="light-content"
+        translucent={false}
+      />
 
-      {/* الهيدر يبدأ من فوق مباشرة ويحتوي ارتفاع الستاتس بار */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.toggleDrawer()}
-          style={styles.menuBtn}
+      {/* نخلي الهيدر جوّا SafeArea للجزء العلوي فقط */}
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: primary }}>
+        <View
+          style={[
+            styles.header,
+            {
+              paddingTop: 0, // صار الـ SafeAreaView هو اللي يضيف المساحة العلوية
+              height:
+                56 + (Platform.OS === "ios" ? 0 : StatusBar.currentHeight || 0),
+            },
+          ]}
         >
-          <Ionicons name="menu" size={26} color="#fff" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.toggleDrawer()}
+            style={styles.menuBtn}
+          >
+            <Ionicons name="menu" size={26} color="#fff" />
+          </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>المرضى</Text>
+          <Text style={styles.headerTitle}>المرضى</Text>
 
-        <View style={styles.menuBtn} />
-      </View>
+          <View style={styles.menuBtn} />
+        </View>
+      </SafeAreaView>
 
       {/* محتوى الشاشة */}
       <View style={styles.container}>
@@ -95,14 +110,8 @@ const Patients = () => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
-  },
+  wrapper: { flex: 1, backgroundColor: "#f2f2f2" },
   header: {
-    // نخلي الهيدر يبدأ من فوق ويضيف ارتفاع الستاتس بار
-    paddingTop: STATUS_BAR_HEIGHT,
-    height: 56 + STATUS_BAR_HEIGHT,
     backgroundColor: primary,
     flexDirection: "row",
     alignItems: "center",
@@ -116,15 +125,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  container: {
-    flex: 1,
-    padding: 15,
-  },
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  container: { flex: 1, padding: 15 },
   button: {
     backgroundColor: primary,
     borderRadius: 12,

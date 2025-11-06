@@ -93,7 +93,7 @@ function MainTabs() {
         component={MedicationsStackScreen}
         options={{ headerShown: false }}
       />
-      <Drawer.Screen
+      <Tab.Screen
           name="المرضى"
           component={PatientsStack}
           options={{headerShown: false}}
