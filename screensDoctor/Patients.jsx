@@ -33,7 +33,6 @@ const Patients = () => {
         barStyle="light-content"
         translucent={false}
       />
-
       {/* نخلي الهيدر جوّا SafeArea للجزء العلوي فقط */}
       <SafeAreaView edges={["top"]} style={{ backgroundColor: primary }}>
         <View
