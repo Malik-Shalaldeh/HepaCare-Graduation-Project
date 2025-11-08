@@ -18,7 +18,7 @@ import {
 } from "../utils/ratings";
 
 const primary = "#00b29c";
-const API = "http://192.168.1.8:8000";
+const API = "http://192.168.1.122:8000";
 
 const FeedbackScreen = () => {
   const navigation = useNavigation();

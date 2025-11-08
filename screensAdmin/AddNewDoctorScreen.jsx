@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.8:8000';
+const API = 'http://192.168.1.122:8000';
 
 export default function AddNewDoctorScreen() {
   const [doctorId, setDoctorId] = useState('');

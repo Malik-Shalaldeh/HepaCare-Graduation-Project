@@ -163,6 +163,19 @@ const Visits = () => {
                 <Text style={styles.buttonText}>عرض سجل الزيارات</Text>
               </View>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('ملخص الزيارات', {
+                patientId: selectedPatient.id,
+                patientName: selectedPatient.name,
+              })}
+            >
+              <View style={styles.buttonContent}>
+                <Ionicons name="logo-reddit" size={24} color="#fff" />
+                <Text style={styles.buttonText}> ملخص الزيارات</Text>
+              </View>
+            </TouchableOpacity>
           </ScrollView>
         )}
       </SafeAreaView>

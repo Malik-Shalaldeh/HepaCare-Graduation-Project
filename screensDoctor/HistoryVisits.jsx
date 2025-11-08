@@ -264,6 +264,8 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '90%',
     maxHeight: '80%',
+    alignSelf: 'center',
+    writingDirection: 'rtl',
   },
   modalTitle: {
     fontSize: 20,
@@ -339,6 +341,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     fontFamily: 'Tajawal',
+    textAlign: 'right',
+    writingDirection: 'rtl',
   },
   multiLine: {
     fontSize: 16,
@@ -346,6 +350,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontFamily: 'Tajawal',
     lineHeight: 24,
+    writingDirection: 'rtl',
   },
 });
 

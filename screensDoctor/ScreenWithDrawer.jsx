@@ -1,6 +1,7 @@
 // screens/ScreenWithDrawer.jsx
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -36,9 +37,9 @@ const ScreenWithDrawer = ({ title, children, showDrawerIcon = true }) => {
   }, [navigation, title, showDrawerIcon]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       {children}
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -14,6 +14,7 @@ import Visits from '../screensDoctor/Visits';
 import LoginScreen from '../Login/LoginScreen';
 import LabsScreen from '../screensDoctor/LabsScreen'; // sami: شاشة المختبرات المعتمدة
 import HistoryVisits from '../screensDoctor/HistoryVisits';
+import VisitsSummaryScreen from '../screensDoctor/VisitsSummaryScreen';
 import Settings from '../screensDoctor/Settings';
 import TestsStack from './TestsStack';
 import PatientsStack from './PatientsStack';
@@ -241,6 +242,14 @@ function NavigatorDoctor() {
         <Drawer.Screen
           name="سجل الزيارات"
           component={HistoryVisits}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="ملخص الزيارات"
+          component={VisitsSummaryScreen}
           options={{
             drawerItemStyle: { height: 0 },
             headerShown: false,
