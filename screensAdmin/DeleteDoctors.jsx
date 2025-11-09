@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import ENDPOINTS from '../malikEndPoint';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.122:8000';
 
 export default function ToggleDoctorScreen() {
   const [search, setSearch] = useState('');
@@ -22,7 +22,6 @@ export default function ToggleDoctorScreen() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔍 البحث
   const handleSearch = async () => {
     if (!search.trim()) {
       Alert.alert("تنبيه", "أدخل اسم الطبيب أو رقمه");
@@ -30,7 +29,7 @@ export default function ToggleDoctorScreen() {
     }
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/admin/search-doctors`, {
+      const res = await axios.get(ENDPOINTS.ADMIN.SEARCH_DOCTORS, {
         params: { q: search.trim() }
       });
       setResults(res.data);
@@ -41,7 +40,6 @@ export default function ToggleDoctorScreen() {
     }
   };
 
-  // 🚫 تعطيل / تفعيل
   const handleToggle = () => {
     if (!selected) return;
     const action = selected.is_active ? "تعطيل" : "تفعيل";
@@ -55,10 +53,8 @@ export default function ToggleDoctorScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              const res = await axios.put(`${API}/admin/doctors/${selected.id}/toggle`);
+              const res = await axios.put(ENDPOINTS.ADMIN.TOGGLE_DOCTOR(selected.id));
               Alert.alert('تم', res.data.message);
-
-              // تحديث القائمة
               setResults(results.map(d =>
                 d.id === selected.id ? { ...d, is_active: res.data.new_status } : d
               ));
@@ -74,11 +70,7 @@ export default function ToggleDoctorScreen() {
   };
 
   const renderItem = ({ item }) => {
-    let active = false;
-    if (selected && selected.id === item.id) {
-      active = true;
-    }
-
+    const active = selected && selected.id === item.id;
     return (
       <TouchableOpacity
         onPress={() => setSelected(item)}
@@ -88,14 +80,12 @@ export default function ToggleDoctorScreen() {
           active && { borderColor: PRIMARY, backgroundColor: '#E6FFFA' },
         ]}
       >
-
         <Ionicons
           name="person-outline"
           size={18}
           color={active ? PRIMARY : '#6B7280'}
           style={styles.cardIcon}
         />
-
         <View style={styles.infoBox}>
           <Text style={[styles.name, active && { color: PRIMARY }]}>{item.name}</Text>
           <Text style={styles.meta}>الرقم: {item.id}</Text>
@@ -105,8 +95,6 @@ export default function ToggleDoctorScreen() {
             {item.is_active ? '✅ مفعل' : '⛔ معطل'}
           </Text>
         </View>
-
-
       </TouchableOpacity>
     );
   };
@@ -114,12 +102,8 @@ export default function ToggleDoctorScreen() {
   return (
     <View style={styles.screen}>
       <StatusBar backgroundColor={PRIMARY} barStyle="light-content" />
-
-      {/* مربع البحث */}
       <View style={styles.searchRow}>
-
         <Ionicons name="search" size={18} color="#6B7280" />
-
         <TextInput
           style={styles.input}
           placeholder="ابحث بالاسم أو رقم الطبيب"
@@ -129,16 +113,11 @@ export default function ToggleDoctorScreen() {
           textAlign="right"
           onSubmitEditing={handleSearch}
         />
-
         <TouchableOpacity onPress={handleSearch} activeOpacity={0.8} style={styles.searchBtn}>
           <Ionicons name="search-outline" size={18} color="#fff" />
         </TouchableOpacity>
-
       </View>
-
       {loading && <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 20 }} />}
-
-      {/* القائمة */}
       <FlatList
         data={results}
         keyExtractor={(item) => String(item.id)}
@@ -146,20 +125,16 @@ export default function ToggleDoctorScreen() {
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={!loading && <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>}
       />
-
-      {/* زر التعطيل / التفعيل */}
       <TouchableOpacity
         onPress={handleToggle}
         disabled={!selected}
         activeOpacity={0.9}
         style={[styles.disableBtn, !selected && { opacity: 0.5 }]}
       >
-
         <Ionicons name={selected?.is_active ? "close-circle-outline" : "checkmark-circle-outline"} size={16} color="#fff" />
         <Text style={styles.disableText}>
           {selected?.is_active ? "تعطيل الحساب" : "إلغاء التعطيل"}
         </Text>
-        
       </TouchableOpacity>
     </View>
   );

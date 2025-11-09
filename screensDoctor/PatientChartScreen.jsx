@@ -9,14 +9,13 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
-import HelpButton from '../componentHelp/ButtonHelp'
-
+import HelpButton from '../componentHelp/ButtonHelp';
+import ENDPOINTS from '../malikEndPoint';
 
 const TESTS = [
   { key: 'ALT',       label: 'ALT (U/L)' },
@@ -36,13 +35,10 @@ export default function PatientChartScreen() {
   const navigation = useNavigation();
   const [records, setRecords] = useState(null);
 
-  // ✅ جلب بيانات المريض من السيرفر
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await axios.get(
-          `http://192.168.1.122:8000/patient-chart?patient_id=${patientId}`
-        );
+        const response = await axios.get(`${ENDPOINTS.PATIENT_CHART.GET}?patient_id=${patientId}`);
         setRecords(response.data);
       } catch (error) {
         console.error(error);
@@ -115,11 +111,10 @@ export default function PatientChartScreen() {
           </View>
         )}
       </View>
-       <HelpButton
-       title="مساعدة - مخططات المريض"
-       info="تعرض هذه الشاشة تطوّر نتائج الفحوصات للمريض على شكل مخطط زمني. استخدمها لمتابعة الاستجابة أو التدهور. الألوان توضّح كل فحص."
+      <HelpButton
+        title="مساعدة - مخططات المريض"
+        info="تعرض هذه الشاشة تطوّر نتائج الفحوصات للمريض على شكل مخطط زمني. استخدمها لمتابعة الاستجابة أو التدهور. الألوان توضّح كل فحص."
       />
-
     </SafeAreaView>
   );
 }

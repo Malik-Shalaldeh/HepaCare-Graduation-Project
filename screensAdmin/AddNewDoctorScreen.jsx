@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import ENDPOINTS from '../malikEndPoint';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.122:8000';
 
 export default function AddNewDoctorScreen() {
   const [doctorId, setDoctorId] = useState('');
@@ -20,7 +20,6 @@ export default function AddNewDoctorScreen() {
   const [phone, setPhone] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // دالة التحقق من المدخلات
   const validate = () => {
     if (!doctorId.trim() || !name.trim() || !clinicName.trim() || !phone.trim()) {
       Alert.alert('تنبيه', 'رجاءً املأ جميع الحقول');
@@ -38,12 +37,12 @@ export default function AddNewDoctorScreen() {
     return true;
   };
 
-  // إرسال البيانات إلى السيرفر
   const onSave = async () => {
     if (!validate()) return;
     try {
       setSaving(true);
-        const res = await axios.post(`${API}/admin/doctors/add`,
+      const res = await axios.post(
+        ENDPOINTS.ADMIN.ADD_DOCTOR,
         {
           doctor_id: doctorId.trim(),
           full_name: name.trim(),
@@ -62,13 +61,11 @@ export default function AddNewDoctorScreen() {
         `${msg}\n\n👤 اسم المستخدم: ${username}\n🔑 كلمة المرور: ${password}`
       );
 
-      // تفريغ الحقول
       setDoctorId('');
       setName('');
       setClinicName('');
       setPhone('');
     } catch (e) {
-      console.error(e?.response?.data || e.message);
       const msg = e?.response?.data?.detail || e?.response?.data?.message || 'تعذر إضافة الطبيب';
       Alert.alert('خطأ', msg);
     } finally {

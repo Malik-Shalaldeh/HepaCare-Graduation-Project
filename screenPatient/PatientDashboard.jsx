@@ -4,31 +4,28 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
+import ENDPOINTS from '../malikEndPoint';
 
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
-const API = 'http://192.168.1.122:8000';
 
 export default function PatientDashboard() {
   const [name, setName] = useState('');
 
   useEffect(() => {
-  const loadName = async () => {
-    const id = await AsyncStorage.getItem('user_id');
-    if (!id) return;
-
-    try {
-      const res = await axios.get(`${API}/patient/dashboard/${id}`);
-      setName(res.data.full_name);
-    } catch {
-      console.log("خطأ في جلب البيانات");
-    }
-  };
-
-  loadName();
+    const loadName = async () => {
+      const id = await AsyncStorage.getItem('user_id');
+      if (!id) return;
+      try {
+        const res = await axios.get(ENDPOINTS.PATIENT_DASHBOARD.BY_ID(id));
+        setName(res.data.full_name);
+      } catch {
+        console.log("خطأ في جلب البيانات");
+      }
+    };
+    loadName();
   }, []);
-
 
   const today = new Date();
   const months = [
@@ -42,9 +39,7 @@ export default function PatientDashboard() {
       <View style={styles.header}>
         <Text style={styles.headerText}>Hepacare</Text>
       </View>
-
       <View style={styles.container}>
-
         <View style={styles.card}>
           <Ionicons
             name="happy-outline"
@@ -52,29 +47,22 @@ export default function PatientDashboard() {
             color={accent}
             style={styles.icon}
           />
-
           <View>
             <Text style={styles.title}> {name || 'مستخدم'} </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
-
         </View>
-
         <View style={styles.motivationBox}>
-
           <Ionicons
             name="heart-circle-outline"
             size={50}
             color="#E74C3C"
             style={{ marginBottom: 10 }}
           />
-          
           <Text style={styles.motivationText}>
             صحتك أمانة... تابع أدويتك وفحوصاتك بانتظام لتحمي كبدك ونحافظ على عافيتك
           </Text>
-
         </View>
-
       </View>
     </ScreenWithDrawer>
   );
@@ -94,7 +82,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 20,
-    paddingHorizontal:25,
+    paddingHorizontal: 25,
     borderRadius: 20,
     marginBottom: 20,
     shadowColor: '#000',

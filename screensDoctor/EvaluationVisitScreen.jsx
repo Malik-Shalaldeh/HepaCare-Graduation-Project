@@ -15,6 +15,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import ENDPOINTS from '../malikEndPoint';
 
 const primary = '#00b29c';
 
@@ -22,6 +23,11 @@ const EvaluationVisitScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
+
+  const [condition, setCondition] = useState('');
+  const [adherence, setAdherence] = useState('');
+  const [notes, setNotes] = useState('');
+  const [psychosocial, setPsychosocial] = useState('');
 
   useEffect(() => {
     if (!patientId) {
@@ -41,11 +47,6 @@ const EvaluationVisitScreen = () => {
 
   const selectedPatient = { id: patientId, name: patientName };
 
-  const [condition, setCondition] = useState('');
-  const [adherence, setAdherence] = useState('');
-  const [notes, setNotes] = useState('');
-  const [psychosocial, setPsychosocial] = useState('');
-
   const handleSave = async () => {
     if (!condition || !adherence) {
       Alert.alert('⚠️ تنبيه', 'يرجى اختيار الحالة العامة والالتزام قبل الحفظ.');
@@ -53,7 +54,7 @@ const EvaluationVisitScreen = () => {
     }
 
     try {
-      await axios.post('http://192.168.1.122:8000/visits/', {
+      await axios.post(ENDPOINTS.VISITS.CREATE, {
         patient_id: patientId,
         visit_date: new Date().toISOString(),
         general_state:
@@ -72,9 +73,7 @@ const EvaluationVisitScreen = () => {
       setAdherence('');
       setNotes('');
       setPsychosocial('');
-      
     } catch (error) {
-      console.error(error);
       Alert.alert('خطأ', 'تأكد من الاتصال أو البيانات.');
     }
   };
@@ -113,8 +112,6 @@ const EvaluationVisitScreen = () => {
         barStyle="dark-content"
         translucent={false}
       />
-
-      {/* 👇 أهم تغيير: اللفّة وترتيبها */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -172,14 +169,12 @@ const EvaluationVisitScreen = () => {
             onChangeText={setPsychosocial}
           />
 
-          {/* مساحة تحت علشان الكيبورد */}
           <View style={{ height: 40 }} />
 
           <TouchableOpacity style={styles.button} onPress={handleSave}>
             <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
           </TouchableOpacity>
 
-          {/* كمان شوية padding تحت */}
           <View style={{ height: 40 }} />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -198,7 +193,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 16,
     paddingBottom: 16,
-    flexGrow: 1,               // 👈 مهم عشان السكرول يتمدد
+    flexGrow: 1,
   },
   backButton: {
     alignSelf: 'flex-start',

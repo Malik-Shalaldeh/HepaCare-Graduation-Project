@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,76 +8,60 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-
-const API = 'http://192.168.1.122:8000';
+import ENDPOINTS from "../malikEndPoint";
 
 export default function AllDoctorsScreen() {
   const [search, setSearch] = useState("");
   const [doctors, setDoctors] = useState([]);
 
-  // جلب الأطباء من الباك-إند
   useEffect(() => {
     const fetchDoctors = async () => {
-
       try {
-        const res = await axios.get(`${API}/admin/doctors`);
+        const res = await axios.get(ENDPOINTS.ADMIN.DOCTORS);
         setDoctors(res.data);
       } catch (err) {
         console.error("خطأ في جلب الأطباء:", err);
       }
-      
     };
     fetchDoctors();
   }, []);
 
-  // فلترة محلية بالاسم أو رقم الهوية أو العيادة
-
   const results = doctors.filter((d) => {
     const query = search.trim();
     if (!query) return true;
-
     const nameMatch = d.name && d.name.includes(query);
-    const idMatch = d.id && d.id.toString().includes(query); 
+    const idMatch = d.id && d.id.toString().includes(query);
     const clinicMatch = d.clinic && d.clinic.includes(query);
-
     return nameMatch || idMatch || clinicMatch;
   });
 
-
-  // بطاقة الطبيب
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-
       <Ionicons
         name="medkit-outline"
         size={20}
         color="#00b29c"
         style={styles.cardIcon}
       />
-
       <View style={styles.infoBox}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.meta}>رقم الهوية: {item.id}</Text>
         <Text style={styles.meta}>رقم الهاتف: {item.phone}</Text>
         <Text style={styles.meta}>العيادة: {item.clinic}</Text>
-
         <Text
           style={[
             styles.status,
             { color: item.active ? "#00b29c" : "#D32F2F" },
           ]}
         >
-          
           {item.active ? "مفعّل" : "غير مفعّل"}
         </Text>
       </View>
-
     </View>
   );
 
   return (
     <View style={styles.screen}>
-      {/* مربع البحث */}
       <View style={styles.searchRow}>
         <Ionicons
           name="search"
@@ -94,8 +78,6 @@ export default function AllDoctorsScreen() {
           textAlign="right"
         />
       </View>
-
-      {/* قائمة الأطباء */}
       <FlatList
         data={results}
         keyExtractor={(item) => item.id.toString()}
