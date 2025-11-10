@@ -38,6 +38,11 @@ const ENDPOINTS = {
 
   // Patient Appointments
   patientAppointments: `${BASE_URL}/patients/appointments`,
+  patientAppointmentsByPatient: (patientId) => `${BASE_URL}/patient/appointments/${patientId}`,
+  doctorAppointments: (doctorId) => `${BASE_URL}/doctor/appointments/${doctorId}`,
+  doctorAppointmentCreate: `${BASE_URL}/doctor/appointments`,
+  doctorAppointmentUpdate: (appointmentId) => `${BASE_URL}/doctor/appointments/${appointmentId}`,
+  doctorAppointmentDelete: (appointmentId) => `${BASE_URL}/doctor/appointments/${appointmentId}`,
 
   // Lab Results
   labResults: `${BASE_URL}/patient/lab-results`,

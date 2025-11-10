@@ -1,74 +1,124 @@
-// sami 
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native';
+// sami
+import React, { useState, useEffect, useCallback } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// بيانات تجريبية - مستقبلاً ستأتي من الباك اند
-const MOCK_APPOINTMENTS = [
-  { id: '1', date: '2025-08-10', time: '10:00', doctor: 'د. أحمد عوض', notes: 'متابعة شهرية' },
-  { id: '2', date: '2025-08-18', time: '14:30', doctor: 'د. سامر أبو يوسف', notes: '' },
-  { id: '3', date: '2025-09-01', time: '09:00', doctor: 'د. ليلى بركات', notes: 'تحاليل دم' },
-]; // حالياً تجريبية، لاحقاً سنجلبها من السيرفر
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ENDPOINTS from '../samiendpoint';
 
 const PatientAppointmentsScreen = () => {
-  // في المستقبل سيتم جلب المواعيد من السيرفر
-  const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
+  const [appointments, setAppointments] = useState([]);
+  const [clinicName, setClinicName] = useState('');
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState('');
 
-  // دالة تحديث البيانات (مستقبلاً ستجلب من الباك اند)
-  const onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      // عند توفر الباك اند، استبدل الكود التالي:
-      // const response = await axios.get(ENDPOINTS.patientAppointments);
-      // setAppointments(response.data);
-      setTimeout(() => setRefreshing(false), 800); // مؤقتاً فقط
-    } catch (err) {
-      // في حال حدوث خطأ في الشبكة
-      setRefreshing(false);
+  const getStoredPatientId = useCallback(async () => {
+    const keys = ['patient_id', 'patientId', 'user_id', 'userId', 'id'];
+    for (const key of keys) {
+      const value = await AsyncStorage.getItem(key);
+      if (value) {
+        return value;
+      }
     }
-  };
-
-  // في المستقبل عند تشغيل التطبيق، يمكن جلب المواعيد تلقائياً
-  useEffect(() => {
-    // عند توفر الباك اند استدعي onRefresh هنا
-    // onRefresh();
+    return null;
   }, []);
 
-  // بطاقة الموعد
+  const normalizeAppointment = (row) => {
+    const rawStart = row.start_at || '';
+    const startDate = rawStart ? new Date(rawStart.replace(' ', 'T')) : null;
+    return {
+      id: String(row.id),
+      date: startDate ? startDate.toLocaleDateString() : 'غير محدد',
+      time: startDate ? startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+      doctor: row.doctor_name || `دكتور رقم ${row.doctor_id}`,
+      clinic: row.clinic_name || '',
+      notes: row.notes || '',
+    };
+  };
+
+  const loadAppointments = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      setError('');
+      let patientId = await getStoredPatientId();
+      if (!patientId) {
+        setAppointments([]);
+        setClinicName('');
+        setError('لم يتم العثور على رقم المريض.');
+        return;
+      }
+
+      const url = ENDPOINTS.patientAppointmentsByPatient(patientId);
+      const response = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!response.ok) {
+        throw new Error('تعذر جلب المواعيد');
+      }
+      const data = await response.json();
+      const rows = Array.isArray(data) ? data : data.appointments || [];
+      const normalized = rows.map(normalizeAppointment);
+      setAppointments(normalized);
+      setClinicName(normalized[0]?.clinic || '');
+    } catch (err) {
+      setError(err.message || 'حدث خطأ أثناء تحميل المواعيد');
+      setAppointments([]);
+      setClinicName('');
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  }, [getStoredPatientId]);
+
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true);
+      await loadAppointments();
+    };
+    init();
+  }, [loadAppointments]);
+
+  const onRefresh = () => {
+    loadAppointments();
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.row}>
-        <Ionicons name="calendar-outline" size={22} color="#00b29c" style={{marginEnd: 10}} />
+        <Ionicons name="calendar-outline" size={22} color="#00b29c" style={{ marginEnd: 10 }} />
         <Text style={styles.date}>{item.date}</Text>
         <Text style={styles.time}>{item.time}</Text>
       </View>
       <Text style={styles.doctor}>{item.doctor}</Text>
-      {!!item.notes && (
-        <Text style={styles.notes}>{item.notes}</Text>
-      )}
+      {!!item.notes && <Text style={styles.notes}>{item.notes}</Text>}
     </View>
   );
 
-  const navigation = useNavigation();
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.container}>
-
-        <Text style={styles.clinicName}>عيادة السلام</Text> 
-        <FlatList
-          data={appointments}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={appointments.length ? undefined : styles.emptyContainer}
-          ListEmptyComponent={<Text style={styles.emptyText}>لا يوجد مواعيد حالياً</Text>}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        />
-        {/* ملاحظة: عند الربط مع الباك اند، سنضيف هنا منطق جلب البيانات والتحديث التلقائي */}
-        {/* ملاحظة: لدعم الإشعارات، يمكن إضافة useEffect هنا لاحقاً لربط خدمة التنبيهات */}
+        <Text style={styles.clinicName}>{clinicName || 'مواعيدي'}</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {loading && !appointments.length ? (
+          <ActivityIndicator color="#00b29c" style={{ marginTop: 24 }} />
+        ) : (
+          <FlatList
+            data={appointments}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={appointments.length ? undefined : styles.emptyContainer}
+            ListEmptyComponent={<Text style={styles.emptyText}>لا يوجد مواعيد حالياً</Text>}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00b29c" />
+            }
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -147,6 +197,11 @@ const styles = StyleSheet.create({
     color: '#aaa',
     marginTop: 30,
     fontSize: 16,
+  },
+  error: {
+    color: '#d32f2f',
+    textAlign: 'center',
+    marginBottom: 12,
   },
 });
 

@@ -1,7 +1,16 @@
 // Developed by Sami
-import React, { useContext, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import React, { useContext } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppointmentsContext } from '../contexts/AppointmentsContext';
 import ScreenWithDrawer from './ScreenWithDrawer';
@@ -10,36 +19,41 @@ const primary = '#00b29c';
 
 const AppointmentListScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const isFocused = useIsFocused();
+  const {
+    appointments,
+    deleteAppointment,
+    loading,
+    error,
+    refresh,
+  } = useContext(AppointmentsContext);
 
-  const { appointments, addOrUpdate, remove } = useContext(AppointmentsContext);
+  const openForm = (appointment) => {
+    navigation.navigate('AppointmentForm', appointment ? { appointment } : undefined);
+  };
 
-  // When returning from form, we may get params with the new / updated appointment
-  useEffect(() => {
-    if (isFocused && route.params?.savedAppointment) {
-      const appointment = route.params.savedAppointment;
-      addOrUpdate(appointment);
-      // clear params so useEffect won't loop
-      navigation.setParams({ savedAppointment: undefined });
+  const handleDelete = async (appointmentId) => {
+    try {
+      await deleteAppointment(appointmentId);
+    } catch (err) {
+      Alert.alert('خطأ', err.message || 'تعذر حذف الموعد');
     }
-  }, [isFocused, route.params, navigation]);
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <TouchableOpacity
         style={{flex:1}}
-        onPress={() => navigation.navigate('AppointmentForm', { appointment: item })}
+        onPress={() => openForm(item)}
       >
       <View style={styles.cardContent}>
         <Ionicons name="calendar" size={24} color={primary} style={styles.icon} />
         <View>
-          <Text style={styles.title}>{item.patient}</Text>
-          <Text style={styles.subtitle}>{`${item.date}  |  ${item.time}`}</Text>
+          <Text style={styles.title}>{item.patientName}</Text>
+          <Text style={styles.subtitle}>{`${item.dateText}  |  ${item.timeText}`}</Text>
         </View>
       </View>
           </TouchableOpacity>
-      <TouchableOpacity style={styles.cancelBtn} onPress={() => remove(item.id)}>
+      <TouchableOpacity style={styles.cancelBtn} onPress={() => handleDelete(item.id)}>
         <Ionicons name="close" size={20} color="#f44336" />
       </TouchableOpacity>
     </View>
@@ -49,12 +63,17 @@ const AppointmentListScreen = () => {
     <ScreenWithDrawer title="المواعيد">
       <TouchableOpacity
         style={styles.addBtn}
-        onPress={() => navigation.navigate('AppointmentForm')}
+        onPress={() => openForm()}
         activeOpacity={0.8}
       >
         <Ionicons name="add" size={20} color="#fff" style={{ marginEnd: 4 }} />
         <Text style={styles.addText}>إضافة موعد جديد</Text>
       </TouchableOpacity>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {loading && !appointments.length ? (
+        <ActivityIndicator color={primary} style={{ marginVertical: 16 }} />
+      ) : null}
       
       <FlatList
         data={appointments}
@@ -62,6 +81,9 @@ const AppointmentListScreen = () => {
         renderItem={renderItem}
         ListEmptyComponent={<Text style={styles.empty}>لا توجد مواعيد حاليًا</Text>}
         contentContainerStyle={appointments.length ? undefined : styles.emptyContainer}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refresh} tintColor={primary} />
+        }
       />
 
 
@@ -120,7 +142,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+  error: {
+    color: '#f44336',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
 });
 
 export default AppointmentListScreen;
