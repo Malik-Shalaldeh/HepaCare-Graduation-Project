@@ -4,18 +4,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import ENDPOINTS from '../malikEndPoint';
 
 const primary = '#2C3E50';
 const accent = '#2980B9';
 const textColor = '#34495E';
 
-const API = 'http://192.168.1.122:8000';
-
 const Dashboard = () => {
   const navigation = useNavigation();
-
-  const [doctorName, setDoctorName] = useState('');   
-  const [patientsCount, setPatientsCount] = useState(0); 
+  const [doctorName, setDoctorName] = useState('');
+  const [patientsCount, setPatientsCount] = useState(0);
 
   const today = new Date();
   const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -32,9 +30,8 @@ const Dashboard = () => {
           return;
         }
 
-        const res = await fetch(`${API}/doctor/dashboard?doctor_id=${doctor_id}`);
-        if (!res.ok) 
-          throw new Error('خطأ في الاتصال');
+        const res = await fetch(`${ENDPOINTS.DOCTOR_DASHBOARD.GET}?doctor_id=${doctor_id}`);
+        if (!res.ok) throw new Error('خطأ في الاتصال');
 
         const data = await res.json();
         if (!active) return;
@@ -42,46 +39,37 @@ const Dashboard = () => {
         setDoctorName(data.doctor_name);
         setPatientsCount(Number(data.patients_count) || 0);
       } catch (err) {
-        console.error(err);
         if (active) Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
         navigation.navigate('LoginScreen');
-
       }
     };
 
     fetchDashboard();
-
-    // إعادة الجلب عند رجوع الفوكس للشاشة
     const unsubscribe = navigation.addListener('focus', fetchDashboard);
 
     return () => {
       active = false;
-      if (unsubscribe) 
-        unsubscribe();
-
+      if (unsubscribe) unsubscribe();
     };
   }, [navigation]);
 
   return (
     <ScreenWithDrawer title="لوحة التحكم">
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Hepacare</Text>
       </View>
 
       <View style={styles.container}>
-        {/* بطاقة الترحيب */}
         <View style={styles.card}>
           <Ionicons name="person-circle-outline" size={40} color={accent} style={styles.icon} />
           <View>
             <Text style={styles.title}>
-               مرحباً د.{doctorName ? doctorName : '...'} 👨‍⚕️
+              مرحباً د.{doctorName ? doctorName : '...'} 👨‍⚕️
             </Text>
             <Text style={styles.subtitle}>{formattedDate}</Text>
           </View>
         </View>
 
-        {/* بطاقة عدد المرضى */}
         <View style={styles.card}>
           <Ionicons name="people-outline" size={40} color={accent} style={styles.icon} />
           <View>

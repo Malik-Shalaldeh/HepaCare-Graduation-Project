@@ -5,9 +5,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import ENDPOINTS from '../malikEndPoint';
 
 const PRIMARY = '#00b29c';
-const API = 'http://192.168.1.122:8000';
 
 const roles = [
   { key: 'DOCTOR', label: 'طبيب' },
@@ -32,7 +32,7 @@ export default function UpdateUserPasswordScreen() {
     setName('');
     if (r === 'MOH' || r === 'ADMIN') {
       try {
-        const res = await axios.get(`${API}/admin/search-by-role`, { params: { role: r } });
+        const res = await axios.get(ENDPOINTS.ADMIN.SEARCH_BY_ROLE, { params: { role: r } });
         if (res.data.length > 0) setUser(res.data[0]);
       } catch {
         Alert.alert('خطأ', 'تعذر جلب حساب هذا الدور');
@@ -50,7 +50,7 @@ export default function UpdateUserPasswordScreen() {
       return;
     }
     try {
-      const res = await axios.get(`${API}/admin/search-by-role`, { params: { role, name } });
+      const res = await axios.get(ENDPOINTS.ADMIN.SEARCH_BY_ROLE, { params: { role, name } });
       setResults(res.data);
     } catch {
       setResults([]);
@@ -60,7 +60,7 @@ export default function UpdateUserPasswordScreen() {
 
   const onSelectUser = async (id) => {
     try {
-      const res = await axios.get(`${API}/admin/user-details`, { params: { user_id: id, role } });
+      const res = await axios.get(ENDPOINTS.ADMIN.USER_DETAILS, { params: { user_id: id, role } });
       setUser(res.data);
       setResults([]);
     } catch {
@@ -82,7 +82,7 @@ export default function UpdateUserPasswordScreen() {
       return;
     }
     try {
-      await axios.post(`${API}/admin/update-user-password`, null, {
+      await axios.post(ENDPOINTS.ADMIN.UPDATE_USER_PASSWORD, null, {
         params: { user_id: user.id, new_password: pass1 },
       });
       Alert.alert('تم', `تم تحديث كلمة مرور: ${user.name}`);
@@ -179,133 +179,114 @@ export default function UpdateUserPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-
-  screen: { 
-    flex: 1, 
-    backgroundColor: '#FFFFFF', 
-    padding: 16 
+  screen: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 16
   },
-
-  label: { 
-    fontSize: 14, 
-    fontWeight: '700', 
-    marginBottom: 6, 
-    textAlign: 'right', 
-    color: '#0F172A' 
+  label: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 6,
+    textAlign: 'right',
+    color: '#0F172A'
   },
-
-  rolesRow: { 
-    flexDirection: 'row-reverse', 
-    flexWrap: 'wrap', 
-    marginBottom: 10 
+  rolesRow: {
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    marginBottom: 10
   },
-
-  roleBtn: { 
-    paddingVertical: 6, 
-    paddingHorizontal: 12, 
-    margin: 4, 
-    borderWidth: 1, 
-    borderColor: '#CBD5E1', 
-    borderRadius: 8 
+  roleBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    margin: 4,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 8
   },
-
-  roleBtnActive: { 
-    backgroundColor: PRIMARY, 
-    borderColor: PRIMARY 
+  roleBtnActive: {
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY
   },
-
-  roleText: { 
-    color: '#0F172A', 
-    fontSize: 13 
+  roleText: {
+    color: '#0F172A',
+    fontSize: 13
   },
-
-  roleTextActive: { 
-    color: '#FFFFFF' 
+  roleTextActive: {
+    color: '#FFFFFF'
   },
-
-  searchBox: { 
-    flexDirection: 'row-reverse', 
-    alignItems: 'center', 
-    borderWidth: 1, 
-    borderColor: '#E2E8F0', 
-    borderRadius: 10, 
-    overflow: 'hidden', 
-    marginBottom: 10 
+  searchBox: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 10
   },
-
-  searchInput: { 
-    flex: 1, 
-    paddingVertical: 6, 
-    paddingHorizontal: 10, 
-    fontSize: 14, 
-    color: '#0F172A' 
+  searchInput: {
+    flex: 1,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: '#0F172A'
   },
-
-  searchIcon: { 
-    backgroundColor: PRIMARY, 
-    padding: 10, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  searchIcon: {
+    backgroundColor: PRIMARY,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-
-  resultItem: { 
-    padding: 10, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#E2E8F0' 
+  resultItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0'
   },
-
-  resultText: { 
-    textAlign: 'right', 
-    color: '#0F172A', 
-    fontSize: 14 
+  resultText: {
+    textAlign: 'right',
+    color: '#0F172A',
+    fontSize: 14
   },
-
-  userCard: { 
-    padding: 12, 
-    borderWidth: 1, 
-    borderColor: '#E2E8F0', 
-    borderRadius: 10, 
-    marginVertical: 10, 
-    backgroundColor: '#F8FAFC' 
+  userCard: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    marginVertical: 10,
+    backgroundColor: '#F8FAFC'
   },
-
-  userName: { 
-    fontSize: 16, 
-    fontWeight: '800', 
-    marginBottom: 4, 
-    textAlign: 'right', 
-    color: '#0F172A' 
+  userName: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 4,
+    textAlign: 'right',
+    color: '#0F172A'
   },
-
-  userMeta: { 
-    fontSize: 13, 
-    color: '#475569', 
-    textAlign: 'right' 
+  userMeta: {
+    fontSize: 13,
+    color: '#475569',
+    textAlign: 'right'
   },
-
-  input: { 
-    borderWidth: 1, 
-    borderColor: '#E2E8F0', 
-    borderRadius: 8, 
-    paddingVertical: 6, 
-    paddingHorizontal: 10, 
-    fontSize: 14, 
-    marginBottom: 8, 
-    color: '#0F172A' 
+  input: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    marginBottom: 8,
+    color: '#0F172A'
   },
-
-  updateBtn: { 
-    backgroundColor: PRIMARY, 
-    paddingVertical: 10, 
-    borderRadius: 8, 
-    alignItems: 'center', 
-    marginTop: 10 
+  updateBtn: {
+    backgroundColor: PRIMARY,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10
   },
-
-  updateText: { 
-    color: '#FFFFFF', 
-    fontWeight: '700', 
-    fontSize: 14 
+  updateText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14
   },
-
 });

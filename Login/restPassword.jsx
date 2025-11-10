@@ -1,3 +1,4 @@
+// ChangePasswordScreen.js
 import { useState, useLayoutEffect } from 'react';
 import {
   SafeAreaView,
@@ -13,17 +14,16 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import ENDPOINTS from '../malikEndPoint';
 
 const primary = '#00b29c';
-const API_URL = 'http://192.168.1.122:8000/auth/change-password';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
-
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
-
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -49,10 +49,19 @@ const ChangePasswordScreen = () => {
         return;
       }
 
-      const url = `${API_URL}?user_id=${user_id}&current_password=${encodeURIComponent(currentPw)}&new_password=${encodeURIComponent(newPw)}`;
-      const res = await fetch(url, { method: 'POST' });
+      const res = await axios.post(
+        ENDPOINTS.AUTH.CHANGE_PASSWORD,
+        {},
+        {
+          params: {
+            user_id,
+            current_password: currentPw,
+            new_password: newPw,
+          },
+        }
+      );
 
-      if (res.ok) {
+      if (res.status === 200) {
         Alert.alert('✅ تم تغيير كلمة المرور بنجاح');
         setCurrentPw('');
         setNewPw('');
@@ -60,13 +69,13 @@ const ChangePasswordScreen = () => {
         setShowCurrent(false);
         setShowNew(false);
         setShowConfirm(false);
-      } else {
-        const data = await res.json();
-        Alert.alert('⚠️ خطأ', data.detail || 'فشل تغيير كلمة المرور');
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم، تحقق من الشبكة.');
+      if (error.response && error.response.data && error.response.data.detail) {
+        Alert.alert('⚠️ خطأ', error.response.data.detail);
+      } else {
+        Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم، تحقق من الشبكة.');
+      }
     }
   };
 

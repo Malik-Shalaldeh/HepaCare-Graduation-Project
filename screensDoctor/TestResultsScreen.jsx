@@ -14,8 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HelpButton from '../componentHelp/ButtonHelp';
-
-const API = 'http://192.168.1.8:8000';
+import ENDPOINTS from '../malikEndPoint'; // ✅ استدعاء ملف الاندبوينت
 
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
@@ -37,7 +36,8 @@ export default function TestResultsScreen() {
       const doctorId = await AsyncStorage.getItem('doctor_id');
       console.log('doctor_id to send:', doctorId);
 
-      const res = await axios.get(`${API}/test-results/`, {
+      // ✅ استخدام الاندبوينت بدل URL مباشر
+      const res = await axios.get(ENDPOINTS.TEST_RESULTS.SEARCH, {
         params: { query, doctor_id: doctorId },
       });
 
@@ -61,7 +61,8 @@ export default function TestResultsScreen() {
         style={styles.searchButton}
         onPress={() =>
           item.filePath
-            ? Linking.openURL(`http://192.168.1.14/${item.filePath}`)
+            ? // ✅ فتح ملف الفحص من الاندبوينت المخصص للفايلات
+              Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
             : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
       >

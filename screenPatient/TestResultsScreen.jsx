@@ -1,30 +1,29 @@
+// screensPatient/TestResultsScreen.js 
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-
-const API = 'http://192.168.1.122:8000';
+import ENDPOINTS from '../malikEndPoint';
 
 export default function TestResultsScreen() {
   const [data, setData] = useState([]);
 
- useEffect(() => {
-  const fetchResults = async () => {
-    const id = await AsyncStorage.getItem('user_id');
-    if (!id) return;
+  useEffect(() => {
+    const fetchResults = async () => {
+      const id = await AsyncStorage.getItem('user_id');
+      if (!id) return;
 
-    try {
-      const response = await axios.get(`${API}/patient/lab-results/${id}`);
-      setData(response.data);
-    } catch (error) {
-      console.error("خطأ في جلب البيانات:", error);
-    }
-  };
+      try {
+        const response = await axios.get(ENDPOINTS.PATIENT_LAB_RESULTS.BY_ID(id));
+        setData(response.data);
+      } catch (error) {
+        console.error("خطأ في جلب البيانات:", error);
+      }
+    };
 
-  fetchResults(); 
+    fetchResults();
   }, []);
-
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderLeftWidth: 6,
     borderLeftColor: '#00b29c',
-    alignItems:'flex-end'
+    alignItems: 'flex-end',
   },
   title: {
     fontSize: 18,
