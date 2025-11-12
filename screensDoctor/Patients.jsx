@@ -1,5 +1,5 @@
 // Patients.jsx
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -18,9 +18,11 @@ const COLORS = {
 };
 
 const Patients = () => {
+
   const navigation = useNavigation();
 
-  useLayoutEffect(() => {
+  useLayoutEffect(() => 
+  {
     navigation.setOptions({
       headerShown: false,
     });

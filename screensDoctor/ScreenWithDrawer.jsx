@@ -25,9 +25,7 @@ const ScreenWithDrawer = ({ title, children, showDrawerIcon = true }) => {
       headerTitleAlign: 'center',
       headerTitle: title,
       headerStyle: {
-        backgroundColor: primary,
-        elevation: 0,
-        shadowOpacity: 0,
+        backgroundColor: primary
       },
       headerTintColor: '#fff',
       headerTitleStyle: {
