@@ -8,12 +8,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  StatusBar,
   SafeAreaView,
   Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import ScreenWithDrawer from "./ScreenWithDrawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
 
@@ -27,9 +25,8 @@ export default function MedPatientsScreen({ navigation }) {
     const loadDoctor = async () => {
       try {
         const stored = await AsyncStorage.getItem("doctor_id");
-        if (stored) setDoctorId(parseInt(stored, 10));
-        else setDoctorId(420094999);
-      } catch (e) {
+        setDoctorId(stored ? parseInt(stored, 10) : 420094999);
+      } catch {
         setDoctorId(420094999);
       }
     };
@@ -45,12 +42,11 @@ export default function MedPatientsScreen({ navigation }) {
         `?q=${encodeURIComponent(text)}&doctor_id=${encodeURIComponent(
           doctorId
         )}`;
-
       const res = await fetch(url);
       if (!res.ok) throw new Error("err");
       const data = await res.json();
       setPatients(Array.isArray(data) ? data : []);
-    } catch (err) {
+    } catch {
       setPatients([]);
       Alert.alert("خطأ", "تعذر جلب المرضى.");
     } finally {
@@ -59,9 +55,7 @@ export default function MedPatientsScreen({ navigation }) {
   };
 
   useEffect(() => {
-    if (doctorId) {
-      fetchPatients("");
-    }
+    if (doctorId) fetchPatients("");
   }, [doctorId]);
 
   const handleSearch = (text) => {
@@ -101,13 +95,7 @@ export default function MedPatientsScreen({ navigation }) {
   );
 
   return (
-    <ScreenWithDrawer title="أدوية المرضى">
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent={true}
-      />
-      <SafeAreaView style={styles.safeArea} />
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.searchSection}>
           <Ionicons
@@ -128,7 +116,7 @@ export default function MedPatientsScreen({ navigation }) {
         <FlatList
           data={patients}
           keyExtractor={(item, index) =>
-            item.id ? item.id.toString() : index.toString()
+            item.id ? String(item.id) : String(index)
           }
           renderItem={renderPatient}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -138,30 +126,23 @@ export default function MedPatientsScreen({ navigation }) {
               {loading ? "جاري التحميل..." : "لا يوجد مرضى"}
             </Text>
           }
+          keyboardShouldPersistTaps="handled"
         />
       </View>
-    </ScreenWithDrawer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#F5F5F5",
-  },
+  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: 12, // بدل StatusBar.currentHeight
   },
-  rtlText: {
-    writingDirection: "rtl",
-    textAlign: "right",
-  },
-  searchSection: {
-    position: "relative",
-    marginBottom: 12,
-  },
+  rtlText: { writingDirection: "rtl", textAlign: "right" },
+  searchSection: { position: "relative", marginBottom: 12 },
   searchIcon: {
     position: "absolute",
     top: Platform.select({ ios: 12, android: 14 }),
@@ -191,9 +172,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
-  patientRight: {
-    marginLeft: 12,
-  },
+  patientRight: { marginLeft: 12 },
   iconCircle: {
     width: 40,
     height: 40,
@@ -202,19 +181,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  patientMiddle: {
-    flex: 1,
-  },
-  patientName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-  },
-  patientSub: {
-    fontSize: 12,
-    color: "#777",
-    marginTop: 2,
-  },
+  patientMiddle: { flex: 1 },
+  patientName: { fontSize: 16, fontWeight: "700", color: "#333" },
+  patientSub: { fontSize: 12, color: "#777", marginTop: 2 },
   emptyText: {
     textAlign: "center",
     marginTop: 20,

@@ -63,16 +63,6 @@ const Patients = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("DataPatientsListScreen")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons name="person-circle-outline" size={22} color="#fff" />
-            <Text style={styles.buttonText}>عرض بيانات مريض</Text>
-          </View>
-        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}

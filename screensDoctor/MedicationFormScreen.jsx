@@ -8,12 +8,10 @@ import {
   ScrollView,
   StyleSheet,
   Platform,
-  StatusBar,
   SafeAreaView,
   Alert,
   Keyboard,
 } from "react-native";
-import ScreenWithDrawer from "./ScreenWithDrawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,10 +23,7 @@ export default function MedicationFormScreen({ route, navigation }) {
 
   const [filteredMedNames, setFilteredMedNames] = useState([]);
   const [showMedNames, setShowMedNames] = useState(false);
-  const [showOtherMedFields, setShowOtherMedFields] = useState(
-    mode === "edit" ? true : false
-  );
-
+  const [showOtherMedFields, setShowOtherMedFields] = useState(mode === "edit");
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [tempTime, setTempTime] = useState(null);
   const [isPickingTime, setIsPickingTime] = useState(false);
@@ -39,8 +34,8 @@ export default function MedicationFormScreen({ route, navigation }) {
 
   const [form, setForm] = useState({
     id: medication?.id || null,
-    patientName: patientName,
-    patientId: patientId,
+    patientName,
+    patientId,
     name: medication?.name || "",
     medicationId: medication?.medicationId || null,
     dosage: medication?.dosage || "",
@@ -54,8 +49,7 @@ export default function MedicationFormScreen({ route, navigation }) {
     const loadDoctor = async () => {
       try {
         const stored = await AsyncStorage.getItem("doctor_id");
-        if (stored) setDoctorId(parseInt(stored, 10));
-        else setDoctorId(420094999);
+        setDoctorId(stored ? parseInt(stored, 10) : 420094999);
       } catch {
         setDoctorId(420094999);
       }
@@ -63,7 +57,6 @@ export default function MedicationFormScreen({ route, navigation }) {
     loadDoctor();
   }, []);
 
-  // جلب الأدوية من الباك اند
   const fetchMedNames = async (text) => {
     try {
       const url = `${
@@ -79,7 +72,7 @@ export default function MedicationFormScreen({ route, navigation }) {
       }));
       setFilteredMedNames(list);
       setShowMedNames(list.length > 0);
-    } catch (err) {
+    } catch {
       setFilteredMedNames([]);
       setShowMedNames(false);
       Alert.alert("خطأ", "تعذر جلب الأدوية من الخادم.");
@@ -107,10 +100,9 @@ export default function MedicationFormScreen({ route, navigation }) {
     setFilteredMedNames([]);
     setShowMedNames(false);
     setShowOtherMedFields(true);
-
-    requestAnimationFrame(() => {
-      scrollRef.current?.scrollToEnd({ animated: true });
-    });
+    requestAnimationFrame(() =>
+      scrollRef.current?.scrollToEnd({ animated: true })
+    );
   };
 
   const onTimeChange = (event, selectedTime) => {
@@ -123,30 +115,24 @@ export default function MedicationFormScreen({ route, navigation }) {
         return;
       }
       if (event.type === "set" && selectedTime) {
-        const hours = selectedTime.getHours().toString().padStart(2, "0");
-        const minutes = selectedTime.getMinutes().toString().padStart(2, "0");
-        const formattedTime = `${hours}:${minutes}`;
-        setForm((prev) => ({ ...prev, timeToTake: formattedTime }));
+        const hours = String(selectedTime.getHours()).padStart(2, "0");
+        const minutes = String(selectedTime.getMinutes()).padStart(2, "0");
+        setForm((p) => ({ ...p, timeToTake: `${hours}:${minutes}` }));
         setShowTimePicker(false);
         setTempTime(null);
         setIsPickingTime(false);
         setTimeFocused(false);
       }
     } else {
-      if (selectedTime) {
-        setTempTime(selectedTime);
-      }
+      if (selectedTime) setTempTime(selectedTime);
     }
   };
 
   const saveTempTimeAndClosePicker = () => {
     const finalTime = tempTime || new Date();
-    if (finalTime) {
-      const hours = finalTime.getHours().toString().padStart(2, "0");
-      const minutes = finalTime.getMinutes().toString().padStart(2, "0");
-      const formattedTime = `${hours}:${minutes}`;
-      setForm((prev) => ({ ...prev, timeToTake: formattedTime }));
-    }
+    const hours = String(finalTime.getHours()).padStart(2, "0");
+    const minutes = String(finalTime.getMinutes()).padStart(2, "0");
+    setForm((p) => ({ ...p, timeToTake: `${hours}:${minutes}` }));
     setShowTimePicker(false);
     setTempTime(null);
     setIsPickingTime(false);
@@ -154,10 +140,7 @@ export default function MedicationFormScreen({ route, navigation }) {
   };
 
   const onFocusInput = () => {
-    if (isPickingTime) {
-      Keyboard.dismiss();
-      return;
-    }
+    if (isPickingTime) Keyboard.dismiss();
   };
 
   const handleSave = async () => {
@@ -172,14 +155,12 @@ export default function MedicationFormScreen({ route, navigation }) {
       Alert.alert("تنبيه", "يرجى تعبئة الحقول الأساسية");
       return;
     }
-    if (!form.medicationId) {
-      Alert.alert("تنبيه", "اختر الدواء من القائمة القادمة من الداتا بيز.");
-      return;
-    }
-    if (!doctorId) {
-      Alert.alert("خطأ", "تعذر تحديد رقم الطبيب.");
-      return;
-    }
+    if (!form.medicationId)
+      return Alert.alert(
+        "تنبيه",
+        "اختر الدواء من القائمة القادمة من الداتا بيز."
+      );
+    if (!doctorId) return Alert.alert("خطأ", "تعذر تحديد رقم الطبيب.");
 
     const body = {
       patient_id: form.patientId,
@@ -193,7 +174,7 @@ export default function MedicationFormScreen({ route, navigation }) {
     };
 
     try {
-      if (mode === "edit" && form.id) {
+      if (route?.params?.mode === "edit" && form.id) {
         const url = `${AbedEndPoint.patientMedicationById(
           form.id
         )}?doctor_id=${encodeURIComponent(doctorId)}`;
@@ -202,10 +183,7 @@ export default function MedicationFormScreen({ route, navigation }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(txt || "تعذر تعديل الدواء");
-        }
+        if (!res.ok) throw new Error((await res.text()) || "تعذر تعديل الدواء");
       } else {
         const url = `${
           AbedEndPoint.patientMedsList
@@ -215,12 +193,8 @@ export default function MedicationFormScreen({ route, navigation }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(txt || "تعذر إضافة الدواء");
-        }
+        if (!res.ok) throw new Error((await res.text()) || "تعذر إضافة الدواء");
       }
-
       navigation.goBack();
     } catch (err) {
       Alert.alert("خطأ", err.message || "حدث خطأ أثناء الحفظ");
@@ -228,34 +202,19 @@ export default function MedicationFormScreen({ route, navigation }) {
   };
 
   return (
-    <ScreenWithDrawer title={mode === "edit" ? "تعديل الدواء" : "جدولة دواء"}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent={true}
-      />
-      <SafeAreaView style={styles.safeArea} />
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
         ref={scrollRef}
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 60 }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* رجوع */}
-        <TouchableOpacity
-          style={styles.backArrow}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-
         <Text style={[styles.modalTitle, styles.rtlText]}>
-          {mode === "edit"
+          {route?.params?.mode === "edit"
             ? `تعديل دواء لـ ${patientName}`
             : `جدولة دواء لـ ${patientName}`}
         </Text>
 
-        {/* اسم المريض */}
         <Text style={[styles.label, styles.rtlText]}>اسم المريض</Text>
         <TextInput
           style={[styles.input, styles.rtlText, styles.disabledInput]}
@@ -263,7 +222,6 @@ export default function MedicationFormScreen({ route, navigation }) {
           editable={false}
         />
 
-        {/* اسم الدواء */}
         <Text style={[styles.label, styles.rtlText]}>اسم الدواء</Text>
         <TextInput
           ref={medicationNameRef}
@@ -275,7 +233,6 @@ export default function MedicationFormScreen({ route, navigation }) {
           onFocus={onFocusInput}
         />
 
-        {/* لستة الأدوية */}
         {showMedNames && (
           <View style={styles.medNamesList}>
             {filteredMedNames.map((item) => (
@@ -292,7 +249,6 @@ export default function MedicationFormScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* باقي الحقول */}
         {showOtherMedFields && (
           <>
             <Text style={[styles.label, styles.rtlText]}>الجرعة</Text>
@@ -331,22 +287,17 @@ export default function MedicationFormScreen({ route, navigation }) {
                 Keyboard.dismiss();
                 setIsPickingTime(true);
                 setTimeFocused(true);
-
                 if (form.timeToTake) {
                   const [h, m] = form.timeToTake.split(":");
                   const d = new Date();
                   d.setHours(Number(h));
                   d.setMinutes(Number(m));
                   setTempTime(d);
-                } else {
-                  setTempTime(new Date());
-                }
-
+                } else setTempTime(new Date());
                 setShowTimePicker(true);
-
-                requestAnimationFrame(() => {
-                  scrollRef.current?.scrollToEnd({ animated: true });
-                });
+                requestAnimationFrame(() =>
+                  scrollRef.current?.scrollToEnd({ animated: true })
+                );
               }}
               style={[
                 styles.input,
@@ -411,28 +362,31 @@ export default function MedicationFormScreen({ route, navigation }) {
               }
               onFocus={() => {
                 onFocusInput();
-                requestAnimationFrame(() => {
-                  scrollRef.current?.scrollToEnd({ animated: true });
-                });
+                requestAnimationFrame(() =>
+                  scrollRef.current?.scrollToEnd({ animated: true })
+                );
               }}
             />
           </>
         )}
 
-        {/* أزرار */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.modalButton, styles.saveButton]}
             onPress={handleSave}
           >
             <Ionicons
-              name={mode === "edit" ? "checkmark-done" : "add-circle-outline"}
+              name={
+                route?.params?.mode === "edit"
+                  ? "checkmark-done"
+                  : "add-circle-outline"
+              }
               size={20}
               color="#fff"
               style={{ marginRight: 6 }}
             />
             <Text style={styles.btnText}>
-              {mode === "edit" ? "حفظ التعديلات" : "إضافة"}
+              {route?.params?.mode === "edit" ? "حفظ التعديلات" : "إضافة"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -449,27 +403,19 @@ export default function MedicationFormScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </ScreenWithDrawer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#F5F5F5",
-  },
+  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: 12,
   },
-  rtlText: {
-    writingDirection: "rtl",
-    textAlign: "right",
-  },
-  backArrow: {
-    marginBottom: 8,
-  },
+  rtlText: { writingDirection: "rtl", textAlign: "right" },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -477,11 +423,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-  },
+  label: { fontSize: 14, color: "#555", marginBottom: 4 },
   input: {
     borderWidth: 1,
     borderColor: "#CCC",
@@ -492,10 +434,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
   },
-  disabledInput: {
-    backgroundColor: "#F0F0F0",
-    color: "#777",
-  },
+  disabledInput: { backgroundColor: "#F0F0F0", color: "#777" },
   medNamesList: {
     maxHeight: 140,
     backgroundColor: "#FFF",
@@ -522,9 +461,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 10,
   },
-  timePickerButtonFocused: {
-    borderColor: "#4CAF50",
-  },
+  timePickerButtonFocused: { borderColor: "#4CAF50" },
   iosTimeActions: {
     flexDirection: "row-reverse",
     justifyContent: "flex-start",
@@ -537,10 +474,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginLeft: 8,
   },
-  iosBtnText: {
-    color: "#fff",
-    fontSize: 14,
-  },
+  iosBtnText: { color: "#fff", fontSize: 14 },
   buttonContainer: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
@@ -555,17 +489,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
   },
-  saveButton: {
-    backgroundColor: "#4CAF50",
-    marginRight: 8,
-  },
-  cancelButton: {
-    backgroundColor: "#F44336",
-    marginLeft: 8,
-  },
-  btnText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  saveButton: { backgroundColor: "#4CAF50", marginRight: 8 },
+  cancelButton: { backgroundColor: "#F44336", marginLeft: 8 },
+  btnText: { color: "#FFF", fontSize: 16, fontWeight: "bold" },
 });

@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 const BASE_URL =
   Platform.OS === 'android'
-    ? 'http://192.168.1.9:8000'
-    : 'http://192.168.1.9:8000';
+    ? 'http://192.168.1.128:8000'
+    : 'http://192.168.1.128:8000';
 
 const AbedEndPoint = {
   BASE_URL,
@@ -18,14 +18,16 @@ const AbedEndPoint = {
 
   // Lab dashboard
   labDashboardById: (id) => `${BASE_URL}/lab/dashboard/${id}`,
+  // ✔ جديد: نتائج مختبر حسب المريض
+  labResultsByPatient: (id) => `${BASE_URL}/lab/results/${id}`,
 
   // Medications (catalog)
   medicationsList: `${BASE_URL}/medications`,
 
   // Patient medications
-  // ✅ المجموعة: مع سلاش أخير (يتفادى 307 في GET/POST)
+  // مجموعة: مع سلاش أخير (يتفادى 307 في GET/POST)
   patientMedsList: `${BASE_URL}/patient-medications/`,
-  // ✅ العنصر: بدون سلاش (يتفادى 307 في PUT/DELETE)
+  // عنصر: بدون سلاش (يتفادى 307 في PUT/DELETE)
   patientMedicationById: (id) => `${BASE_URL}/patient-medications/${id}`,
   patientMedsByPatient: (patientId) => `${BASE_URL}/patient-medications/by-patient/${patientId}`,
   patientMedsPatients: `${BASE_URL}/patient-medications/patients`,

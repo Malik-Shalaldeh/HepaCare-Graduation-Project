@@ -1,48 +1,48 @@
-import React from 'react';
-import { StatusBar, Alert, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from "react";
+import { StatusBar, Alert, Platform, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
-  DrawerItem
-} from '@react-navigation/drawer';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+  DrawerItem,
+} from "@react-navigation/drawer";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-import Visits from '../screensDoctor/Visits';
-import LoginScreen from '../Login/LoginScreen';
-import LabsScreen from '../screensDoctor/LabsScreen'; // sami: شاشة المختبرات المعتمدة
-import HistoryVisits from '../screensDoctor/HistoryVisits';
-import VisitsSummaryScreen from '../screensDoctor/VisitsSummaryScreen';
-import Settings from '../screensDoctor/Settings';
-import TestsStack from './TestsStack';
-import PatientsStack from './PatientsStack';
-import MedicationsStackScreen from './medicationStack';
-import AppointmentsStack from './AppointmentsStack';
-import EducationalContentStack from './EducationalContentStack';
-import Dashboard from '../screensDoctor/Dashboard';
-import EvaluationVisitScreen from '../screensDoctor/EvaluationVisitScreen';
-import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
-import AddPatientsScreen from '../screensDoctor/AddPatientsScreen'
-import SymptomTrackingScreen from '../screensDoctor/SymptomTrackingScreen'
-import ChangePasswordScreen from '../Login/restPassword';
+import Visits from "../screensDoctor/Visits";
+import LoginScreen from "../Login/LoginScreen";
+import LabsScreen from "../screensDoctor/LabsScreen";
+import HistoryVisits from "../screensDoctor/HistoryVisits";
+import VisitsSummaryScreen from "../screensDoctor/VisitsSummaryScreen";
+import Settings from "../screensDoctor/Settings";
+import TestsStack from "./TestsStack";
+import PatientsStack from "./PatientsStack";
+import MedicationsStackScreen from "./medicationStack";
+import AppointmentsStack from "./AppointmentsStack";
+import EducationalContentStack from "./EducationalContentStack";
+import Dashboard from "../screensDoctor/Dashboard";
+import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
+import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
+import AddPatientsScreen from "../screensDoctor/AddPatientsScreen";
+import SymptomTrackingScreen from "../screensDoctor/SymptomTrackingScreen";
+import ChangePasswordScreen from "../Login/restPassword";
 
-const primary = '#00b29c';
+const primary = "#00b29c";
 
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
   const handleLogout = () => {
     Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      "تسجيل الخروج",
+      "هل أنت متأكد أنك تريد تسجيل الخروج؟",
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: "إلغاء", style: "cancel" },
         {
-          text: 'تسجيل خروج',
-          onPress: () => navigation.replace('Login'),
-          style: 'destructive',
+          text: "تسجيل خروج",
+          onPress: () => navigation.replace("Login"),
+          style: "destructive",
         },
       ],
       { cancelable: true }
@@ -72,20 +72,23 @@ function MainTabs() {
         headerShown: true,
         tabBarIcon: ({ color, size }) => {
           const icons = {
-            المرضى: 'people',
-            'لوحة التحكم': 'home',
-            الزيارات: 'calendar',
-            الأدوية: 'medkit',
+            المرضى: "people",
+            "لوحة التحكم": "home",
+            الزيارات: "calendar",
+            الأدوية: "medkit",
           };
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
+          return (
+            <Ionicons name={icons[route.name]} size={size} color={color} />
+          );
         },
-        tabBarActiveTintColor: '#2196f3',
-        tabBarInactiveTintColor: 'gray',
-        headerShown: true,
+        tabBarActiveTintColor: "#2196f3",
+        tabBarInactiveTintColor: "gray",
+        animation: "shift",
         tabBarStyle: {
-          height: 90 ,  marginBottom: Platform.OS === 'android' ? 5 : 0 
+          height: 90,
+          marginBottom: Platform.OS === "android" ? 5 : 0,
         },
-        tabBarHideOnKeyboard: true, // بنخفي البار السفلي أول ما يطلع الكيبورد
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen name="الزيارات" component={Visits} />
@@ -95,9 +98,9 @@ function MainTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-          name="المرضى"
-          component={PatientsStack}
-          options={{headerShown: false}}
+        name="المرضى"
+        component={PatientsStack}
+        options={{ headerShown: false }}
       />
       <Tab.Screen name="لوحة التحكم" component={Dashboard} />
     </Tab.Navigator>
@@ -114,7 +117,6 @@ function NavigatorDoctor() {
         translucent={false}
       />
 
-      
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         initialRouteName="MainTabs"
@@ -122,7 +124,7 @@ function NavigatorDoctor() {
           headerShown: true,
           drawerActiveTintColor: primary,
           drawerLabelStyle: { fontSize: 16 },
-          drawerStyle: { backgroundColor: '#fff' },
+          drawerStyle: { backgroundColor: "#fff" },
         }}
       >
         <Drawer.Screen
@@ -158,8 +160,8 @@ function NavigatorDoctor() {
           name="المحتوى التثقيفي"
           component={EducationalContentStack}
           options={{
-            headerTitle: 'المحتوى التثقيفي',
-            headerTitleAlign: 'center',
+            headerTitle: "المحتوى التثقيفي",
+            headerTitleAlign: "center",
             headerShown: true,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="book-outline" size={size} color={color} />
@@ -167,12 +169,16 @@ function NavigatorDoctor() {
           }}
         />
 
-         <Drawer.Screen
+        <Drawer.Screen
           name="سياسة التطبيق"
           component={PrivacyPolicyScreen}
           options={{
             drawerIcon: ({ size, color }) => (
-              <Ionicons name="document-text-outline" size={size} color={color} />
+              <Ionicons
+                name="document-text-outline"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
@@ -193,41 +199,67 @@ function NavigatorDoctor() {
             headerShown: false,
           }}
         />
-        
+
+        {/* === شاشة إضافة مريض بعنوان أعلى وزر رجوع (بدون زر الدراور) === */}
         <Drawer.Screen
           name="إضافة مريض"
           component={AddPatientsScreen}
-          options={{
+          options={({ navigation }) => ({
             drawerItemStyle: { height: 0 },
-            headerShown: false,
-          }}
+            headerShown: true,
+            headerTitle: "إضافة مريض",
+            headerTitleAlign: "center",
+            headerStyle: { backgroundColor: primary },
+            headerTintColor: "#fff",
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{ paddingHorizontal: 12 }}
+              >
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+            ),
+          })}
         />
+
+        {/* === شاشة تتبّع الأعراض بعنوان أعلى وزر رجوع (بدون زر الدراور) === */}
         <Drawer.Screen
           name="تتبع الأعراض"
           component={SymptomTrackingScreen}
+          options={({ navigation }) => ({
+            drawerItemStyle: { height: 0 },
+            headerShown: true,
+            headerTitle: "تتبع الأعراض",
+            headerTitleAlign: "center",
+            headerStyle: { backgroundColor: primary },
+            headerTintColor: "#fff",
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{ paddingHorizontal: 12 }}
+              >
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+
+        <Drawer.Screen
+          name="اعادة تعيين كلمة المرور"
+          component={ChangePasswordScreen}
           options={{
             drawerItemStyle: { height: 0 },
             headerShown: false,
           }}
         />
-
         <Drawer.Screen
-        name="اعادة تعيين كلمة المرور"
-        component={ChangePasswordScreen}
-        options={{
-          drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
-          headerShown: false,             // يخفي العنوان العلوي
-       }}
-      />
-      
-       <Drawer.Screen
-        name="LoginScreen"
-        component={LoginScreen}
-        options={{
-          drawerItemStyle: { height: 0 }, // يخفي العنصر من القائمة
-          headerShown: false,             // يخفي العنوان العلوي
-       }}
-      />
+          name="LoginScreen"
+          component={LoginScreen}
+          options={{
+            drawerItemStyle: { height: 0 },
+            headerShown: false,
+          }}
+        />
 
         <Drawer.Screen
           name=" المختبرات المعتمدة"
@@ -255,7 +287,6 @@ function NavigatorDoctor() {
             headerShown: false,
           }}
         />
-        
       </Drawer.Navigator>
     </>
   );

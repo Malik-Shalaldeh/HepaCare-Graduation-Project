@@ -1,5 +1,5 @@
 // componentDoctor/HealthMedComponent.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,17 @@ import {
   Switch,
   Alert,
   Platform,
-  StatusBar,
-  I18nManager,
+  SafeAreaView,
+  RefreshControl,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
 import AbedEndPoint from "../AbedEndPoint";
 
 export default function HealthMedComponent() {
-  const navigation = useNavigation();
-
-  const [meds, setMeds] = useState([]); // [{id, Name, isAvailable, ...}]
+  const [meds, setMeds] = useState([]); // [{id, Name, isAvailable}]
   const [availableMedsMap, setAvailableMedsMap] = useState({}); // {id: bool}
   const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadMeds = async () => {
     try {
@@ -49,6 +47,12 @@ export default function HealthMedComponent() {
     loadMeds();
   }, []);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadMeds();
+    setRefreshing(false);
+  }, []);
+
   const handleToggle = async (med) => {
     if (!med || typeof med.id === "undefined" || med.id === null) {
       Alert.alert("تنبيه", "معرّف الدواء غير متوفر");
@@ -59,7 +63,10 @@ export default function HealthMedComponent() {
 
     try {
       const url = AbedEndPoint.setHealthMedAvailability(med.id, newValue);
-      const res = await fetch(url, { method: "PATCH", headers: { Accept: "application/json" } });
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: { Accept: "application/json" },
+      });
       if (!res.ok) throw new Error("PATCH failed");
 
       setAvailableMedsMap((prev) => ({ ...(prev || {}), [med.id]: newValue }));
@@ -71,7 +78,10 @@ export default function HealthMedComponent() {
           : []
       );
       if (newValue) {
-        Alert.alert("دواء متوفر", `دواء ${String(med?.Name ?? "")} متوفر الآن في الصحة`);
+        Alert.alert(
+          "دواء متوفر",
+          `دواء ${String(med?.Name ?? "")} متوفر الآن في الصحة`
+        );
       }
     } catch (e) {
       console.log("Toggle error:", e);
@@ -80,70 +90,75 @@ export default function HealthMedComponent() {
   };
 
   const displayedMeds = Array.isArray(meds)
-    ? meds.filter((m) => m && typeof m.id !== "undefined" && availableMedsMap[m.id])
+    ? meds.filter(
+        (m) => m && typeof m.id !== "undefined" && availableMedsMap[m.id]
+      )
     : [];
-  const displayedMedNames = displayedMeds.map((m) => String(m?.Name ?? ""));
+
+  const renderMedCard = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.cardRow}>
+        <View style={styles.cardIconWrap}>
+          <Ionicons name="bandage-outline" size={22} color="#00b29c" />
+        </View>
+        <Text style={[styles.cardTitle, styles.rtl]} numberOfLines={2}>
+          {String(item?.Name ?? "")}
+        </Text>
+      </View>
+
+      <View style={styles.badgeRow}>
+        <View style={[styles.badge, styles.badgeSuccess]}>
+          <View style={styles.dot} />
+          <Text style={styles.badgeText}>متوفر</Text>
+        </View>
+      </View>
+    </View>
+  );
 
   return (
-    <>
-      <TouchableOpacity
-        style={styles.backArrow}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons
-          name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
-          size={24}
-          color="#000"
-        />
-      </TouchableOpacity>
-
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.headerSection}>
-          <Text style={[styles.subtitle, styles.rtlText]}>
-            إجمالي الأدوية: {displayedMedNames.length}
+        {/* رأس مبسّط */}
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, styles.rtl]}>
+            إجمالي الأدوية المتوفرة: {displayedMeds.length}
           </Text>
           <TouchableOpacity
-            style={[styles.actionBtn, styles.addButton]}
+            style={styles.manageBtn}
             onPress={() => setModalVisible(true)}
+            activeOpacity={0.9}
           >
-            <Ionicons name="medkit-outline" size={20} color="#fff" />
-            <Text style={styles.addButtonText}>إدارة الأدوية</Text>
+            <Ionicons name="medkit-outline" size={18} color="#fff" />
+            <Text style={styles.manageBtnText}>إدارة الأدوية</Text>
           </TouchableOpacity>
         </View>
 
-        {displayedMedNames.length === 0 ? (
-          <Text style={[styles.noMedsText, styles.rtlText]}>
+        {/* قائمة حديثة بشكل كروت */}
+        {displayedMeds.length === 0 ? (
+          <Text style={[styles.emptyText, styles.rtl]}>
             لا توجد أدوية متوفرة حالياً
           </Text>
         ) : (
           <FlatList
-            data={Array.isArray(displayedMedNames) ? displayedMedNames : []}
+            data={displayedMeds}
             keyExtractor={(item, index) =>
-              typeof item === "string" && item ? `${item}__${index}` : String(index)
+              typeof item?.id !== "undefined" ? String(item.id) : String(index)
             }
-            renderItem={({ item }) => (
-              <View style={styles.medItem}>
-                <Ionicons
-                  name="bandage-outline"
-                  size={24}
-                  color="#4CAF50"
-                  style={{ marginLeft: 8 }}
-                />
-                <Text style={[styles.medName, styles.rtlText]}>{String(item ?? "")}</Text>
-              </View>
-            )}
-            contentContainerStyle={{ paddingBottom: 100 }}
-            nestedScrollEnabled
+            renderItem={renderMedCard}
+            contentContainerStyle={{ paddingBottom: 24 }}
             keyboardShouldPersistTaps="handled"
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
         )}
 
+        {/* مودال الإدارة بالتبديل */}
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={[styles.modalTitle, styles.rtlText]}>
-                إدارة الأدوية
-              </Text>
+              <Text style={[styles.modalTitle, styles.rtl]}>إدارة الأدوية</Text>
+
               <FlatList
                 data={Array.isArray(meds) ? meds : []}
                 keyExtractor={(item, index) =>
@@ -153,7 +168,7 @@ export default function HealthMedComponent() {
                 }
                 renderItem={({ item }) => (
                   <View style={styles.switchRow}>
-                    <Text style={[styles.patientNameText, styles.rtlText]}>
+                    <Text style={[styles.switchText, styles.rtl]}>
                       {String(item?.Name ?? "")}
                     </Text>
                     <Switch
@@ -162,101 +177,142 @@ export default function HealthMedComponent() {
                     />
                   </View>
                 )}
-                style={{ marginBottom: 20, maxHeight: 300 }}
+                style={{ marginBottom: 20, maxHeight: 320 }}
               />
+
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.closeBtn]}
                 onPress={() => setModalVisible(false)}
+                activeOpacity={0.9}
               >
-                <Ionicons
-                  name="close-circle"
-                  size={20}
-                  color="#fff"
-                  style={{ marginRight: 6 }}
-                />
-                <Text style={styles.btnText}>إغلاق</Text>
+                <Ionicons name="close-circle" size={20} color="#fff" />
+                <Text style={styles.modalBtnText}>إغلاق</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 
-// ====== نفس الستايل تمامًا بدون أي تعديل ======
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 20 : 20,
+    paddingTop: 12, // بدون StatusBar.currentHeight لتجنّب التعارض مع هيدر الStack
   },
-  rtlText: {
-    writingDirection: "rtl",
-    textAlign: "right",
-  },
-  backArrow: {
-    top: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 0,
-    left: 16,
-    zIndex: 10,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 16,
-  },
-  headerSection: {
+  rtl: { writingDirection: "rtl", textAlign: "right" },
+
+  header: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
   },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#444",
-  },
-  addButton: {
+  headerTitle: { fontSize: 18, fontWeight: "700", color: "#333" },
+  manageBtn: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 6,
     backgroundColor: "#4CAF50",
-    paddingVertical: Platform.select({ ios: 12, android: 10 }),
-    paddingHorizontal: 14,
-    borderRadius: 8,
+    paddingVertical: Platform.select({ ios: 10, android: 8 }),
+    paddingHorizontal: 12,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },
-  addButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
+  manageBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "700",
     marginLeft: 6,
   },
-  noMedsText: {
-    textAlign: "center",
-    marginTop: 50,
-    color: "#888",
-    fontSize: 16,
-  },
-  medItem: {
-    flexDirection: "row-reverse",
-    backgroundColor: "#FFF",
-    padding: Platform.select({ ios: 16, android: 14 }),
-    borderRadius: 10,
+
+  // بطاقة الدواء
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
     marginVertical: 6,
     shadowColor: "#000",
-    shadowOffset: ({ width: 0, height: 1 }),
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,
-    alignItems: "center",
   },
-  medName: {
+  cardRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  cardIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,178,156,0.12)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
+  },
+  cardTitle: { flex: 1, fontSize: 16, fontWeight: "700", color: "#333" },
+
+  badgeRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+  badge: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  badgeSuccess: {
+    backgroundColor: "rgba(76,175,80,0.1)",
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "#4CAF50",
+  },
+  badgeText: { color: "#2e7d32", fontWeight: "700", fontSize: 12 },
+
+  // نصوص ومودال
+  emptyText: {
+    textAlign: "center",
+    marginTop: 40,
+    color: "#888",
+    fontSize: 15,
+  },
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.3)" },
+  modalContent: {
+    marginTop: Platform.select({ ios: 100, android: 60 }),
+    marginHorizontal: 20,
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+    padding: 20,
+    paddingBottom: 26,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "800",
     color: "#333",
-    flex: 1,
+    textAlign: "center",
+    marginBottom: 14,
   },
   switchRow: {
     flexDirection: "row-reverse",
@@ -264,48 +320,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
   },
-  patientNameText: {
-    fontSize: 15,
-    color: "#444",
-    width: "80%",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
-  },
-  modalContent: {
-    marginTop: Platform.select({ ios: 100, android: 60 }),
-    marginHorizontal: 20,
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 20,
-    paddingBottom: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
-  },
+  switchText: { fontSize: 15, color: "#444", width: "80%" },
   modalButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 10,
   },
-  cancelButton: {
-    backgroundColor: "#F44336",
-  },
-  btnText: {
+  closeBtn: { backgroundColor: "#F44336" },
+  modalBtnText: {
     color: "#FFF",
-    fontWeight: "bold",
-    fontSize: 16,
+    fontWeight: "700",
+    fontSize: 15,
+    marginLeft: 6,
   },
 });
