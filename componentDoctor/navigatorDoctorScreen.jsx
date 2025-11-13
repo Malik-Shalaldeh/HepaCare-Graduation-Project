@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusBar, Alert, Platform, TouchableOpacity } from "react-native";
+import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -24,8 +24,6 @@ import EducationalContentStack from "./EducationalContentStack";
 import Dashboard from "../screensDoctor/Dashboard";
 import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
-import AddPatientsScreen from "../screensDoctor/AddPatientsScreen";
-import SymptomTrackingScreen from "../screensDoctor/SymptomTrackingScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 
 const primary = "#00b29c";
@@ -72,10 +70,11 @@ function MainTabs() {
         headerShown: true,
         tabBarIcon: ({ color, size }) => {
           const icons = {
-            المرضى: "people",
-            "لوحة التحكم": "home",
             الزيارات: "calendar",
             الأدوية: "medkit",
+            المرضى: "people",
+            "إضافة مريض": "person-add",
+            "لوحة التحكم": "home",
           };
           return (
             <Ionicons name={icons[route.name]} size={size} color={color} />
@@ -200,49 +199,7 @@ function NavigatorDoctor() {
           }}
         />
 
-        {/* === شاشة إضافة مريض بعنوان أعلى وزر رجوع (بدون زر الدراور) === */}
-        <Drawer.Screen
-          name="إضافة مريض"
-          component={AddPatientsScreen}
-          options={({ navigation }) => ({
-            drawerItemStyle: { height: 0 },
-            headerShown: true,
-            headerTitle: "إضافة مريض",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: primary },
-            headerTintColor: "#fff",
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={{ paddingHorizontal: 12 }}
-              >
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
-
-        {/* === شاشة تتبّع الأعراض بعنوان أعلى وزر رجوع (بدون زر الدراور) === */}
-        <Drawer.Screen
-          name="تتبع الأعراض"
-          component={SymptomTrackingScreen}
-          options={({ navigation }) => ({
-            drawerItemStyle: { height: 0 },
-            headerShown: true,
-            headerTitle: "تتبع الأعراض",
-            headerTitleAlign: "center",
-            headerStyle: { backgroundColor: primary },
-            headerTintColor: "#fff",
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={{ paddingHorizontal: 12 }}
-              >
-                <Ionicons name="arrow-back" size={24} color="#fff" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
+        {/* مافي "إضافة مريض" في الدراور الآن */}
 
         <Drawer.Screen
           name="اعادة تعيين كلمة المرور"

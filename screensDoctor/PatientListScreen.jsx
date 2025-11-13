@@ -170,9 +170,6 @@ const PatientListScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
 
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>قائمة المرضى</Text>
-      </View>
 
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>

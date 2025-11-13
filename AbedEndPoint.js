@@ -1,10 +1,10 @@
 // AbedEndPoint.js
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 const BASE_URL =
-  Platform.OS === 'android'
-    ? 'http://192.168.1.128:8000'
-    : 'http://192.168.1.128:8000';
+  Platform.OS === "android"
+    ? "http://192.168.1.128:8000"
+    : "http://192.168.1.128:8000";
 
 const AbedEndPoint = {
   BASE_URL,
@@ -29,7 +29,8 @@ const AbedEndPoint = {
   patientMedsList: `${BASE_URL}/patient-medications/`,
   // عنصر: بدون سلاش (يتفادى 307 في PUT/DELETE)
   patientMedicationById: (id) => `${BASE_URL}/patient-medications/${id}`,
-  patientMedsByPatient: (patientId) => `${BASE_URL}/patient-medications/by-patient/${patientId}`,
+  patientMedsByPatient: (patientId) =>
+    `${BASE_URL}/patient-medications/by-patient/${patientId}`,
   patientMedsPatients: `${BASE_URL}/patient-medications/patients`,
   patientMedsMedications: `${BASE_URL}/patient-medications/medications`,
 
@@ -46,7 +47,14 @@ const AbedEndPoint = {
   // Health meds
   healthMeds: `${BASE_URL}/health-meds`,
   setHealthMedAvailability: (medId, available) =>
-    `${BASE_URL}/health-meds/set-availability?med_id=${encodeURIComponent(medId)}&available=${available ? 1 : 0}`,
+    `${BASE_URL}/health-meds/set-availability?med_id=${encodeURIComponent(
+      medId
+    )}&available=${available ? 1 : 0}`,
+
+  // Symptom tracking
+  symptomPatients: `${BASE_URL}/symptom-tracking/patients`,
+  symptomSymptoms: `${BASE_URL}/symptom-tracking/symptoms`,
+  symptomEntries: `${BASE_URL}/symptom-tracking/entries`,
 };
 
 export default AbedEndPoint;

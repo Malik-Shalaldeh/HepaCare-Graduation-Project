@@ -52,6 +52,17 @@ const Patients = () => {
 
       {/* المحتوى */}
       <View style={styles.content}>
+         <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("إضافة مريض")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="person-add-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>إضافة مريض</Text>
+          </View>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("PatientListScreen")}
@@ -60,18 +71,6 @@ const Patients = () => {
           <View style={styles.buttonContent}>
             <Ionicons name="search-outline" size={22} color="#fff" />
             <Text style={styles.buttonText}>البحث عن سجل مريض</Text>
-          </View>
-        </TouchableOpacity>
-
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("إضافة مريض")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons name="person-add-outline" size={22} color="#fff" />
-            <Text style={styles.buttonText}>إضافة مريض</Text>
           </View>
         </TouchableOpacity>
 
