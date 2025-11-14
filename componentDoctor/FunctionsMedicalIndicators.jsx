@@ -1,8 +1,7 @@
-// utils/medicalIndicators.js
+//FunctionsmedicalIndicators.js
 
 import { AVAILABLE_TESTS } from '../componentDoctor/availableTestsindicators';
 
-// ترجع القيم اللي لازم نضيفها على حسب نوع الفحص
 export function getInitialValuesForTest(key) {
   if (key === 'FIB4') {
     return {
@@ -21,15 +20,15 @@ export function getInitialValuesForTest(key) {
     };
   }
 
-  // الفحوص العادية
   return {
     [key]: '',
   };
 }
 
-// دالة التحليل كاملة: تاخد (tests, values) وترجع مصفوفة نتائج
 export function analyzeTests(tests, values) {
-  return tests.map(key => {
+
+  return tests.map(key => 
+    {
     let status = '❌ Invalid';
 
     if (key === 'FIB4') {
@@ -39,25 +38,39 @@ export function analyzeTests(tests, values) {
       const plt = parseFloat(values.FIB4_platelets);
 
       if (![age, ast, alt, plt].some(v => isNaN(v))) {
+        
         const fib4 = (age * ast) / (0.001 * plt * Math.sqrt(alt));
         const val = fib4.toFixed(2);
 
-        if (fib4 < 1.45) status = `${val} - Less probable cirrhosis`;
-        else if (fib4 <= 3.25) status = `${val} - Indeterminate`;
-        else status = `${val} - More probable cirrhosis`;
+        if (fib4 < 1.45) 
+          status = `${val} - Less probable cirrhosis`;
+        else if (fib4 <= 3.25) 
+          status = `${val} - Indeterminate`;
+        else 
+          status = `${val} - More probable cirrhosis`;
+
+
       }
-    } else if (key === 'APRI') {
+    } 
+    else if (key === 'APRI') {
+
       const ast = parseFloat(values.APRI_ast);
       const uln = parseFloat(values.APRI_uln);
       const plt = parseFloat(values.APRI_platelets);
 
-      if (![ast, uln, plt].some(v => isNaN(v))) {
+      if (![ast, uln, plt].some(v => isNaN(v))) 
+      {
         const apri = ((ast / uln) / plt) * 100;
         status = `${apri.toFixed(2)}%`;
       }
-    } else {
+
+    } 
+    else 
+      {
       const raw = parseFloat(values[key]);
-      if (!isNaN(raw)) {
+
+      if (!isNaN(raw)) 
+        {
         switch (key) {
           case 'ALT':
             status = raw > 40 ? 'High' : 'Normal';
@@ -83,10 +96,10 @@ export function analyzeTests(tests, values) {
       label: AVAILABLE_TESTS.find(t => t.key === key).label,
       status,
     };
+    
   });
 }
 
-// دالة مساعدة لو بدك تشيل نتيجة فحص معيّن
 export function removeResultByKey(results, key) {
   return results.filter(r => r.key !== key);
 }

@@ -1,5 +1,5 @@
 // MedicalIndicatorsScreen.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -13,11 +13,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 import { AVAILABLE_TESTS } from '../componentDoctor/availableTestsindicators';
 import TestCard from '../componentDoctor/TestCardindicator';
 import ResultCard from '../componentDoctor/ResultCardincedators';
-
 import {
   getInitialValuesForTest,
   analyzeTests,
@@ -38,11 +36,11 @@ const MedicalIndicatorsScreen = () => {
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
-  const selectTest = key => {
+  const selectTest = (key) => 
+  {
     if (!tests.includes(key)) {
       setTests(prev => [...prev, key]);
 
-      // استخدمنا الفنكشن بدل ما نكتب if طويلة
       const initial = getInitialValuesForTest(key);
       setValues(prev => ({ ...prev, ...initial }));
 
@@ -115,6 +113,7 @@ const MedicalIndicatorsScreen = () => {
         {results.map(r => (
           <ResultCard key={r.key} label={r.label} status={r.status} />
         ))}
+        
       </ScrollView>
     </SafeAreaView>
   );
