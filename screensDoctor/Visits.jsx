@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ENDPOINTS from '../samiendpoint';
+import ButtonHelp from '../componentHelp/ButtonHelp';
 
 const primary = '#00b29c';
 
@@ -181,6 +182,10 @@ const Visits = () => {
       </SafeAreaView>
     </ScreenWithDrawer>
   );
+
+
+
+  
 };
 
 const styles = StyleSheet.create({
