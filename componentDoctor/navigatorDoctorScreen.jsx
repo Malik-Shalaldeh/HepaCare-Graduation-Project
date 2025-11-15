@@ -1,4 +1,3 @@
-import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -15,7 +14,6 @@ import LoginScreen from "../Login/LoginScreen";
 import LabsScreen from "../screensDoctor/LabsScreen";
 import HistoryVisits from "../screensDoctor/HistoryVisits";
 import VisitsSummaryScreen from "../screensDoctor/VisitsSummaryScreen";
-import Settings from "../screensDoctor/Settings";
 import TestsStack from "./TestsStack";
 import PatientsStack from "./PatientsStack";
 import MedicationsStackScreen from "./medicationStack";
@@ -180,8 +178,8 @@ function NavigatorDoctor() {
           }}
         />
         <Drawer.Screen
-          name="الإعدادات"
-          component={Settings}
+          name="اعادة تعيين كلمه المرور"
+          component={ChangePasswordScreen}
           options={{
             drawerIcon: ({ size, color }) => (
               <Ionicons name="settings-outline" size={size} color={color} />

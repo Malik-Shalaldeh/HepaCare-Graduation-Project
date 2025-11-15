@@ -2,32 +2,100 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
+import theme from '../style/theme';
 
 const Tests = () => {
   const navigation = useNavigation();
+
   return (
-    <ScreenWithDrawer title={"الفحوصات"}>
+    <ScreenWithDrawer title={'الفحوصات'}>
       {/* زر الرجوع */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} >
-        <Ionicons name='arrow-back' size={24} color={"#000"} />
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.8}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="رجوع"
+        accessibilityHint="العودة إلى الشاشة السابقة"
+        accessibilityLanguage="ar"
+      >
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={theme.colors.textPrimary}
+          accessibilityRole="image"
+          accessibilityLabel="سهم الرجوع"
+          accessibilityLanguage="ar"
+        />
+        <Text
+          style={styles.backText}
+          accessibilityRole="text"
+          accessibilityLanguage="ar"
+        >
+          رجوع
+        </Text>
       </TouchableOpacity>
 
-      {/* زر ادخال نتائج الفحوصات */}
+      {/* زر إدخال نتائج الفحوصات */}
       <TouchableOpacity
         style={[styles.testButton, styles.entryButton]}
         onPress={() => navigation.navigate('InputTestResultScreen')}
+        activeOpacity={0.9}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="إدخال نتائج الفحوصات"
+        accessibilityHint="يفتح شاشة لإدخال نتائج الفحوصات للمرضى"
+        accessibilityLanguage="ar"
       >
         <View style={styles.testButtonContent}>
-          <Ionicons name="create-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.testButtonText}>ادخال نتائج الفحوصات</Text>
+          <Ionicons
+            name="create-outline"
+            size={24}
+            color={theme.colors.background}
+            style={styles.icon}
+            accessibilityRole="image"
+            accessibilityLabel="أيقونة إدخال"
+            accessibilityLanguage="ar"
+          />
+          <Text
+            style={styles.testButtonText}
+            accessibilityRole="text"
+            accessibilityLanguage="ar"
+          >
+            ادخال نتائج الفحوصات
+          </Text>
         </View>
       </TouchableOpacity>
 
       {/* زر نتائج الفحوصات */}
-      <TouchableOpacity style={styles.testButton} onPress={() => navigation.navigate('TestResultsScreen')}>
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={() => navigation.navigate('TestResultsScreen')}
+        activeOpacity={0.9}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="نتائج فحوصات المرضى"
+        accessibilityHint="يفتح شاشة لمشاهدة نتائج الفحوصات المخزنة للمرضى"
+        accessibilityLanguage="ar"
+      >
         <View style={styles.testButtonContent}>
-          <Ionicons name="document-text-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.testButtonText}>نتائج فحوصات المرضى</Text>
+          <Ionicons
+            name="document-text-outline"
+            size={24}
+            color={theme.colors.background}
+            style={styles.icon}
+            accessibilityRole="image"
+            accessibilityLabel="أيقونة ملف نتائج"
+            accessibilityLanguage="ar"
+          />
+          <Text
+            style={styles.testButtonText}
+            accessibilityRole="text"
+            accessibilityLanguage="ar"
+          >
+            نتائج فحوصات المرضى
+          </Text>
         </View>
       </TouchableOpacity>
 
@@ -35,10 +103,30 @@ const Tests = () => {
       <TouchableOpacity
         style={[styles.testButton, styles.indicatorsButton]}
         onPress={() => navigation.navigate('MedicalIndicatorsScreen')}
+        activeOpacity={0.9}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="حساب القيم الطبية"
+        accessibilityHint="يفتح شاشة لحساب المؤشرات والقيم الطبية بناءً على مدخلاتك"
+        accessibilityLanguage="ar"
       >
         <View style={styles.testButtonContent}>
-          <Ionicons name="medkit-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.testButtonText}>حساب القيم الطبية</Text>
+          <Ionicons
+            name="medkit-outline"
+            size={24}
+            color={theme.colors.background}
+            style={styles.icon}
+            accessibilityRole="image"
+            accessibilityLabel="أيقونة حقيبة طبية"
+            accessibilityLanguage="ar"
+          />
+          <Text
+            style={styles.testButtonText}
+            accessibilityRole="text"
+            accessibilityLanguage="ar"
+          >
+            حساب القيم الطبية
+          </Text>
         </View>
       </TouchableOpacity>
     </ScreenWithDrawer>
@@ -49,26 +137,29 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5,
-    marginBottom: 30,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  backText: {
+    marginLeft: theme.spacing.sm,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
   },
   testButton: {
-    backgroundColor: '#2E3192',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radii.md,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.light,
   },
   entryButton: {
-    backgroundColor: '#16A085',  // لون أخضر لإبراز الإدخال
+    backgroundColor: theme.colors.success, // مميز للإدخال
   },
   indicatorsButton: {
-    backgroundColor: '#8532A8',  // أرجواني للحساب الطبي
+    backgroundColor: theme.colors.accent, // لون مختلف لزر القيم الطبية
   },
   testButtonContent: {
     flexDirection: 'row-reverse', // لأن النص بالعربي
@@ -76,12 +167,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   testButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: theme.colors.background,
+    fontSize: theme.typography.headingSm,
     fontWeight: 'bold',
+    textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
+    flex: 1,
   },
   icon: {
-    marginLeft: 10,
+    marginLeft: theme.spacing.sm,
   },
 });
 

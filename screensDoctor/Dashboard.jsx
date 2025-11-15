@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity  } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import ENDPOINTS from '../malikEndPoint';
+import axios from 'axios';
 
-const primary = '#2C3E50';
-const accent = '#2980B9';
-const textColor = '#34495E';
+// استدعاء الثيم الموحد
+import theme from '../style/theme';
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -16,7 +16,20 @@ const Dashboard = () => {
   const [patientsCount, setPatientsCount] = useState(0);
 
   const today = new Date();
-  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const months = [
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
+  ];
   const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
   useEffect(() => {
@@ -29,18 +42,22 @@ const Dashboard = () => {
           Alert.alert('خطأ', 'لم يتم العثور على رقم الطبيب، يرجى تسجيل الدخول مجددًا.');
           return;
         }
+        const res = await axios.get(ENDPOINTS.DOCTOR_DASHBOARD.GET, {
+          params: { doctor_id },
+        });
 
-        const res = await fetch(`${ENDPOINTS.DOCTOR_DASHBOARD.GET}?doctor_id=${doctor_id}`);
-        if (!res.ok) throw new Error('خطأ في الاتصال');
-
-        const data = await res.json();
         if (!active) return;
 
-        setDoctorName(data.doctor_name);
+        const data = res.data || {};
+
+        setDoctorName(data.doctor_name || '');
         setPatientsCount(Number(data.patients_count) || 0);
       } catch (err) {
-        if (active) Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
-        navigation.navigate('LoginScreen');
+        console.log('Dashboard error:', err?.message || err);
+        if (active) {
+          Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
+          navigation.navigate('LoginScreen');
+        }
       }
     };
 
@@ -55,13 +72,45 @@ const Dashboard = () => {
 
   return (
     <ScreenWithDrawer title="لوحة التحكم">
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Hepacare</Text>
+      {/* هيدر الشاشة */}
+      <View
+        style={styles.header}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel="رأس صفحة لوحة التحكم، تطبيق هيباكير"
+        accessibilityHint="يعرض اسم نظام HepaCare في أعلى الشاشة"
+        accessibilityLanguage="ar"
+      >
+        <Text
+          style={styles.headerText}
+          accessibilityRole="text"
+          accessibilityLabel="هيباكير"
+          accessibilityLanguage="ar"
+        >
+          Hepacare
+        </Text>
       </View>
 
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Ionicons name="person-circle-outline" size={40} color={accent} style={styles.icon} />
+      {/* المحتوى الرئيسي */}
+      <View style={styles.container} accessibilityLanguage="ar">
+        {/* كرت الترحيب بالطبيب */}
+        <View
+          style={styles.card}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={`مرحباً دكتور ${doctorName || 'غير معروف'}، تاريخ اليوم ${formattedDate}`}
+          accessibilityHint="يعرض اسم الطبيب والتاريخ الحالي"
+          accessibilityLanguage="ar"
+        >
+          <Ionicons
+            name="person-circle-outline"
+            size={40}
+            color={theme.colors.accent}
+            style={styles.icon}
+            accessibilityLabel="أيقونة طبيب"
+            accessibilityRole="image"
+            accessibilityLanguage="ar"
+          />
           <View>
             <Text style={styles.title}>
               مرحباً د.{doctorName ? doctorName : '...'} 👨‍⚕️
@@ -70,35 +119,59 @@ const Dashboard = () => {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Ionicons name="people-outline" size={40} color={accent} style={styles.icon} />
+        {/* كرت عدد المرضى */}
+        <View
+          style={styles.card}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={`${patientsCount} مريض تحت إشرافك`}
+          accessibilityHint="يعرض العدد الكلي للمرضى الذين تشرف عليهم حالياً"
+          accessibilityLanguage="ar"
+        >
+          <Ionicons
+            name="people-outline"
+            size={40}
+            color={theme.colors.accent}
+            style={styles.icon}
+            accessibilityLabel="أيقونة مجموعة مرضى"
+            accessibilityRole="image"
+            accessibilityLanguage="ar"
+          />
           <View>
-            <Text style={styles.title}>
-              {patientsCount} مريض
-            </Text>
+            <Text style={styles.title}>{patientsCount} مريض</Text>
             <Text style={styles.subtitle}>عدد المرضى المشرف عليهم</Text>
           </View>
         </View>
 
-      {/* زر  ينقل لشاشة نظرة عامة */}
-      <TouchableOpacity
-        style={styles.overviewButton}
-        onPress={() => navigation.navigate("نظرة عامة")}
-        activeOpacity={0.85}
-      >
-        <View style={styles.overviewIconWrapper}>
-          <Ionicons name="stats-chart-outline" size={22} color={accent} />
-        </View>
+        {/* زر الانتقال لشاشة نظرة عامة */}
+        <TouchableOpacity
+          style={styles.overviewButton}
+          onPress={() => navigation.navigate('نظرة عامة')}
+          activeOpacity={0.85}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="فتح شاشة النظرة العامة على المرضى"
+          accessibilityHint="ينقلك إلى شاشة تعرض توزيع المرضى حسب المحافظة"
+          accessibilityLanguage="ar"
+        >
+          <View style={styles.overviewIconWrapper}>
+            <Ionicons
+              name="stats-chart-outline"
+              size={22}
+              color={theme.colors.primary}
+              accessibilityLabel="أيقونة إحصائيات"
+              accessibilityRole="image"
+              accessibilityLanguage="ar"
+            />
+          </View>
 
-        {/* النصوص في المنتصف */}
-        <View style={styles.overviewTextWrapper}>
-          <Text style={styles.overviewTitle}>نظرة عامة</Text>
-          <Text style={styles.overviewSubtitle}>عرض توزيع المرضى حسب المحافظة</Text>
-        </View>
-
-      </TouchableOpacity>
-
-
+          <View style={styles.overviewTextWrapper}>
+            <Text style={styles.overviewTitle}>نظرة عامة</Text>
+            <Text style={styles.overviewSubtitle}>
+              عرض توزيع المرضى حسب المحافظة
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </ScreenWithDrawer>
   );
@@ -107,96 +180,93 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 60,
-    backgroundColor: '#F8FAFB',
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.xxl,
+    backgroundColor: theme.colors.backgroundLight,
     alignItems: 'center',
   },
   card: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 4,
+    backgroundColor: theme.colors.background,
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.xl,
+    borderRadius: theme.radii.lg,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.light,
   },
-  icon: { marginEnd: 12 },
+  icon: {
+    marginEnd: theme.spacing.md,
+  },
   title: {
-    fontSize: 18,
+    fontSize: theme.typography.headingSm,
     fontWeight: '700',
-    color: primary,
+    color: theme.colors.textPrimary,
     marginBottom: 4,
+    textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
-  subtitle: { fontSize: 14, color: textColor },
+  subtitle: {
+    fontSize: theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
+    textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
+  },
   header: {
     width: '100%',
-    backgroundColor: accent,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    marginBottom: 30,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radii.md,
+    marginBottom: theme.spacing.xl,
     alignItems: 'center',
+    ...theme.shadows.medium,
   },
   headerText: {
-    fontSize: 28,
+    fontSize: theme.typography.headingLg,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFFFFF',
     letterSpacing: 3,
-  },
-  overviewButtonWrapper: {
-    width: '100%',
-    marginBottom: 20,
-    alignItems: 'flex-end', // يخلي الزر باتجاه اليمين (يتماشى مع العربية)
+    fontFamily: theme.typography.fontFamily,
   },
   overviewButton: {
     width: '100%',
-    flexDirection: 'row-reverse', // عشان العربية: الأيقونة يمين
+    flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: accent,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    marginTop: 4,
-    marginBottom: 24,
+    backgroundColor: theme.colors.accent,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radii.md,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.xl,
   },
   overviewIconWrapper: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10, 
+    marginLeft: theme.spacing.sm,
   },
   overviewTextWrapper: {
     flex: 1,
   },
   overviewTitle: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '700',
     marginBottom: 2,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   overviewSubtitle: {
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 12,
+    fontSize: theme.typography.bodySm,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
-
-  
-
 });
 
 export default Dashboard;

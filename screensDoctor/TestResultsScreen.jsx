@@ -14,7 +14,10 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HelpButton from '../componentHelp/ButtonHelp';
-import ENDPOINTS from '../malikEndPoint'; // ✅ استدعاء ملف الاندبوينت
+import ENDPOINTS from '../malikEndPoint';
+
+// ✅ استدعاء ملف الثيم
+import theme from '../style/theme';
 
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
@@ -46,8 +49,17 @@ export default function TestResultsScreen() {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.name}>👤 {item.name} (رقم: {item.patientId})</Text>
+    <View
+      style={styles.card}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`نتيجة فحص للمريض ${item.name}، رقم المريض ${item.patientId}، نوع الفحص ${item.test}، النتيجة ${item.result}، التقييم ${item.evaluation}`}
+      accessibilityHint="يعرض تفاصيل نتيجة الفحص مع إمكانية فتح الملف المرفق إن وجد"
+      accessibilityLanguage="ar"
+    >
+      <Text style={styles.name}>
+        👤 {item.name} (رقم: {item.patientId})
+      </Text>
       <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
       <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
       <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
@@ -55,11 +67,18 @@ export default function TestResultsScreen() {
       <Text style={styles.note}>📅 تاريخ الفحص: {item.dat}</Text>
 
       <TouchableOpacity
-        style={styles.searchButton}
+        style={[styles.searchButton, styles.fileButton]}
         onPress={() =>
-          item.filePath? Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
+          item.filePath
+            ? Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
             : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
+        activeOpacity={0.9}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="فتح ملف الفحص"
+        accessibilityHint="يفتح ملف الفحص المرفق إن كان متوفراً"
+        accessibilityLanguage="ar"
       >
         <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
@@ -67,35 +86,101 @@ export default function TestResultsScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name='arrow-back' size={24} color='#000' />
+    <View
+      style={styles.container}
+      accessibilityLanguage="ar"
+    >
+      {/* زر الرجوع */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.8}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="رجوع"
+        accessibilityHint="العودة إلى الشاشة السابقة"
+        accessibilityLanguage="ar"
+      >
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={theme.colors.textPrimary}
+          accessibilityRole="image"
+          accessibilityLabel="سهم الرجوع"
+          accessibilityLanguage="ar"
+        />
+        <Text style={styles.backText}>رجوع</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>🔍 ابحث عن فحوصات المريض</Text>
+      {/* العنوان */}
+      <Text
+        style={styles.header}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel="ابحث عن فحوصات المريض"
+        accessibilityLanguage="ar"
+      >
+        🔍 ابحث عن فحوصات المريض
+      </Text>
 
+      {/* حقل البحث */}
       <TextInput
         style={styles.input}
-        placeholder='...ادخل اسم أو رقم المريض'
+        placeholder="...ادخل اسم أو رقم المريض"
+        placeholderTextColor={theme.colors.textMuted}
         onChangeText={setSearchInput}
         value={searchInput}
+        textAlign="right"
+        autoCapitalize="none"
+        accessible
+        accessibilityRole="search"
+        accessibilityLabel="حقل البحث عن المريض"
+        accessibilityHint="أدخل اسم المريض أو رقمه ثم اضغط على زر بحث لعرض النتائج"
+        accessibilityLanguage="ar"
       />
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <Ionicons name='search' size={20} color='#fff' />
+      {/* زر البحث */}
+      <TouchableOpacity
+        style={styles.searchButton}
+        onPress={handleSearch}
+        activeOpacity={0.9}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="بحث عن نتائج الفحوصات"
+        accessibilityHint="يضغط للبحث عن نتائج الفحوصات بناءً على الاسم أو الرقم المدخل"
+        accessibilityLanguage="ar"
+      >
+        <Ionicons
+          name="search"
+          size={20}
+          color={theme.colors.background}
+          accessibilityRole="image"
+          accessibilityLabel="أيقونة بحث"
+          accessibilityLanguage="ar"
+        />
         <Text style={styles.searchButtonText}>بحث</Text>
       </TouchableOpacity>
 
+      {/* قائمة النتائج */}
       <FlatList
         data={filteredResults}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         ListEmptyComponent={
           filteredResults.length === 0 && searchInput.trim() !== '' ? (
-            <Text style={styles.emptyText}>لا يوجد نتائج</Text>
+            <Text
+              style={styles.emptyText}
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel="لا يوجد نتائج مطابقة لبيانات البحث"
+              accessibilityLanguage="ar"
+            >
+              لا يوجد نتائج
+            </Text>
           ) : null
         }
       />
+
       <HelpButton
         title="شاشة عرض النتائج"
         info="تُستخدم هذه الشاشة للاستعلام عن نتائج الفحوصات للمرضى، وذلك بإدخال اسم المريض أو رقمه، ثم عرض التفاصيل وفتح ملف الفحص عند توفره."
@@ -107,100 +192,117 @@ export default function TestResultsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F6F8',
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: theme.spacing.md,
+  },
+  backText: {
+    marginLeft: theme.spacing.sm,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
   },
   header: {
-    fontSize: 20,
+    fontSize: theme.typography.headingMd,
     fontWeight: 'bold',
-    marginBottom: 12,
-    color: '#2C3E50',
+    marginBottom: theme.spacing.md,
+    color: theme.colors.textPrimary,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 10,
-    borderColor: '#ddd',
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
+    padding: theme.spacing.md,
+    fontSize: theme.typography.bodyLg,
+    marginBottom: theme.spacing.sm,
+    borderColor: theme.colors.border,
     borderWidth: 1,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2980B9',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.sm + 2,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radii.md,
     alignSelf: 'flex-start',
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
+    ...theme.shadows.light,
+  },
+  fileButton: {
+    backgroundColor: theme.colors.success,
+    marginTop: theme.spacing.sm,
   },
   searchButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    marginLeft: 8,
+    color: theme.colors.background,
+    fontSize: theme.typography.bodyLg,
+    marginLeft: theme.spacing.sm,
     fontWeight: 'bold',
+    fontFamily: theme.typography.fontFamily,
   },
   btn: {
-    color: '#fff',
-    fontSize: 14,
-    marginLeft: 8,
+    color: theme.colors.background,
+    fontSize: theme.typography.bodySm,
+    marginLeft: theme.spacing.sm,
     fontWeight: 'bold',
+    fontFamily: theme.typography.fontFamily,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.light,
   },
   name: {
     fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 6,
-    color: '#34495E',
+    fontSize: theme.typography.headingSm,
+    marginBottom: theme.spacing.xs,
+    color: theme.colors.textPrimary,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   test: {
-    fontSize: 16,
-    color: '#2C3E50',
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
     marginBottom: 4,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   result: {
-    fontSize: 16,
-    color: '#2C3E50',
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
     marginBottom: 4,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   evaluation: {
-    fontSize: 16,
-    color: '#27ae60',
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.success,
     marginBottom: 4,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   note: {
-    fontSize: 15,
-    color: '#7f8c8d',
+    fontSize: theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
     textAlign: 'right',
     marginBottom: 2,
+    fontFamily: theme.typography.fontFamily,
   },
   emptyText: {
     textAlign: 'center',
-    color: '#aaa',
-    fontSize: 16,
-    marginTop: 20,
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.bodyLg,
+    marginTop: theme.spacing.lg,
+    fontFamily: theme.typography.fontFamily,
   },
 });

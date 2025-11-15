@@ -2,14 +2,14 @@ import { Platform } from "react-native";
 
 const BASE_URL =
   Platform.OS === "android"
-    ? "http://192.168.1.128:8000"
-    : "http://192.168.1.128:8000";
+    ? "http://192.168.1.9:8000"
+    : "http://192.168.1.9:8000";
 
 const ENDPOINTS = {
   BASE_URL,
   TEST_RESULTS: {
     SEARCH: `${BASE_URL}/test-results/`,
-    FILE_BASE: "http://192.168.1.14",
+    FILE_BASE: "http://192.168.1.9",
   },
   PATIENT_CHART: {
     GET: `${BASE_URL}/patient-chart`,
