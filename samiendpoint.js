@@ -6,8 +6,10 @@ import { Platform } from 'react-native';
 
 // تحديد الـ BASE URL بناءً على المنصة
 const BASE_URL = Platform.OS === 'android' 
+
   ?  'http://192.168.1.128:8000'  // للأندرويد
   :  'http://192.168.1.128:8000'; // للماك/ويندوز
+
 
 const ENDPOINTS = {
   // الاتصال الأساسي

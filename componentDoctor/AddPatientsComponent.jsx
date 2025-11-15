@@ -194,7 +194,6 @@ export default function AddPatientsComponent() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>إضافة مريض جديد</Text>
 
         {step === 1 && (
           <>

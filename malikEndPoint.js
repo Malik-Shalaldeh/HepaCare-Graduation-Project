@@ -21,9 +21,9 @@ const ENDPOINTS = {
     LOGIN: `${BASE_URL}/auth/login`,
     CHANGE_PASSWORD: `${BASE_URL}/auth/change-password`,
   },
-  PATIENT_LAB_RESULTS: {
-    BY_ID: (id) => `${BASE_URL}/patient/lab-results/${id}`,
-  },
+PATIENT_LAB_RESULTS: {
+  BY_ID: (id) => `${BASE_URL}/patient/lab-results/${id}`,
+},
   PATIENT_DASHBOARD: {
     BY_ID: (id) => `${BASE_URL}/patient/dashboard/${id}`,
   },
@@ -38,6 +38,10 @@ const ENDPOINTS = {
   },
   VISITS: {
     CREATE: `${BASE_URL}/visits/`,
+  },
+  
+  STATS: {
+    PATIENTS_BY_CITY: `${BASE_URL}/statistics/patients-by-city`,
   },
 };
 

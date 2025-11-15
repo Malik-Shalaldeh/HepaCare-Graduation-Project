@@ -32,7 +32,6 @@ const TestsStack = () => {
     component={MedicalIndicatorsScreen}
     options={{ headerShown: false }}
   /> 
-
   
 </Stack.Navigator>
 

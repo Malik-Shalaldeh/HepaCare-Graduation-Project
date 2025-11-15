@@ -3,8 +3,6 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import Medications from "../screensDoctor/Medications";
-
-// الشاشات الجديدة اللي قسمناها
 import MedPatientsScreen from "../screensDoctor/MedPatientsScreen";
 import PatientMedicationsScreen from "../screensDoctor/PatientMedicationsScreen";
 import MedicationFormScreen from "../screensDoctor/MedicationFormScreen";
@@ -16,29 +14,66 @@ const MedicationsStackScreen = () => {
   return (
     <Stack.Navigator
       initialRouteName="Medications"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        // هيدر موحّد
+        headerShown: true,
+        headerTitleAlign: "center",
+        headerTintColor: "#fff",
+        headerStyle: {
+          backgroundColor: "#00b29c",
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        headerTitleStyle: { fontSize: 18, fontWeight: "700" },
+
+        // إبقاء السهم فقط (بدون Back/اسم الشاشة السابقة)
+        headerBackTitleVisible: false,
+        headerBackTitle: "",
+
+        gestureEnabled: true,
+      }}
     >
-      {/* شاشة البداية تبعتك */}
-      <Stack.Screen name="Medications" component={Medications} />
-
-      {/* 1) شاشة المرضى – الاسم الجديد */}
-      <Stack.Screen name="MedPatients" component={MedPatientsScreen} />
-      {/* نفس الشاشة لكن بالاسم القديم اللي كان في Medications.jsx */}
-      <Stack.Screen name="MedPatientsScreen" component={MedPatientsScreen} />
-
-      {/* 2) شاشة أدوية المريض – الاسم الجديد */}
+      {/* الرئيسية (هيدر داخليها الخاص) */}
       <Stack.Screen
-        name="PatientMedications"
-        component={PatientMedicationsScreen}
-      />
-      <Stack.Screen
-        component={HealthMedicationsDisplay}
-        name="HealthMedicationsDisplay"
+        name="Medications"
+        component={Medications}
         options={{ headerShown: false }}
       />
 
-      {/* 3) شاشة إضافة/تعديل دواء */}
-      <Stack.Screen name="MedicationForm" component={MedicationFormScreen} />
+      {/* المرضى */}
+      <Stack.Screen
+        name="MedPatients"
+        component={MedPatientsScreen}
+        options={{ title: "أدوية المرضى" }}
+      />
+      <Stack.Screen
+        name="MedPatientsScreen"
+        component={MedPatientsScreen}
+        options={{ title: "أدوية المرضى" }}
+      />
+
+      {/* أدوية المريض — عنوان ثابت بدون اسم المريض */}
+      <Stack.Screen
+        name="PatientMedications"
+        component={PatientMedicationsScreen}
+        options={{ title: "أدوية المريض" }}
+      />
+
+      {/* أدوية الصحة */}
+      <Stack.Screen
+        name="HealthMedicationsDisplay"
+        component={HealthMedicationsDisplay}
+        options={{ title: "أدوية الصحة" }}
+      />
+
+      {/* إضافة/تعديل دواء — عنوان ثابت بدون اسم المريض */}
+      <Stack.Screen
+        name="MedicationForm"
+        component={MedicationFormScreen}
+        options={({ route }) => ({
+          title: route?.params?.mode === "edit" ? "تعديل الدواء" : "جدولة دواء",
+        })}
+      />
     </Stack.Navigator>
   );
 };

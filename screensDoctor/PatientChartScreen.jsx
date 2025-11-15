@@ -9,6 +9,7 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -31,8 +32,13 @@ const COLORS = ['#D32F2F','#1976D2','#388E3C','#FBC02D','#7B1FA2','#00796B','#F5
 const { width } = Dimensions.get('window');
 
 export default function PatientChartScreen() {
-  const { patientId, patientName } = useRoute().params;
+
+  const route = useRoute();
+  const patientId = route.params.patientId;
+  const patientName = route.params.patientName;
+
   const navigation = useNavigation();
+
   const [records, setRecords] = useState(null);
 
   useEffect(() => {
@@ -40,10 +46,19 @@ export default function PatientChartScreen() {
       try {
         const response = await axios.get(`${ENDPOINTS.PATIENT_CHART.GET}?patient_id=${patientId}`);
         setRecords(response.data);
-      } catch (error) {
-        console.error(error);
+      } 
+      catch (error) {
+        Alert.alert(
+         'خطأ',
+         'تأكد من اتصالك بالإنترنت',
+        [
+          { text: 'إلغاء', style: 'cancel' },
+        ]
+      );
       }
+
     }
+
     loadData();
   }, [patientId]);
 
@@ -56,6 +71,7 @@ export default function PatientChartScreen() {
   }
 
   const labels = records.map(r => r.date);
+
   const datasets = TESTS.map((t, i) => ({
     data: records.map(r => r[t.key] || 0),
     color: () => COLORS[i % COLORS.length],
@@ -111,6 +127,7 @@ export default function PatientChartScreen() {
           </View>
         )}
       </View>
+      
       <HelpButton
         title="مساعدة - مخططات المريض"
         info="تعرض هذه الشاشة تطوّر نتائج الفحوصات للمريض على شكل مخطط زمني. استخدمها لمتابعة الاستجابة أو التدهور. الألوان توضّح كل فحص."

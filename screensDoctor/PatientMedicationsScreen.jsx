@@ -7,12 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  StatusBar,
   SafeAreaView,
   Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import ScreenWithDrawer from "./ScreenWithDrawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import AbedEndPoint from "../AbedEndPoint";
@@ -23,13 +21,11 @@ export default function PatientMedicationsScreen({ route, navigation }) {
   const [medications, setMedications] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // جلب الدكتور
   useEffect(() => {
     const loadDoctor = async () => {
       try {
         const stored = await AsyncStorage.getItem("doctor_id");
-        if (stored) setDoctorId(parseInt(stored, 10));
-        else setDoctorId(420094999);
+        setDoctorId(stored ? parseInt(stored, 10) : 420094999);
       } catch {
         setDoctorId(420094999);
       }
@@ -45,11 +41,9 @@ export default function PatientMedicationsScreen({ route, navigation }) {
         `${AbedEndPoint.patientMedsList}` +
         `?patient_id=${encodeURIComponent(patientId)}` +
         `&doctor_id=${encodeURIComponent(doctorId)}`;
-
       const res = await fetch(url);
       if (!res.ok) throw new Error("err");
       const data = await res.json();
-
       const mapped = (Array.isArray(data) ? data : []).map((item) => ({
         id: item.id,
         patientName: item.patient_name,
@@ -63,7 +57,7 @@ export default function PatientMedicationsScreen({ route, navigation }) {
         additionalInstructions: item.instructions || "",
       }));
       setMedications(mapped);
-    } catch (err) {
+    } catch {
       setMedications([]);
       Alert.alert("خطأ", "تعذر جلب أدوية المريض.");
     } finally {
@@ -71,7 +65,6 @@ export default function PatientMedicationsScreen({ route, navigation }) {
     }
   };
 
-  // كل ما تنفتح الشاشة
   useFocusEffect(
     useCallback(() => {
       fetchMeds();
@@ -85,7 +78,6 @@ export default function PatientMedicationsScreen({ route, navigation }) {
       patientName,
     });
   };
-
   const goToEdit = (item) => {
     navigation.navigate("MedicationForm", {
       mode: "edit",
@@ -94,24 +86,16 @@ export default function PatientMedicationsScreen({ route, navigation }) {
       medication: item,
     });
   };
-
   const deleteMedication = async (med) => {
-    if (!doctorId) {
-      Alert.alert("خطأ", "تعذر تحديد رقم الطبيب.");
-      return;
-    }
+    if (!doctorId) return Alert.alert("خطأ", "تعذر تحديد رقم الطبيب.");
     try {
-      const url =
-        `${AbedEndPoint.patientMedicationById(med.id)}` +
-        `?doctor_id=${encodeURIComponent(doctorId)}`;
-
+      const url = `${AbedEndPoint.patientMedicationById(
+        med.id
+      )}?doctor_id=${encodeURIComponent(doctorId)}`;
       const res = await fetch(url, { method: "DELETE" });
-      if (!res.ok && res.status !== 204) {
-        const txt = await res.text();
-        throw new Error(txt || "تعذر حذف الدواء");
-      }
+      if (!res.ok && res.status !== 204) throw new Error(await res.text());
       setMedications((prev) => prev.filter((m) => m.id !== med.id));
-    } catch (err) {
+    } catch {
       Alert.alert("خطأ", "تعذر حذف الدواء.");
     }
   };
@@ -122,7 +106,6 @@ export default function PatientMedicationsScreen({ route, navigation }) {
         <Text style={[styles.medName, styles.rtlText]}>
           {item.name || item.medication_name}
         </Text>
-
         <Text style={[styles.infoText, styles.rtlText]}>
           <Ionicons name="flask-outline" size={16} /> الجرعة: {item.dosage}
         </Text>
@@ -161,27 +144,12 @@ export default function PatientMedicationsScreen({ route, navigation }) {
   );
 
   return (
-    <ScreenWithDrawer title="أدوية المريض">
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent={true}
-      />
-      <SafeAreaView style={styles.safeArea} />
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* رجوع */}
-        <TouchableOpacity
-          style={styles.backArrow}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-
         <Text style={[styles.subtitle, styles.rtlText]}>
           متابعات {patientName}
         </Text>
 
-        {/* زر الجدولة */}
         <TouchableOpacity style={styles.addButton} onPress={goToAdd}>
           <Ionicons name="add-circle" size={24} color="#fff" />
           <Text style={styles.addButtonText}>جــدول دواء</Text>
@@ -198,33 +166,26 @@ export default function PatientMedicationsScreen({ route, navigation }) {
         ) : (
           <FlatList
             data={medications}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => String(item.id)}
             renderItem={renderMedicationItem}
             contentContainerStyle={{ paddingBottom: 100 }}
+            keyboardShouldPersistTaps="handled"
           />
         )}
       </View>
-    </ScreenWithDrawer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#F5F5F5",
-  },
+  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: 12,
   },
-  rtlText: {
-    writingDirection: "rtl",
-    textAlign: "right",
-  },
-  backArrow: {
-    marginBottom: 8,
-  },
+  rtlText: { writingDirection: "rtl", textAlign: "right" },
   subtitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -270,21 +231,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-  medName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 6,
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 2,
-  },
-  medActions: {
-    justifyContent: "space-between",
-    marginRight: 10,
-  },
+  medName: { fontSize: 18, fontWeight: "bold", color: "#333", marginBottom: 6 },
+  infoText: { fontSize: 14, color: "#555", marginBottom: 2 },
+  medActions: { justifyContent: "space-between", marginRight: 10 },
   actionBtn: {
     padding: 8,
     borderRadius: 6,
@@ -294,10 +243,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  editBtn: {
-    backgroundColor: "#2196F3",
-  },
-  deleteBtn: {
-    backgroundColor: "#F44336",
-  },
+  editBtn: { backgroundColor: "#2196F3" },
+  deleteBtn: { backgroundColor: "#F44336" },
 });

@@ -34,9 +34,6 @@ export default function TestResultsScreen() {
 
     try {
       const doctorId = await AsyncStorage.getItem('doctor_id');
-      console.log('doctor_id to send:', doctorId);
-
-      // ✅ استخدام الاندبوينت بدل URL مباشر
       const res = await axios.get(ENDPOINTS.TEST_RESULTS.SEARCH, {
         params: { query, doctor_id: doctorId },
       });
@@ -60,9 +57,7 @@ export default function TestResultsScreen() {
       <TouchableOpacity
         style={styles.searchButton}
         onPress={() =>
-          item.filePath
-            ? // ✅ فتح ملف الفحص من الاندبوينت المخصص للفايلات
-              Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
+          item.filePath? Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
             : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
       >
@@ -84,7 +79,6 @@ export default function TestResultsScreen() {
         placeholder='...ادخل اسم أو رقم المريض'
         onChangeText={setSearchInput}
         value={searchInput}
-        autoCapitalize="none"
       />
 
       <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>

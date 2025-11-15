@@ -20,6 +20,7 @@ import ENDPOINTS from '../malikEndPoint';
 const primary = '#00b29c';
 
 const EvaluationVisitScreen = () => {
+  
   const navigation = useNavigation();
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
@@ -43,6 +44,7 @@ const EvaluationVisitScreen = () => {
       setPsychosocial('');
     });
     return unsubscribe;
+
   }, [navigation]);
 
   const selectedPatient = { id: patientId, name: patientName };

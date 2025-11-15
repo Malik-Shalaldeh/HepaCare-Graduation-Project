@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity  } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -79,6 +79,26 @@ const Dashboard = () => {
             <Text style={styles.subtitle}>عدد المرضى المشرف عليهم</Text>
           </View>
         </View>
+
+      {/* زر  ينقل لشاشة نظرة عامة */}
+      <TouchableOpacity
+        style={styles.overviewButton}
+        onPress={() => navigation.navigate("نظرة عامة")}
+        activeOpacity={0.85}
+      >
+        <View style={styles.overviewIconWrapper}>
+          <Ionicons name="stats-chart-outline" size={22} color={accent} />
+        </View>
+
+        {/* النصوص في المنتصف */}
+        <View style={styles.overviewTextWrapper}>
+          <Text style={styles.overviewTitle}>نظرة عامة</Text>
+          <Text style={styles.overviewSubtitle}>عرض توزيع المرضى حسب المحافظة</Text>
+        </View>
+
+      </TouchableOpacity>
+
+
       </View>
     </ScreenWithDrawer>
   );
@@ -134,6 +154,49 @@ const styles = StyleSheet.create({
     color: '#fff',
     letterSpacing: 3,
   },
+  overviewButtonWrapper: {
+    width: '100%',
+    marginBottom: 20,
+    alignItems: 'flex-end', // يخلي الزر باتجاه اليمين (يتماشى مع العربية)
+  },
+  overviewButton: {
+    width: '100%',
+    flexDirection: 'row-reverse', // عشان العربية: الأيقونة يمين
+    alignItems: 'center',
+    backgroundColor: accent,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 18,
+    marginTop: 4,
+    marginBottom: 24,
+  },
+  overviewIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10, 
+  },
+  overviewTextWrapper: {
+    flex: 1,
+  },
+  overviewTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 2,
+    textAlign: 'right',
+  },
+  overviewSubtitle: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 12,
+    textAlign: 'right',
+  },
+
+  
+
 });
 
 export default Dashboard;

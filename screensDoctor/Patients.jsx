@@ -1,5 +1,5 @@
 // Patients.jsx
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -18,9 +18,11 @@ const COLORS = {
 };
 
 const Patients = () => {
+
   const navigation = useNavigation();
 
-  useLayoutEffect(() => {
+  useLayoutEffect(() => 
+  {
     navigation.setOptions({
       headerShown: false,
     });
@@ -50,6 +52,17 @@ const Patients = () => {
 
       {/* المحتوى */}
       <View style={styles.content}>
+         <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("إضافة مريض")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons name="person-add-outline" size={22} color="#fff" />
+            <Text style={styles.buttonText}>إضافة مريض</Text>
+          </View>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("PatientListScreen")}
@@ -58,28 +71,6 @@ const Patients = () => {
           <View style={styles.buttonContent}>
             <Ionicons name="search-outline" size={22} color="#fff" />
             <Text style={styles.buttonText}>البحث عن سجل مريض</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("DataPatientsListScreen")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons name="person-circle-outline" size={22} color="#fff" />
-            <Text style={styles.buttonText}>عرض بيانات مريض</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("إضافة مريض")}
-          activeOpacity={0.8}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons name="person-add-outline" size={22} color="#fff" />
-            <Text style={styles.buttonText}>إضافة مريض</Text>
           </View>
         </TouchableOpacity>
 
