@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  StatusBar,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
+import theme from '../style/theme';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -27,90 +29,159 @@ export default function LoginScreen({ navigation }) {
       const data = response.data;
 
       if (data.is_active === 0) {
-        Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
-        setPassword("");
+        Alert.alert('الحساب معطل', 'هذا الحساب معطل، تواصل مع الإدارة.');
+        setPassword('');
         return;
       }
 
-      await AsyncStorage.setItem("user_id", String(data.id));
+      await AsyncStorage.setItem('user_id', String(data.id));
 
-      if (data.role === "DOCTOR") {
-        await AsyncStorage.setItem("doctor_id", String(data.id));
-        await AsyncStorage.setItem("patientId", "");
-      } else if (data.role === "PATIENT") {
-        await AsyncStorage.removeItem("doctor_id");
-        await AsyncStorage.setItem("patientId", String(data.id));
+      if (data.role === 'DOCTOR') {
+        await AsyncStorage.setItem('doctor_id', String(data.id));
+        await AsyncStorage.setItem('patientId', '');
+      } else if (data.role === 'PATIENT') {
+        await AsyncStorage.removeItem('doctor_id');
+        await AsyncStorage.setItem('patientId', String(data.id));
       }
 
       navigation.replace(data.route);
     } catch (e) {
       if (e.response) {
         if (e.response.status === 403) {
-          Alert.alert("الحساب معطل", "هذا الحساب معطل، تواصل مع الإدارة.");
+          Alert.alert('الحساب معطل', 'هذا الحساب معطل، تواصل مع الإدارة.');
         } else if (e.response.status === 401) {
-          Alert.alert("خطأ", "اسم المستخدم أو كلمة المرور غير صحيحة");
+          Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
         } else {
-          Alert.alert("خطأ", "حدث خطأ في تسجيل الدخول");
+          Alert.alert('خطأ', 'حدث خطأ في تسجيل الدخول');
         }
       } else {
-        Alert.alert("خطأ", "تعذر الاتصال بالخادم");
+        Alert.alert('خطأ', 'تعذر الاتصال بالخادم');
       }
-      setPassword("");
+      setPassword('');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.logo}>HepaCare</Text>
+    <View
+      style={styles.container}
+      accessibilityLanguage="ar"
+    >
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={theme.colors.primary}
+      />
+
+      {/* الهيدر */}
+      <View
+        style={styles.header}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel="تسجيل الدخول إلى نظام هيباكير"
+        accessibilityLanguage="ar"
+      >
+        <Text
+          style={styles.logo}
+          accessibilityRole="text"
+          accessibilityLabel="هيباكير"
+          accessibilityLanguage="ar"
+        >
+          HepaCare
+        </Text>
       </View>
 
+      {/* النموذج */}
       <View style={styles.form}>
+        {/* حقل اسم المستخدم */}
         <View style={styles.inputContainer}>
           <Ionicons
             name="person-outline"
             size={20}
-            color="#777"
+            color={theme.colors.textMuted}
             style={styles.inputIcon}
+            accessibilityRole="image"
+            accessibilityLabel="أيقونة مستخدم"
+            accessibilityLanguage="ar"
           />
           <TextInput
             placeholder="اسم المستخدم"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.input}
             onChangeText={setUsername}
             value={username}
+            textAlign="right"
+            autoCapitalize="none"
+            accessible
+            accessibilityLabel="حقل اسم المستخدم"
+            accessibilityHint="أدخل اسم المستخدم الخاص بك"
+            accessibilityLanguage="ar"
           />
         </View>
 
+        {/* حقل كلمة المرور */}
         <View style={styles.inputContainer}>
           <Ionicons
             name="lock-closed-outline"
             size={20}
-            color="#777"
+            color={theme.colors.textMuted}
             style={styles.inputIcon}
+            accessibilityRole="image"
+            accessibilityLabel="أيقونة قفل لكلمة المرور"
+            accessibilityLanguage="ar"
           />
           <TextInput
             placeholder="كلمة المرور"
-            placeholderTextColor="#999"
+            placeholderTextColor={theme.colors.textMuted}
             style={[styles.input, { flex: 1 }]}
             secureTextEntry={!showPassword}
             onChangeText={setPassword}
             value={password}
+            textAlign="right"
+            autoCapitalize="none"
+            accessible
+            accessibilityLabel="حقل كلمة المرور"
+            accessibilityHint="أدخل كلمة المرور الخاصة بحسابك"
+            accessibilityLanguage="ar"
           />
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeButton}
+            activeOpacity={0.8}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={
+              showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
+            }
+            accessibilityLanguage="ar"
           >
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={20}
-              color="#00b29c"
+              color={theme.colors.primary}
+              accessibilityRole="image"
+              accessibilityLabel="أيقونة إظهار أو إخفاء كلمة المرور"
+              accessibilityLanguage="ar"
             />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>دخول</Text>
+        {/* زر الدخول */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          activeOpacity={0.9}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="تسجيل الدخول"
+          accessibilityHint="يحاول تسجيل الدخول باستخدام اسم المستخدم وكلمة المرور المدخلة"
+          accessibilityLanguage="ar"
+        >
+          <Text
+            style={styles.buttonText}
+            accessibilityRole="text"
+            accessibilityLanguage="ar"
+          >
+            دخول
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -118,42 +189,67 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
   header: {
     height: 180,
-    backgroundColor: '#00b29c',
+    backgroundColor: theme.colors.primary,
     borderBottomLeftRadius: 60,
     borderBottomRightRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
+    ...theme.shadows.medium,
   },
-  logo: { fontSize: 34, fontWeight: 'bold', color: '#fff' },
-  form: { flex: 1, paddingHorizontal: 30, paddingTop: 50 },
+  logo: {
+    fontSize: theme.typography.headingLg,
+    fontWeight: 'bold',
+    color: theme.colors.buttonPrimaryText,
+    fontFamily: theme.typography.fontFamily,
+  },
+  form: {
+    flex: 1,
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.xl,
+  },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    borderRadius: 12,
-    marginBottom: 20,
+    backgroundColor: theme.colors.backgroundLight,
+    borderRadius: theme.radii.md,
+    marginBottom: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 10,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+    ...theme.shadows.light,
   },
-  inputIcon: { marginRight: 8 },
-  input: { height: 50, flex: 1, fontSize: 16, color: '#333' },
-  eyeButton: { padding: 8 },
+  inputIcon: {
+    marginLeft: theme.spacing.sm,
+  },
+  input: {
+    height: 50,
+    flex: 1,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
+  },
+  eyeButton: {
+    padding: theme.spacing.xs,
+  },
   button: {
     height: 52,
-    backgroundColor: '#00b29c',
-    borderRadius: 12,
+    backgroundColor: theme.colors.buttonPrimary,
+    borderRadius: theme.radii.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    marginTop: theme.spacing.sm,
+    ...theme.shadows.light,
   },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
+  buttonText: {
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
+    fontWeight: '600',
+    fontFamily: theme.typography.fontFamily,
+  },
 });

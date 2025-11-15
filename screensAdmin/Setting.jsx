@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,9 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const primary = '#00b29c';
-const dark = '#2C3E50';
+import theme from '../style/theme';
 
 export default function Setting() {
   const navigation = useNavigation();
@@ -26,26 +25,31 @@ export default function Setting() {
   };
 
   const Logout = () => {
-     Alert.alert(
-          'تسجيل الخروج',
-          'هل أنت متأكد أنك تريد تسجيل الخروج؟',
-          [
-            { text: 'إلغاء', style: 'cancel' },
-            {
-              text: 'تسجيل خروج',
-              onPress: () => navigation.navigate('Login'),
-              style: 'destructive',
-            },
-          ],
-          { cancelable: true }
-        );
-   };
+    Alert.alert(
+      'تسجيل الخروج',
+      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'تسجيل خروج',
+          onPress: () => navigation.navigate('Login'),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
+        translucent={false}
+      />
+
       <View style={styles.container}>
-        <Text style={styles.title}>الاعدادات</Text>
+        <Text style={styles.title}>الإعدادات</Text>
 
         <TouchableOpacity
           style={[styles.btn, styles.btnPrimary]}
@@ -53,18 +57,18 @@ export default function Setting() {
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>
-            <Ionicons name="key-outline" size={22} color="#fff" />
+            <Ionicons name="key-outline" size={22} color={theme.colors.buttonPrimaryText} />
             <Text style={styles.btnText}>تحديث كلمة مرور مستخدم</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.btn, styles.btnDark]}
+          style={[styles.btn, styles.btnSecondary]}
           onPress={onResetAdmin}
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>
-            <Ionicons name="shield-checkmark-outline" size={22} color="#fff" />
+            <Ionicons name="shield-checkmark-outline" size={22} color={theme.colors.buttonPrimaryText} />
             <Text style={styles.btnText}>إعادة تعيين كلمة مرور الأدمن</Text>
           </View>
         </TouchableOpacity>
@@ -75,8 +79,10 @@ export default function Setting() {
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>
-            <Ionicons name="exit-outline" size={22} color={primary} />
-            <Text style={[styles.btnText, { color: primary }]}>تسجيل الخروج</Text>
+            <Ionicons name="exit-outline" size={22} color={theme.colors.buttonOutlineText} />
+            <Text style={[styles.btnText, { color: theme.colors.buttonOutlineText }]}>
+              تسجيل الخروج
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -87,55 +93,54 @@ export default function Setting() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0,
   },
   container: {
     flex: 1,
-    padding: 20,
-    gap: 14,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
   },
   title: {
-    color: dark,
-    fontSize: 27,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.headingLg,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 8,
-    marginTop:30
+    marginBottom: theme.spacing.xl,
+    marginTop: theme.spacing.lg * 2,
+    fontFamily: theme.typography.fontFamily,
   },
   btn: {
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    // ظل خفيف
+    borderRadius: theme.radii.lg,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
     shadowColor: '#000',
     shadowOpacity: 0.06,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 6 },
     elevation: 2,
   },
-  btnPrimary: { 
-    backgroundColor: primary 
+  btnPrimary: {
+    backgroundColor: theme.colors.buttonPrimary,
   },
-
-  btnDark: { 
-    backgroundColor: dark 
+  btnSecondary: {
+    backgroundColor: theme.colors.buttonSecondary,
   },
-
   btnOutline: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderWidth: 1.5,
-    borderColor: primary,
+    borderColor: theme.colors.buttonOutlineBorder,
   },
   btnContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: theme.spacing.sm,
   },
   btnText: {
-    color: '#fff',
-    fontSize: 16,
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '700',
+    fontFamily: theme.typography.fontFamily,
   },
 });

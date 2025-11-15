@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
-  
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import { AVAILABLE_TESTS } from '../componentDoctor/availableTestsindicators';
 import TestCard from '../componentDoctor/TestCardindicator';
 import ResultCard from '../componentDoctor/ResultCardincedators';
@@ -22,9 +22,7 @@ import {
   removeResultByKey,
 } from '../componentDoctor/FunctionsMedicalIndicators';
 
-const primary = '#009688';
-const cardBg = '#ffffff';
-const textPrimary = '#004D40';
+import theme from '../style/theme';
 
 const MedicalIndicatorsScreen = () => {
   const navigation = useNavigation();
@@ -36,8 +34,7 @@ const MedicalIndicatorsScreen = () => {
 
   const toggleDropdown = () => setShowDropdown(prev => !prev);
 
-  const selectTest = (key) => 
-  {
+  const selectTest = (key) => {
     if (!tests.includes(key)) {
       setTests(prev => [...prev, key]);
 
@@ -49,7 +46,7 @@ const MedicalIndicatorsScreen = () => {
     }
   };
 
-  const removeTest = key => {
+  const removeTest = (key) => {
     setTests(prev => prev.filter(t => t !== key));
     setResults(prev => removeResultByKey(prev, key));
   };
@@ -64,18 +61,76 @@ const MedicalIndicatorsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor={primary} barStyle="dark-content" />
+    <SafeAreaView
+      style={styles.safeArea}
+      accessibilityLanguage="ar"
+    >
+      <StatusBar
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
+      />
 
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
+      {/* زر الرجوع */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.8}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel="رجوع"
+        accessibilityHint="العودة إلى الشاشة السابقة"
+        accessibilityLanguage="ar"
+      >
+        <Ionicons
+          name="arrow-back"
+          size={24}
+          color={theme.colors.textPrimary}
+          accessibilityRole="image"
+          accessibilityLabel="سهم الرجوع"
+          accessibilityLanguage="ar"
+        />
+        <Text
+          style={styles.backText}
+          accessibilityRole="text"
+          accessibilityLanguage="ar"
+        >
+          رجوع
+        </Text>
       </TouchableOpacity>
 
-      {/* dropdown */}
-      <View style={styles.dropdownContainer}>
-        <TouchableOpacity style={styles.dropdownButton} onPress={toggleDropdown}>
-          <Text style={styles.dropdownText}>اختر الفحص</Text>
-          <Ionicons name={showDropdown ? 'chevron-up' : 'chevron-down'} size={20} color={textPrimary} />
+      {/* اختيار الفحص (dropdown) */}
+      <View
+        style={styles.dropdownContainer}
+        accessible
+        accessibilityRole="text"
+        accessibilityLabel="اختر الفحص الذي تريد حساب قيمه"
+        accessibilityLanguage="ar"
+      >
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={toggleDropdown}
+          activeOpacity={0.85}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="اختيار الفحص"
+          accessibilityHint="اضغط لعرض قائمة الفحوصات المتاحة"
+          accessibilityLanguage="ar"
+        >
+          <Text
+            style={styles.dropdownText}
+            accessibilityRole="text"
+            accessibilityLanguage="ar"
+          >
+            اختر الفحص
+          </Text>
+          <Ionicons
+            name={showDropdown ? 'chevron-up' : 'chevron-down'}
+            size={20}
+            color={theme.colors.textPrimary}
+            accessibilityRole="image"
+            accessibilityLabel={showDropdown ? 'طي القائمة' : 'فتح القائمة'}
+            accessibilityLanguage="ar"
+          />
         </TouchableOpacity>
 
         {showDropdown && (
@@ -85,15 +140,32 @@ const MedicalIndicatorsScreen = () => {
                 key={test.key}
                 style={styles.dropdownItem}
                 onPress={() => selectTest(test.key)}
+                activeOpacity={0.85}
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={`اختيار فحص ${test.label}`}
+                accessibilityHint="اضغط لإضافة هذا الفحص إلى قائمة الفحوصات التي سيتم حسابها"
+                accessibilityLanguage="ar"
               >
-                <Text style={styles.dropdownItemText}>{test.label}</Text>
+                <Text
+                  style={styles.dropdownItemText}
+                  accessibilityRole="text"
+                  accessibilityLanguage="ar"
+                >
+                  {test.label}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        accessibilityLanguage="ar"
+      >
+        {/* بطاقات إدخال الفحوصات المختارة */}
         {tests.map(key => (
           <TestCard
             key={key}
@@ -104,16 +176,36 @@ const MedicalIndicatorsScreen = () => {
           />
         ))}
 
+        {/* زر حساب القيم */}
         {tests.length > 0 && (
-          <TouchableOpacity style={styles.calcButton} onPress={analyze}>
-            <Text style={styles.calcText}>احسب</Text>
+          <TouchableOpacity
+            style={styles.calcButton}
+            onPress={analyze}
+            activeOpacity={0.9}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="احسب القيم الطبية"
+            accessibilityHint="يضغط لحساب المؤشرات والقيم الطبية اعتماداً على البيانات المدخلة"
+            accessibilityLanguage="ar"
+          >
+            <Text
+              style={styles.calcText}
+              accessibilityRole="text"
+              accessibilityLanguage="ar"
+            >
+              احسب
+            </Text>
           </TouchableOpacity>
         )}
 
+        {/* نتائج التحليل */}
         {results.map(r => (
-          <ResultCard key={r.key} label={r.label} status={r.status} />
+          <ResultCard
+            key={r.key}
+            label={r.label}
+            status={r.status}
+          />
         ))}
-        
       </ScrollView>
     </SafeAreaView>
   );
@@ -122,64 +214,79 @@ const MedicalIndicatorsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
   },
-
   backButton: {
-    margin: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
   },
-
+  backText: {
+    marginLeft: theme.spacing.sm,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
+  },
   dropdownContainer: {
-    margin: 16,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
   },
-
   dropdownButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: cardBg,
-    borderRadius: 8,
-    elevation: 1,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadows.light,
   },
-
   dropdownText: {
-    fontSize: 16,
-    color: textPrimary,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
   },
-
   dropdownList: {
-    backgroundColor: cardBg,
-    borderRadius: 8,
-    marginTop: 4,
-    elevation: 1,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
+    marginTop: theme.spacing.xs,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    ...theme.shadows.light,
   },
-
   dropdownItem: {
-    padding: 12,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
-
   dropdownItemText: {
-    fontSize: 16,
-    color: textPrimary,
+    fontSize: theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.fontFamily,
+    textAlign: 'right',
   },
-
   content: {
-    padding: 16,
+    paddingHorizontal: theme.spacing.lg,
     paddingBottom: Platform.OS === 'android' ? 30 : 20,
   },
-
   calcButton: {
-    backgroundColor: primary,
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: theme.colors.buttonPrimary,
+    borderRadius: theme.radii.md,
+    paddingVertical: theme.spacing.md,
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: theme.spacing.md,
+    ...theme.shadows.light,
   },
-
   calcText: {
-    color: '#fff',
-    fontSize: 16,
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
     fontWeight: 'bold',
+    fontFamily: theme.typography.fontFamily,
   },
 });
 

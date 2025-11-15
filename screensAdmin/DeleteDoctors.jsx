@@ -1,3 +1,4 @@
+// screensAdmin/ToggleDoctorScreen.jsx
 import { useState } from 'react';
 import {
   View,
@@ -13,8 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
-
-const PRIMARY = '#00b29c';
+import theme from '../style/theme';
 
 export default function ToggleDoctorScreen() {
   const [search, setSearch] = useState('');
@@ -24,17 +24,18 @@ export default function ToggleDoctorScreen() {
 
   const handleSearch = async () => {
     if (!search.trim()) {
-      Alert.alert("تنبيه", "أدخل اسم الطبيب أو رقمه");
+      Alert.alert('تنبيه', 'أدخل اسم الطبيب أو رقمه');
       return;
     }
     try {
       setLoading(true);
       const res = await axios.get(ENDPOINTS.ADMIN.SEARCH_DOCTORS, {
-        params: { q: search.trim() }
+        params: { q: search.trim() },
       });
-      setResults(res.data);
+      setResults(res.data || []);
     } catch {
       setResults([]);
+      Alert.alert('خطأ', 'تعذر جلب قائمة الأطباء');
     } finally {
       setLoading(false);
     }
@@ -42,22 +43,29 @@ export default function ToggleDoctorScreen() {
 
   const handleToggle = () => {
     if (!selected) return;
-    const action = selected.is_active ? "تعطيل" : "تفعيل";
+    const action = selected.is_active ? 'تعطيل' : 'تفعيل';
+
     Alert.alert(
       'تأكيد العملية',
       `هل تريد ${action} ${selected.name} (رقم: ${selected.id})؟`,
       [
-        { text: 'إلغاء' },
+        { text: 'إلغاء', style: 'cancel' },
         {
           text: action,
           style: 'destructive',
           onPress: async () => {
             try {
-              const res = await axios.put(ENDPOINTS.ADMIN.TOGGLE_DOCTOR(selected.id));
+              const res = await axios.put(
+                ENDPOINTS.ADMIN.TOGGLE_DOCTOR(selected.id)
+              );
               Alert.alert('تم', res.data.message);
-              setResults(results.map(d =>
-                d.id === selected.id ? { ...d, is_active: res.data.new_status } : d
-              ));
+              setResults(prev =>
+                prev.map(d =>
+                  d.id === selected.id
+                    ? { ...d, is_active: res.data.new_status }
+                    : d
+                )
+              );
               setSelected(null);
               setSearch('');
             } catch {
@@ -77,21 +85,36 @@ export default function ToggleDoctorScreen() {
         activeOpacity={0.85}
         style={[
           styles.card,
-          active && { borderColor: PRIMARY, backgroundColor: '#E6FFFA' },
+          active && {
+            borderColor: theme.colors.primary,
+            backgroundColor: '#E1ECF2',
+          },
         ]}
       >
         <Ionicons
           name="person-outline"
           size={18}
-          color={active ? PRIMARY : '#6B7280'}
+          color={active ? theme.colors.primary : theme.colors.textMuted}
           style={styles.cardIcon}
         />
         <View style={styles.infoBox}>
-          <Text style={[styles.name, active && { color: PRIMARY }]}>{item.name}</Text>
+          <Text
+            style={[
+              styles.name,
+              active && { color: theme.colors.primary },
+            ]}
+          >
+            {item.name}
+          </Text>
           <Text style={styles.meta}>الرقم: {item.id}</Text>
           <Text style={styles.meta}>الهاتف: {item.phone}</Text>
           <Text style={styles.meta}>العيادة: {item.clinic}</Text>
-          <Text style={[styles.meta, { color: item.is_active ? 'green' : 'red' }]}>
+          <Text
+            style={[
+              styles.meta,
+              { color: item.is_active ? theme.colors.success : theme.colors.danger },
+            ]}
+          >
             {item.is_active ? '✅ مفعل' : '⛔ معطل'}
           </Text>
         </View>
@@ -101,39 +124,77 @@ export default function ToggleDoctorScreen() {
 
   return (
     <View style={styles.screen}>
-      <StatusBar backgroundColor={PRIMARY} barStyle="light-content" />
+      <StatusBar
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
+      />
+
+      {/* شريط البحث */}
       <View style={styles.searchRow}>
-        <Ionicons name="search" size={18} color="#6B7280" />
+        <Ionicons name="search" size={18} color={theme.colors.textMuted} />
         <TextInput
           style={styles.input}
           placeholder="ابحث بالاسم أو رقم الطبيب"
-          placeholderTextColor="#9AA4AF"
+          placeholderTextColor={theme.colors.textMuted}
           value={search}
           onChangeText={setSearch}
           textAlign="right"
           onSubmitEditing={handleSearch}
         />
-        <TouchableOpacity onPress={handleSearch} activeOpacity={0.8} style={styles.searchBtn}>
-          <Ionicons name="search-outline" size={18} color="#fff" />
+        <TouchableOpacity
+          onPress={handleSearch}
+          activeOpacity={0.8}
+          style={styles.searchBtn}
+        >
+          <Ionicons name="search-outline" size={18} color={theme.colors.buttonPrimaryText} />
         </TouchableOpacity>
       </View>
-      {loading && <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 20 }} />}
+
+      {loading && (
+        <ActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+          style={{ marginTop: 20 }}
+        />
+      )}
+
       <FlatList
         data={results}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={item => String(item.id)}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={!loading && <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>}
+        ListEmptyComponent={
+          !loading && (
+            <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>
+          )
+        }
       />
+
+      {/* زر التعطيل / التفعيل */}
       <TouchableOpacity
         onPress={handleToggle}
         disabled={!selected}
         activeOpacity={0.9}
-        style={[styles.disableBtn, !selected && { opacity: 0.5 }]}
+        style={[
+          styles.disableBtn,
+          !selected && { opacity: 0.5 },
+          selected &&
+            (selected.is_active
+              ? { backgroundColor: theme.colors.buttonDanger }
+              : { backgroundColor: theme.colors.buttonSuccess }),
+        ]}
       >
-        <Ionicons name={selected?.is_active ? "close-circle-outline" : "checkmark-circle-outline"} size={16} color="#fff" />
+        <Ionicons
+          name={
+            selected?.is_active
+              ? 'close-circle-outline'
+              : 'checkmark-circle-outline'
+          }
+          size={16}
+          color={theme.colors.buttonPrimaryText}
+        />
         <Text style={styles.disableText}>
-          {selected?.is_active ? "تعطيل الحساب" : "إلغاء التعطيل"}
+          {selected?.is_active ? 'تعطيل الحساب' : 'إلغاء التعطيل'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -143,79 +204,84 @@ export default function ToggleDoctorScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F6FAF9',
-    padding: 16,
+    backgroundColor: theme.colors.backgroundLight,
+    padding: theme.spacing.md,
   },
   searchRow: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
     borderWidth: 1,
-    borderColor: '#E6E8EC',
-    paddingHorizontal: 12,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
     paddingVertical: 10,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
   },
   input: {
     flex: 1,
-    color: '#2C3E50',
-    fontSize: 15,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.bodyMd,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   searchBtn: {
-    backgroundColor: PRIMARY,
+    backgroundColor: theme.colors.buttonPrimary,
     width: 38,
     height: 38,
-    borderRadius: 10,
+    borderRadius: theme.radii.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   listContainer: {
-    paddingVertical: 8,
-    paddingBottom: 12,
+    paddingVertical: theme.spacing.sm,
+    paddingBottom: theme.spacing.lg,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
     borderWidth: 1,
-    borderColor: '#E6E8EC',
-    padding: 12,
-    marginBottom: 10,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 8,
+    ...theme.shadows.light,
   },
   cardIcon: {
-    marginLeft: 6,
+    marginLeft: theme.spacing.xs,
   },
   infoBox: {
     flex: 1,
     alignItems: 'flex-end',
   },
   name: {
-    fontSize: 16,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '700',
-    color: '#2C3E50',
+    color: theme.colors.textPrimary,
     marginBottom: 2,
     textAlign: 'right',
     width: '100%',
+    fontFamily: theme.typography.fontFamily,
   },
   meta: {
-    fontSize: 13,
-    color: '#6B7280',
+    fontSize: theme.typography.bodySm,
+    color: theme.colors.textSecondary,
     textAlign: 'right',
     width: '100%',
+    fontFamily: theme.typography.fontFamily,
   },
   empty: {
     textAlign: 'center',
-    color: '#6B7280',
-    marginTop: 16,
+    color: theme.colors.textMuted,
+    marginTop: theme.spacing.md,
+    fontFamily: theme.typography.fontFamily,
   },
   disableBtn: {
-    backgroundColor: PRIMARY,
-    borderRadius: 999,
+    backgroundColor: theme.colors.buttonPrimary,
+    borderRadius: theme.radii.pill,
     paddingVertical: 10,
     paddingHorizontal: 14,
     alignSelf: 'center',
@@ -223,13 +289,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 6,
+    marginTop: theme.spacing.sm,
     minWidth: 180,
     marginBottom: 100,
   },
   disableText: {
-    color: '#fff',
-    fontSize: 14,
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodySm,
     fontWeight: '800',
+    fontFamily: theme.typography.fontFamily,
   },
 });

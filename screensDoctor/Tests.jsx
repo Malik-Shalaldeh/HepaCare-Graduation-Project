@@ -37,7 +37,7 @@ const Tests = () => {
         </Text>
       </TouchableOpacity>
 
-      {/* زر إدخال نتائج الفحوصات */}
+      {/* زر إدخال نتائج الفحوصات (أساسي) */}
       <TouchableOpacity
         style={[styles.testButton, styles.entryButton]}
         onPress={() => navigation.navigate('InputTestResultScreen')}
@@ -52,14 +52,14 @@ const Tests = () => {
           <Ionicons
             name="create-outline"
             size={24}
-            color={theme.colors.background}
+            color={theme.colors.buttonPrimaryText}
             style={styles.icon}
             accessibilityRole="image"
             accessibilityLabel="أيقونة إدخال"
             accessibilityLanguage="ar"
           />
           <Text
-            style={styles.testButtonText}
+            style={[styles.testButtonText, styles.testButtonTextOnPrimary]}
             accessibilityRole="text"
             accessibilityLanguage="ar"
           >
@@ -70,7 +70,7 @@ const Tests = () => {
 
       {/* زر نتائج الفحوصات */}
       <TouchableOpacity
-        style={styles.testButton}
+        style={[styles.testButton, styles.resultsButton]}
         onPress={() => navigation.navigate('TestResultsScreen')}
         activeOpacity={0.9}
         accessible
@@ -83,14 +83,14 @@ const Tests = () => {
           <Ionicons
             name="document-text-outline"
             size={24}
-            color={theme.colors.background}
+            color={theme.colors.buttonSecondaryText}
             style={styles.icon}
             accessibilityRole="image"
             accessibilityLabel="أيقونة ملف نتائج"
             accessibilityLanguage="ar"
           />
           <Text
-            style={styles.testButtonText}
+            style={[styles.testButtonText, styles.testButtonTextOnSecondary]}
             accessibilityRole="text"
             accessibilityLanguage="ar"
           >
@@ -114,14 +114,14 @@ const Tests = () => {
           <Ionicons
             name="medkit-outline"
             size={24}
-            color={theme.colors.background}
+            color={theme.colors.buttonInfoText}
             style={styles.icon}
             accessibilityRole="image"
             accessibilityLabel="أيقونة حقيبة طبية"
             accessibilityLanguage="ar"
           />
           <Text
-            style={styles.testButtonText}
+            style={[styles.testButtonText, styles.testButtonTextOnInfo]}
             accessibilityRole="text"
             accessibilityLanguage="ar"
           >
@@ -148,18 +148,21 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamily,
   },
   testButton: {
-    backgroundColor: theme.colors.primary,
     borderRadius: theme.radii.md,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.md,
     ...theme.shadows.light,
   },
+  // توزيع الألوان حسب الثيم
   entryButton: {
-    backgroundColor: theme.colors.success, // مميز للإدخال
+    backgroundColor: theme.colors.buttonPrimary,   // أهم زر
+  },
+  resultsButton: {
+    backgroundColor: theme.colors.buttonSecondary, // ثانوي
   },
   indicatorsButton: {
-    backgroundColor: theme.colors.accent, // لون مختلف لزر القيم الطبية
+    backgroundColor: theme.colors.buttonInfo,      // معلومات/حسابات
   },
   testButtonContent: {
     flexDirection: 'row-reverse', // لأن النص بالعربي
@@ -167,12 +170,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   testButtonText: {
-    color: theme.colors.background,
     fontSize: theme.typography.headingSm,
     fontWeight: 'bold',
     textAlign: 'right',
     fontFamily: theme.typography.fontFamily,
     flex: 1,
+  },
+  testButtonTextOnPrimary: {
+    color: theme.colors.buttonPrimaryText,
+  },
+  testButtonTextOnSecondary: {
+    color: theme.colors.buttonSecondaryText,
+  },
+  testButtonTextOnInfo: {
+    color: theme.colors.buttonInfoText,
   },
   icon: {
     marginLeft: theme.spacing.sm,

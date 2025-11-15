@@ -1,3 +1,4 @@
+import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -25,7 +26,7 @@ import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
 
-const primary = "#00b29c";
+import theme from "../style/theme";
 
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
@@ -67,6 +68,16 @@ function MainTabs() {
       initialRouteName="لوحة التحكم"
       screenOptions={({ route }) => ({
         headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.colors.primary,
+        },
+        headerTintColor: theme.colors.buttonPrimaryText,
+        headerTitleAlign: "center",
+        headerTitleStyle: {
+          fontWeight: "bold",
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.headingSm,
+        },
         tabBarIcon: ({ color, size }) => {
           const icons = {
             الزيارات: "calendar",
@@ -79,12 +90,13 @@ function MainTabs() {
             <Ionicons name={icons[route.name]} size={size} color={color} />
           );
         },
-        tabBarActiveTintColor: "#2196f3",
-        tabBarInactiveTintColor: "gray",
-        animation: "shift",
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textMuted,
         tabBarStyle: {
           height: 90,
           marginBottom: Platform.OS === "android" ? 5 : 0,
+          backgroundColor: theme.colors.background,
+          borderTopColor: theme.colors.border,
         },
         tabBarHideOnKeyboard: true,
       })}
@@ -110,7 +122,7 @@ function NavigatorDoctor() {
   return (
     <>
       <StatusBar
-        backgroundColor={primary}
+        backgroundColor={theme.colors.primary}
         barStyle="light-content"
         translucent={false}
       />
@@ -120,9 +132,23 @@ function NavigatorDoctor() {
         initialRouteName="الرئيسية"
         screenOptions={{
           headerShown: true,
-          drawerActiveTintColor: primary,
-          drawerLabelStyle: { fontSize: 16 },
-          drawerStyle: { backgroundColor: "#fff" },
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+          },
+          headerTintColor: theme.colors.buttonPrimaryText,
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontFamily: theme.typography.fontFamily,
+            fontSize: theme.typography.headingSm,
+          },
+          drawerActiveTintColor: theme.colors.primary,
+          drawerInactiveTintColor: theme.colors.textSecondary,
+          drawerLabelStyle: {
+            fontSize: 16,
+            fontFamily: theme.typography.fontFamily,
+          },
+          drawerStyle: { backgroundColor: theme.colors.background },
         }}
       >
         <Drawer.Screen
@@ -142,6 +168,7 @@ function NavigatorDoctor() {
             ),
           }}
         />
+
         <Drawer.Screen
           name="الفحوصات"
           component={TestsStack}
@@ -151,13 +178,12 @@ function NavigatorDoctor() {
             ),
           }}
         />
+
         <Drawer.Screen
           name="المحتوى التثقيفي"
           component={EducationalContentStack}
           options={{
             headerTitle: "المحتوى التثقيفي",
-            headerTitleAlign: "center",
-            headerShown: true,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="book-outline" size={size} color={color} />
             ),
@@ -177,6 +203,7 @@ function NavigatorDoctor() {
             ),
           }}
         />
+
         <Drawer.Screen
           name="اعادة تعيين كلمه المرور"
           component={ChangePasswordScreen}
@@ -186,6 +213,7 @@ function NavigatorDoctor() {
             ),
           }}
         />
+
         <Drawer.Screen
           name="تقييم الزيارة"
           component={EvaluationVisitScreen}
@@ -195,16 +223,6 @@ function NavigatorDoctor() {
           }}
         />
 
-        {/* مافي "إضافة مريض" في الدراور الآن */}
-
-        <Drawer.Screen
-          name="اعادة تعيين كلمة المرور"
-          component={ChangePasswordScreen}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerShown: false,
-          }}
-        />
         <Drawer.Screen
           name="LoginScreen"
           component={LoginScreen}
@@ -232,6 +250,7 @@ function NavigatorDoctor() {
             headerShown: false,
           }}
         />
+
         <Drawer.Screen
           name="ملخص الزيارات"
           component={VisitsSummaryScreen}
@@ -251,9 +270,6 @@ function NavigatorDoctor() {
             drawerItemStyle: { height: 0 },
           }}
         />
-
-
-        
       </Drawer.Navigator>
     </>
   );

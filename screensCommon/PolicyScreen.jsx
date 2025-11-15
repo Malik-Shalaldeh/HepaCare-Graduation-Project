@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   View,
   Text,
@@ -10,8 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-
-const primary = '#00b29c';
+import theme from '../style/theme';
 
 const POLICY_ITEMS = [
   {
@@ -56,28 +56,74 @@ const PrivacyPolicyScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <ScreenWithDrawer>
-      <SafeAreaView style={styles.safeArea}>
-     
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={28} color={primary} />
-          </TouchableOpacity>
+    <ScreenWithDrawer title="سياسة الخصوصية">
+      <SafeAreaView
+        style={styles.safeArea}
+        accessibilityLanguage="ar"
+      >
+        {/* زر الرجوع */}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          activeOpacity={0.8}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="رجوع"
+          accessibilityHint="العودة إلى الشاشة السابقة"
+          accessibilityLanguage="ar"
+        >
+          <Ionicons
+            name="arrow-back"
+            size={28}
+            color={theme.colors.primary}
+            accessibilityRole="image"
+            accessibilityLabel="سهم الرجوع"
+            accessibilityLanguage="ar"
+          />
+        </TouchableOpacity>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-
-          {
-          POLICY_ITEMS.map((item) => (
-            <View key={item.id} style={styles.card}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          accessibilityLanguage="ar"
+        >
+          {POLICY_ITEMS.map((item) => (
+            <View
+              key={item.id}
+              style={styles.card}
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel={`${item.title}. ${item.content}`}
+              accessibilityLanguage="ar"
+            >
               <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text
+                  style={styles.cardTitle}
+                  accessibilityRole="text"
+                  accessibilityLanguage="ar"
+                >
+                  {item.title}
+                </Text>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="document-text-outline" size={20} color={primary} />
+                  <Ionicons
+                    name="document-text-outline"
+                    size={20}
+                    color={theme.colors.primary}
+                    accessibilityRole="image"
+                    accessibilityLabel="أيقونة مستند"
+                    accessibilityLanguage="ar"
+                  />
                 </View>
               </View>
-              <Text style={styles.cardContent}>{item.content}</Text>
+              <Text
+                style={styles.cardContent}
+                accessibilityRole="text"
+                accessibilityLanguage="ar"
+              >
+                {item.content}
+              </Text>
             </View>
-          ))
-          }
+          ))}
 
           <View style={{ height: Platform.OS === 'android' ? 30 : 20 }} />
         </ScrollView>
@@ -89,51 +135,56 @@ const PrivacyPolicyScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.colors.backgroundLight,
   },
-
   backButton: {
-    marginRight: 12,
+    alignSelf: 'flex-start',
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
   },
-
+  scrollContent: {
+    paddingBottom: theme.spacing.lg,
+  },
   card: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: theme.colors.background,
+    marginHorizontal: theme.spacing.lg,
+    marginVertical: theme.spacing.sm,
+    borderRadius: theme.radii.lg,
+    padding: theme.spacing.lg,
+    shadowColor: theme.shadows.light.shadowColor,
+    shadowOffset: theme.shadows.light.shadowOffset,
+    shadowOpacity: theme.shadows.light.shadowOpacity,
+    shadowRadius: theme.shadows.light.shadowRadius,
+    elevation: theme.shadows.light.elevation,
     borderLeftWidth: 4,
-    borderLeftColor: primary,
+    borderLeftColor: theme.colors.primary,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: theme.spacing.sm,
   },
   iconContainer: {
-    backgroundColor: `${primary}15`,
-    padding: 8,
-    borderRadius: 10,
-    marginLeft: 12,
+    backgroundColor: `${theme.colors.primary}15`,
+    padding: theme.spacing.xs,
+    borderRadius: theme.radii.sm,
+    marginLeft: theme.spacing.sm,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '600',
-    color: primary,
+    color: theme.colors.primary,
     flex: 1,
-    lineHeight: 22,
-    textAlign:'right'
+    lineHeight: theme.typography.lineHeightNormal,
+    textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   cardContent: {
-    fontSize: 14,
-    color: '#222',
-    lineHeight: 22,
+    fontSize: theme.typography.bodyMd,
+    color: theme.colors.textPrimary,
+    lineHeight: theme.typography.lineHeightNormal,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
 });
 

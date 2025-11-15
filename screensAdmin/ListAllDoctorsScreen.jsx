@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import {
+  SafeAreaView,
   View,
   Text,
   TextInput,
   FlatList,
   StyleSheet,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import ENDPOINTS from "../malikEndPoint";
+
+const PRIMARY = "#00b29c";
 
 export default function AllDoctorsScreen() {
   const [search, setSearch] = useState("");
@@ -39,8 +43,8 @@ export default function AllDoctorsScreen() {
     <View style={styles.card}>
       <Ionicons
         name="medkit-outline"
-        size={20}
-        color="#00b29c"
+        size={22}
+        color={PRIMARY}
         style={styles.cardIcon}
       />
       <View style={styles.infoBox}>
@@ -51,50 +55,58 @@ export default function AllDoctorsScreen() {
         <Text
           style={[
             styles.status,
-            { color: item.active ? "#00b29c" : "#D32F2F" },
+            { color: item.active ? "#16A34A" : "#DC2626" },
           ]}
         >
-          {item.active ? "مفعّل" : "غير مفعّل"}
+          {item.active ? "✅ مفعّل" : "⛔ غير مفعّل"}
         </Text>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.searchRow}>
-        <Ionicons
-          name="search"
-          size={18}
-          color="#6B7280"
-          style={{ marginLeft: 6 }}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="ابحث بالاسم أو رقم الهوية أو العيادة"
-          placeholderTextColor="#9AA4AF"
-          value={search}
-          onChangeText={setSearch}
-          textAlign="right"
+    <SafeAreaView style={styles.safe}>
+      <StatusBar backgroundColor={PRIMARY} barStyle="light-content" />
+
+      <View style={styles.screen}>
+        <View style={styles.searchRow}>
+          <Ionicons
+            name="search"
+            size={18}
+            color="#6B7280"
+            style={{ marginLeft: 6 }}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="ابحث بالاسم أو رقم الهوية أو العيادة"
+            placeholderTextColor="#9AA4AF"
+            value={search}
+            onChangeText={setSearch}
+            textAlign="right"
+          />
+        </View>
+
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>
+          }
         />
       </View>
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <Text style={styles.empty}>لا توجد نتائج مطابقة.</Text>
-        }
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#F6FAF9",
+  },
   screen: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
     padding: 16,
     alignItems: "center",
   },
@@ -108,7 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     marginBottom: 12,
-    width: "85%",
+    width: "90%",
   },
   input: {
     flex: 1,
@@ -133,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 8,
-    width: "85%",
+    width: "90%",
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,

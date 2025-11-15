@@ -1,7 +1,6 @@
 import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createDrawerNavigator,
@@ -11,10 +10,10 @@ import {
 } from "@react-navigation/drawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-// شاشاتك
+// شاشات المريض
 import TestResultsScreen from "../screenPatient/TestResultsScreen";
-import LabsScreen from "../screenPatient/LabsScreen"; // sami: شاشة المختبرات المعتمدة
-import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen"; // sami: شاشة مواعيدي
+import LabsScreen from "../screenPatient/LabsScreen";
+import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
 import PatientMedications from "../screenPatient/PatientMedications";
 import PatientDashboard from "../screenPatient/PatientDashboard";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
@@ -24,7 +23,10 @@ import AvailableMedicationsScreen from "../screenPatient/AvailableMedicationsScr
 import MyMedicationsScreen from "../screenPatient/MyMedicationsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 
-const primary = "#2196f3"; // اللون الرئيسي
+// 🎨 الثيم الموحد
+import theme from "../style/theme";
+
+const primary = theme.colors.primary;
 
 // ✅ محتوى الـ Drawer مع زر تسجيل الخروج
 function CustomDrawerContent(props) {
@@ -60,7 +62,7 @@ function CustomDrawerContent(props) {
   );
 }
 
-// ✅ مكون التابات السفلية (MainTabs)
+// ✅ التابات السفلية (MainTabs)
 const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
@@ -68,6 +70,16 @@ function MainTabs() {
       initialRouteName="لوحة التحكم"
       screenOptions={({ route }) => ({
         headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.colors.primary,
+        },
+        headerTintColor: theme.colors.buttonPrimaryText,
+        headerTitleAlign: "center",
+        headerTitleStyle: {
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.headingSm,
+          fontWeight: "700",
+        },
         tabBarIcon: ({ color, size }) => {
           const icons = {
             الفحوصات: "flask-outline",
@@ -84,7 +96,7 @@ function MainTabs() {
           height: 90,
           marginBottom: Platform.OS === "android" ? 5 : 0,
         },
-        tabBarHideOnKeyboard: true, // بنخفي البار السفلي أول ما يطلع الكيبورد
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
@@ -104,17 +116,28 @@ function NavigatorPatient() {
         barStyle="light-content"
         translucent={false}
       />
+
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         initialRouteName="MainTabs"
         screenOptions={{
           headerShown: true,
+          headerStyle: {
+            backgroundColor: theme.colors.primary,
+          },
+          headerTintColor: theme.colors.buttonPrimaryText,
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontFamily: theme.typography.fontFamily,
+            fontSize: theme.typography.headingSm,
+            fontWeight: "700",
+          },
           drawerActiveTintColor: primary,
-          drawerLabelStyle: { fontSize: 16 },
+          drawerLabelStyle: { fontSize: 16, fontFamily: theme.typography.fontFamily },
           drawerStyle: { backgroundColor: "#fff" },
         }}
       >
-        {/* هذا العنصر هو لإخفاء MainTabs من الـ Drawer */}
+        {/* إخفاء MainTabs من الـ Drawer */}
         <Drawer.Screen
           name="MainTabs"
           component={MainTabs}
@@ -135,6 +158,7 @@ function NavigatorPatient() {
             ),
           }}
         />
+
         <Drawer.Screen
           name="تقييم جودة الخدمات"
           component={FeedbackScreen}

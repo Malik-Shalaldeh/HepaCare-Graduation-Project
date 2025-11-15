@@ -1,3 +1,4 @@
+// screensAdmin/AddNewDoctorScreen.jsx
 import React, { useState } from 'react';
 import {
   View,
@@ -10,8 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
-
-const PRIMARY = '#00b29c';
+import theme from '../style/theme';
 
 export default function AddNewDoctorScreen() {
   const [doctorId, setDoctorId] = useState('');
@@ -66,7 +66,10 @@ export default function AddNewDoctorScreen() {
       setClinicName('');
       setPhone('');
     } catch (e) {
-      const msg = e?.response?.data?.detail || e?.response?.data?.message || 'تعذر إضافة الطبيب';
+      const msg =
+        e?.response?.data?.detail ||
+        e?.response?.data?.message ||
+        'تعذر إضافة الطبيب';
       Alert.alert('خطأ', msg);
     } finally {
       setSaving(false);
@@ -79,7 +82,7 @@ export default function AddNewDoctorScreen() {
       <TextInput
         style={styles.input}
         placeholder="مثال: 4023456789"
-        placeholderTextColor="#9AA4AF"
+        placeholderTextColor={theme.colors.textMuted}
         value={doctorId}
         onChangeText={setDoctorId}
         keyboardType="number-pad"
@@ -90,7 +93,7 @@ export default function AddNewDoctorScreen() {
       <TextInput
         style={styles.input}
         placeholder="مثال: د. سارة إبراهيم"
-        placeholderTextColor="#9AA4AF"
+        placeholderTextColor={theme.colors.textMuted}
         value={name}
         onChangeText={setName}
         textAlign="right"
@@ -100,7 +103,7 @@ export default function AddNewDoctorScreen() {
       <TextInput
         style={styles.input}
         placeholder="مثال: عيادة السلام"
-        placeholderTextColor="#9AA4AF"
+        placeholderTextColor={theme.colors.textMuted}
         value={clinicName}
         onChangeText={setClinicName}
         textAlign="right"
@@ -110,7 +113,7 @@ export default function AddNewDoctorScreen() {
       <TextInput
         style={styles.input}
         placeholder="مثال: 0599000004"
-        placeholderTextColor="#9AA4AF"
+        placeholderTextColor={theme.colors.textMuted}
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"
@@ -124,48 +127,67 @@ export default function AddNewDoctorScreen() {
         disabled={saving}
         style={[styles.saveBtn, saving && { opacity: 0.6 }]}
       >
-        <Ionicons name="save-outline" size={18} color="#fff" />
-        <Text style={styles.saveText}>{saving ? 'جارٍ الحفظ...' : 'حفظ الطبيب'}</Text>
+        <Ionicons
+          name="save-outline"
+          size={18}
+          color={theme.colors.buttonPrimaryText}
+        />
+        <Text style={styles.saveText}>
+          {saving ? 'جارٍ الحفظ...' : 'حفظ الطبيب'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff', padding: 16, alignItems: 'center' },
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.backgroundLight,
+    padding: theme.spacing.lg,
+    alignItems: 'center',
+  },
   label: {
-    color: '#2C3E50',
-    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.bodyMd,
     fontWeight: '700',
     textAlign: 'right',
     alignSelf: 'flex-end',
-    marginBottom: 6,
-    marginTop: 6,
+    marginBottom: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
     width: '85%',
+    fontFamily: theme.typography.fontFamily,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
     borderWidth: 1,
-    borderColor: '#E6E8EC',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    color: '#2C3E50',
-    fontSize: 15,
-    marginBottom: 10,
+    borderColor: theme.colors.border,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.bodyLg,
+    marginBottom: theme.spacing.sm,
     width: '85%',
+    fontFamily: theme.typography.fontFamily,
   },
   saveBtn: {
-    backgroundColor: PRIMARY,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    backgroundColor: theme.colors.buttonPrimary,
+    borderRadius: theme.radii.pill,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 12,
+    gap: theme.spacing.xs,
+    marginTop: theme.spacing.md,
     minWidth: 160,
+    ...theme.shadows.light,
   },
-  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  saveText: {
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyMd,
+    fontWeight: '800',
+    fontFamily: theme.typography.fontFamily,
+  },
 });

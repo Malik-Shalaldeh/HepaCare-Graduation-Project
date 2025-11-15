@@ -11,7 +11,7 @@ import LapsNavigator from './LapsNavigator'; // ✅ بدل LapsStack
 
 
 const Tab = createBottomTabNavigator();
-const primary = '#00b29c';
+const primary = '#0B4F6C';
 
  function AdminTabs() {
   return (
@@ -47,19 +47,19 @@ const primary = '#00b29c';
         }}
       />
       <Tab.Screen
-        name="الرئيسية"
-        component={AdminHome}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="المختبرات"
         component={LapsNavigator} 
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="flask" size={size} color={color} /> }}
       />
+<Tab.Screen
+  name="الرئيسية"
+  component={AdminHome}
+  options={{
+    tabBarIcon: ({ color, size }) => (
+      <Ionicons name="home" size={size} color={color} />
+    ),
+  }}
+/>
     </Tab.Navigator>
   );
 }

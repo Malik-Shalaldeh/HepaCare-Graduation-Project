@@ -1,3 +1,4 @@
+// screensAdmin/DoctorsOperationsScreen.jsx
 import {
   SafeAreaView,
   View,
@@ -9,9 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const primary = '#00b29c';
-const textColor = '#2C3E50';
+import theme from '../style/theme';
 
 export default function DoctorsScreen() {
   const navigation = useNavigation();
@@ -21,7 +20,7 @@ export default function DoctorsScreen() {
   };
 
   const onDelete = () => {
-     navigation.navigate('DeleteDoctor');
+    navigation.navigate('DeleteDoctor');
   };
 
   const onShowAll = () => {
@@ -30,36 +29,43 @@ export default function DoctorsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
       <View style={styles.container}>
-
         <Text style={styles.title}>إدارة سجلات الأطباء</Text>
 
-        <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={onAdd} activeOpacity={0.9}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btnPrimary]}
+          onPress={onAdd}
+          activeOpacity={0.9}
+        >
           <View style={styles.btnContent}>
-            <Ionicons name="person-add-outline" size={24} color="#fff" />
+            <Ionicons name="person-add-outline" size={24} color={theme.colors.buttonPrimaryText} />
             <Text style={styles.btnText}>إضافة طبيب جديد</Text>
           </View>
         </TouchableOpacity>
 
-
-        <TouchableOpacity style={[styles.btn , styles.btnPrimary]} onPress={onDelete} activeOpacity={0.9}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btnPrimary]}
+          onPress={onDelete}
+          activeOpacity={0.9}
+        >
           <View style={styles.btnContent}>
-            <Ionicons name="trash-outline" size={24} color="#fff" />
+            <Ionicons name="trash-outline" size={24} color={theme.colors.buttonPrimaryText} />
             <Text style={styles.btnText}>تعطيل /تفعيل حساب طبيب</Text>
           </View>
         </TouchableOpacity>
 
-
-        <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={onShowAll} activeOpacity={0.9}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btnPrimary]}
+          onPress={onShowAll}
+          activeOpacity={0.9}
+        >
           <View style={styles.btnContent}>
-            <Ionicons name="list-outline" size={24} color="#fff" />
+            <Ionicons name="list-outline" size={24} color={theme.colors.buttonPrimaryText} />
             <Text style={styles.btnText}>عرض جميع الأطباء</Text>
           </View>
         </TouchableOpacity>
-        
-
       </View>
     </SafeAreaView>
   );
@@ -68,39 +74,32 @@ export default function DoctorsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    
+    backgroundColor: theme.colors.backgroundLight,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0,
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: theme.spacing.lg,
   },
   title: {
-    color: textColor,
-    fontSize: 24,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.headingMd,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 24,
-    marginTop:40
+    marginBottom: theme.spacing.xl,
+    marginTop: theme.spacing.xl,
+    fontFamily: theme.typography.fontFamily,
   },
   btn: {
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginBottom: 14,
-    // ظلّ خفيف
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
+    borderRadius: theme.radii.lg,
+    paddingVertical: theme.spacing.md + 4,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    backgroundColor: theme.colors.buttonPrimary,
+    ...theme.shadows.medium,
   },
   btnPrimary: {
-    backgroundColor: primary,
-  },
-  btnDanger: {
-    backgroundColor: '#ef4444',
+    backgroundColor: theme.colors.buttonPrimary,
   },
   btnContent: {
     flexDirection: 'row',
@@ -108,9 +107,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnText: {
-    color: '#fff',
-    fontSize: 16,
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '700',
-    marginStart: 8,
+    marginStart: theme.spacing.sm,
+    fontFamily: theme.typography.fontFamily,
   },
 });

@@ -1,4 +1,5 @@
 // screensAdmin/AdminHome.tsx
+import React from "react";
 import {
   View,
   Text,
@@ -8,11 +9,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-const primary = "#00b29c";
-const text = "#2C3E50";
-const subtle = "#6B7280";
-const bg = "#F8FAFB";
+import theme from "../style/theme";
 
 export default function AdminHome() {
   const today = new Date();
@@ -36,7 +33,10 @@ export default function AdminHome() {
 
   return (
     <SafeAreaView style={styles.page}>
-      <StatusBar backgroundColor={primary} barStyle="dark-content" />
+      <StatusBar
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
+      />
 
       {/* كارد شعار التطبيق + التاريخ */}
       <View style={styles.logoCard}>
@@ -44,7 +44,7 @@ export default function AdminHome() {
         <Text style={styles.logoDate}>{date}</Text>
       </View>
 
-      {/*كارد ترحيب */}
+      {/* كارد ترحيب */}
       <View style={styles.welcomeCard}>
         <View style={styles.textBox}>
           <Text style={styles.welcomeTitle}>مرحباً أيها المدير 👋</Text>
@@ -55,7 +55,7 @@ export default function AdminHome() {
         <Ionicons
           name="person-circle-outline"
           size={44}
-          color={primary}
+          color={theme.colors.primary}
           style={styles.iconLeft}
         />
       </View>
@@ -71,7 +71,7 @@ export default function AdminHome() {
         <Ionicons
           name="shield-checkmark-outline"
           size={44}
-          color={primary}
+          color={theme.colors.primary}
           style={styles.iconLeft}
         />
       </View>
@@ -82,10 +82,10 @@ export default function AdminHome() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: bg,
-    paddingTop: (StatusBar.currentHeight || 0) + 10,
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingTop: (StatusBar.currentHeight || 0) + theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
     ...Platform.select({
       ios: {
         width: "98%",
@@ -95,34 +95,28 @@ const styles = StyleSheet.create({
   },
 
   logoCard: {
-    backgroundColor: primary,
-    borderRadius: 16,
-    paddingVertical: 18,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.radii.lg,
+    paddingVertical: theme.spacing.lg,
     alignItems: "center",
-    marginBottom: 16,
-    marginTop: 30,
-    ...Platform.select({
-      android: { elevation: 6 },
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 4 },
-      },
-    }),
+    marginBottom: theme.spacing.md,
+    marginTop: theme.spacing.xl,
+    ...theme.shadows.medium,
   },
 
   logoText: {
-    fontSize: 24,
+    fontSize: theme.typography.headingMd,
     fontWeight: "800",
-    color: "#fff",
+    color: theme.colors.buttonPrimaryText,
     letterSpacing: 1.5,
+    fontFamily: theme.typography.fontFamily,
   },
 
   logoDate: {
-    fontSize: 13,
-    color: "#E8FFF8",
-    marginTop: 4,
+    fontSize: theme.typography.bodySm,
+    color: theme.colors.buttonMutedText,
+    marginTop: theme.spacing.xs,
+    fontFamily: theme.typography.fontFamily,
   },
 
   textBox: {
@@ -131,62 +125,50 @@ const styles = StyleSheet.create({
   },
 
   welcomeCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 14,
-    marginTop: 50,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.xl,
     flexDirection: "row-reverse", // النص يمين / الأيقونة يسار
     alignItems: "center",
-    ...Platform.select({
-      android: { elevation: 2 },
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.06,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 4 },
-      },
-    }),
+    ...theme.shadows.light,
   },
+
   welcomeTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.headingSm,
     fontWeight: "700",
-    color: text,
+    color: theme.colors.textPrimary,
     textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
 
   adminCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 14,
-    marginTop: 16,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-
-    ...Platform.select({
-      android: { elevation: 2 },
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.06,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 4 },
-      },
-    }),
+    ...theme.shadows.light,
   },
+
   adminTitle: {
-    fontSize: 18,
+    fontSize: theme.typography.headingSm,
     fontWeight: "700",
-    color: text,
-    marginBottom: 4,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xs,
     textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
 
   adminSubtitle: {
-    fontSize: 14,
-    color: subtle,
+    fontSize: theme.typography.bodySm,
+    color: theme.colors.textSecondary,
     textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
 
   iconLeft: {
-    marginLeft: 10,
+    marginLeft: theme.spacing.sm,
   },
 });

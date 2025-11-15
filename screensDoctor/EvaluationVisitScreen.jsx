@@ -16,11 +16,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
-
-const primary = '#00b29c';
+import theme from '../style/theme';
 
 const EvaluationVisitScreen = () => {
-  
   const navigation = useNavigation();
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
@@ -44,7 +42,6 @@ const EvaluationVisitScreen = () => {
       setPsychosocial('');
     });
     return unsubscribe;
-
   }, [navigation]);
 
   const selectedPatient = { id: patientId, name: patientName };
@@ -82,7 +79,15 @@ const EvaluationVisitScreen = () => {
 
   const renderOptionGroup = (label, options, selected, onSelect) => (
     <View style={styles.optionGroup}>
-      <Text style={styles.label}>{label}</Text>
+      <Text
+        style={styles.label}
+        accessible
+        accessibilityRole="text"
+        accessibilityLabel={label}
+        accessibilityLanguage="ar"
+      >
+        {label}
+      </Text>
       <View style={styles.optionsRow}>
         {options.map(option => (
           <TouchableOpacity
@@ -92,6 +97,13 @@ const EvaluationVisitScreen = () => {
               selected === option && styles.optionSelected,
             ]}
             onPress={() => onSelect(option)}
+            activeOpacity={0.85}
+            accessible
+            accessibilityRole="button"
+            accessibilityState={{ selected: selected === option }}
+            accessibilityLabel={`${label} - ${option}`}
+            accessibilityHint="اضغط لاختيار هذا الخيار"
+            accessibilityLanguage="ar"
           >
             <Text
               style={[
@@ -108,12 +120,16 @@ const EvaluationVisitScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      accessibilityLanguage="ar"
+    >
       <StatusBar
-        backgroundColor={primary}
-        barStyle="dark-content"
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
         translucent={false}
       />
+
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -127,15 +143,46 @@ const EvaluationVisitScreen = () => {
           contentContainerStyle={styles.contentContainer}
           keyboardShouldPersistTaps="handled"
         >
+          {/* زر الرجوع */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
+            activeOpacity={0.8}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="رجوع"
+            accessibilityHint="العودة إلى الشاشة السابقة"
+            accessibilityLanguage="ar"
           >
-            <Ionicons name="arrow-back" size={26} color={primary} />
+            <Ionicons
+              name="arrow-back"
+              size={26}
+              color={theme.colors.primary}
+              accessibilityRole="image"
+              accessibilityLabel="سهم الرجوع"
+              accessibilityLanguage="ar"
+            />
           </TouchableOpacity>
 
-          <Text style={styles.title}>تقييم زيارة المريض 🩺</Text>
-          <Text style={styles.patientInfo}>
+          {/* العنوان */}
+          <Text
+            style={styles.title}
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel="تقييم زيارة المريض"
+            accessibilityLanguage="ar"
+          >
+            تقييم زيارة المريض 🩺
+          </Text>
+
+          {/* معلومات المريض */}
+          <Text
+            style={styles.patientInfo}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={`المريض ${selectedPatient.name}، رقم المريض ${selectedPatient.id}`}
+            accessibilityLanguage="ar"
+          >
             المريض: {selectedPatient.name} ({selectedPatient.id})
           </Text>
 
@@ -153,31 +200,69 @@ const EvaluationVisitScreen = () => {
             setAdherence
           )}
 
-          <Text style={styles.label}>3. ملاحظات الطبيب</Text>
+          <Text
+            style={styles.label}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel="3. ملاحظات الطبيب"
+            accessibilityLanguage="ar"
+          >
+            3. ملاحظات الطبيب
+          </Text>
           <TextInput
             placeholder="ملاحظات طبية..."
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.textInput}
             multiline
             value={notes}
             onChangeText={setNotes}
+            textAlign="right"
+            accessible
+            accessibilityLabel="حقل ملاحظات الطبيب"
+            accessibilityHint="أدخل الملاحظات الطبية المتعلقة بزيارة المريض"
+            accessibilityLanguage="ar"
           />
 
-          <Text style={styles.label}>4. ملاحظات نفسية / اجتماعية</Text>
+          <Text
+            style={styles.label}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel="4. ملاحظات نفسية أو اجتماعية"
+            accessibilityLanguage="ar"
+          >
+            4. ملاحظات نفسية / اجتماعية
+          </Text>
           <TextInput
             placeholder="مثال: اكتئاب، قلق، دعم عائلي..."
+            placeholderTextColor={theme.colors.textMuted}
             style={styles.textInput}
             multiline
             value={psychosocial}
             onChangeText={setPsychosocial}
+            textAlign="right"
+            accessible
+            accessibilityLabel="حقل الملاحظات النفسية والاجتماعية"
+            accessibilityHint="أدخل الملاحظات النفسية أو الاجتماعية المتعلقة بالمريض"
+            accessibilityLanguage="ar"
           />
 
-          <View style={{ height: 40 }} />
+          <View style={{ height: theme.spacing.lg }} />
 
-          <TouchableOpacity style={styles.button} onPress={handleSave}>
+          {/* زر الحفظ */}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSave}
+            activeOpacity={0.9}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="حفظ التقييم"
+            accessibilityHint="يحفظ تقييم الزيارة الحالية للمريض"
+            accessibilityLanguage="ar"
+          >
             <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
           </TouchableOpacity>
 
-          <View style={{ height: 40 }} />
+          <View style={{ height: theme.spacing.xl }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -189,51 +274,56 @@ export default EvaluationVisitScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
+    backgroundColor: theme.colors.background,
   },
   contentContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
     flexGrow: 1,
   },
   backButton: {
     alignSelf: 'flex-start',
-    marginVertical: 20,
-    marginHorizontal: 16,
+    marginVertical: theme.spacing.lg,
   },
   title: {
-    fontSize: 22,
+    fontSize: theme.typography.headingMd,
     fontWeight: 'bold',
-    color: primary,
+    color: theme.colors.primary,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: theme.spacing.md,
+    fontFamily: theme.typography.fontFamily,
   },
   patientInfo: {
-    fontSize: 16,
+    fontSize: theme.typography.bodyLg,
     fontWeight: '600',
-    color: '#555',
-    marginBottom: 20,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.lg,
     textAlign: 'center',
+    fontFamily: theme.typography.fontFamily,
   },
   label: {
-    fontSize: 16,
-    color: '#444',
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textPrimary,
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
     textAlign: 'right',
+    fontFamily: theme.typography.fontFamily,
   },
   textInput: {
-    backgroundColor: '#f1f1f1',
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: theme.colors.backgroundLight,
+    borderRadius: theme.radii.md,
+    padding: theme.spacing.md,
     minHeight: 80,
-    fontSize: 15,
-    marginBottom: 25,
+    fontSize: theme.typography.bodyMd,
+    marginBottom: theme.spacing.xl,
     textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    fontFamily: theme.typography.fontFamily,
   },
   optionGroup: {
-    marginBottom: 25,
+    marginBottom: theme.spacing.xl,
   },
   optionsRow: {
     flexDirection: 'row-reverse',
@@ -241,36 +331,39 @@ const styles = StyleSheet.create({
   },
   optionButton: {
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: theme.spacing.xs,
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: '#f2f2f2',
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    borderRadius: theme.radii.md,
+    backgroundColor: theme.colors.backgroundLight,
     alignItems: 'center',
   },
   optionSelected: {
-    backgroundColor: primary,
-    borderColor: primary,
+    backgroundColor: theme.colors.buttonSecondary,
+    borderColor: theme.colors.buttonSecondary,
   },
   optionText: {
-    color: '#333',
+    color: theme.colors.textPrimary,
     fontWeight: '600',
+    fontFamily: theme.typography.fontFamily,
   },
   optionTextSelected: {
-    color: '#fff',
+    color: theme.colors.buttonSecondaryText,
   },
   button: {
-    backgroundColor: primary,
-    padding: 15,
-    borderRadius: 14,
+    backgroundColor: theme.colors.buttonPrimary,
+    padding: theme.spacing.md,
+    borderRadius: theme.radii.lg,
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.light,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
     fontWeight: 'bold',
+    fontFamily: theme.typography.fontFamily,
   },
 });
