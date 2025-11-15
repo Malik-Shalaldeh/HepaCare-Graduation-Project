@@ -25,6 +25,7 @@ import Dashboard from "../screensDoctor/Dashboard";
 import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
+import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
 
 const primary = "#00b29c";
 
@@ -118,7 +119,7 @@ function NavigatorDoctor() {
 
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
-        initialRouteName="MainTabs"
+        initialRouteName="الرئيسية"
         screenOptions={{
           headerShown: true,
           drawerActiveTintColor: primary,
@@ -127,12 +128,9 @@ function NavigatorDoctor() {
         }}
       >
         <Drawer.Screen
-          name="MainTabs"
+          name="الرئيسية"
           component={MainTabs}
           options={{
-            drawerLabel: () => null,
-            title: null,
-            drawerIcon: () => null,
             headerShown: false,
           }}
         />
@@ -244,6 +242,20 @@ function NavigatorDoctor() {
             headerShown: false,
           }}
         />
+
+        <Drawer.Screen
+          name="نظرة عامة"
+          component={PatientsOverviewScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="flask-outline" size={size} color={color} />
+            ),
+            drawerItemStyle: { height: 0 },
+          }}
+        />
+
+
+        
       </Drawer.Navigator>
     </>
   );

@@ -39,6 +39,10 @@ PATIENT_LAB_RESULTS: {
   VISITS: {
     CREATE: `${BASE_URL}/visits/`,
   },
+  
+  STATS: {
+    PATIENTS_BY_CITY: `${BASE_URL}/statistics/patients-by-city`,
+  },
 };
 
 export default ENDPOINTS;

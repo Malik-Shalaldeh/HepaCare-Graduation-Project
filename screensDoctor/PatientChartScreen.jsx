@@ -32,6 +32,7 @@ const COLORS = ['#D32F2F','#1976D2','#388E3C','#FBC02D','#7B1FA2','#00796B','#F5
 const { width } = Dimensions.get('window');
 
 export default function PatientChartScreen() {
+
   const route = useRoute();
   const patientId = route.params.patientId;
   const patientName = route.params.patientName;
@@ -126,6 +127,7 @@ export default function PatientChartScreen() {
           </View>
         )}
       </View>
+      
       <HelpButton
         title="مساعدة - مخططات المريض"
         info="تعرض هذه الشاشة تطوّر نتائج الفحوصات للمريض على شكل مخطط زمني. استخدمها لمتابعة الاستجابة أو التدهور. الألوان توضّح كل فحص."
