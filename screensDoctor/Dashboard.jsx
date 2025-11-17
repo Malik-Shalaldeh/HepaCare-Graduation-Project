@@ -75,41 +75,25 @@ const Dashboard = () => {
       {/* هيدر الشاشة */}
       <View
         style={styles.header}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="رأس صفحة لوحة التحكم، تطبيق هيباكير"
-        accessibilityHint="يعرض اسم نظام HepaCare في أعلى الشاشة"
-        accessibilityLanguage="ar"
       >
         <Text
           style={styles.headerText}
-          accessibilityRole="text"
-          accessibilityLabel="هيباكير"
-          accessibilityLanguage="ar"
         >
           Hepacare
         </Text>
       </View>
 
       {/* المحتوى الرئيسي */}
-      <View style={styles.container} accessibilityLanguage="ar">
+      <View style={styles.container}>
         {/* كرت الترحيب بالطبيب */}
         <View
           style={styles.card}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={`مرحباً دكتور ${doctorName || 'غير معروف'}، تاريخ اليوم ${formattedDate}`}
-          accessibilityHint="يعرض اسم الطبيب والتاريخ الحالي"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="person-circle-outline"
             size={40}
             color={theme.colors.accent}
             style={styles.icon}
-            accessibilityLabel="أيقونة طبيب"
-            accessibilityRole="image"
-            accessibilityLanguage="ar"
           />
           <View>
             <Text style={styles.title}>
@@ -122,20 +106,12 @@ const Dashboard = () => {
         {/* كرت عدد المرضى */}
         <View
           style={styles.card}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={`${patientsCount} مريض تحت إشرافك`}
-          accessibilityHint="يعرض العدد الكلي للمرضى الذين تشرف عليهم حالياً"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="people-outline"
             size={40}
             color={theme.colors.accent}
             style={styles.icon}
-            accessibilityLabel="أيقونة مجموعة مرضى"
-            accessibilityRole="image"
-            accessibilityLanguage="ar"
           />
           <View>
             <Text style={styles.title}>{patientsCount} مريض</Text>
@@ -148,20 +124,12 @@ const Dashboard = () => {
           style={styles.overviewButton}
           onPress={() => navigation.navigate('نظرة عامة')}
           activeOpacity={0.85}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="فتح شاشة النظرة العامة على المرضى"
-          accessibilityHint="ينقلك إلى شاشة تعرض توزيع المرضى حسب المحافظة"
-          accessibilityLanguage="ar"
         >
           <View style={styles.overviewIconWrapper}>
             <Ionicons
               name="stats-chart-outline"
               size={22}
               color={theme.colors.primary}
-              accessibilityLabel="أيقونة إحصائيات"
-              accessibilityRole="image"
-              accessibilityLanguage="ar"
             />
           </View>
 
