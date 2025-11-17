@@ -77,7 +77,6 @@ const ChangePasswordScreen = () => {
   return (
     <SafeAreaView
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         barStyle="dark-content"
@@ -89,29 +88,17 @@ const ChangePasswordScreen = () => {
         style={styles.backBtn}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="رجوع"
-        accessibilityHint="العودة إلى الشاشة السابقة"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="arrow-back"
           size={28}
           color={theme.colors.primary}
-          accessibilityRole="image"
-          accessibilityLabel="سهم الرجوع"
-          accessibilityLanguage="ar"
         />
       </TouchableOpacity>
 
       {/* العنوان */}
       <Text
         style={styles.title}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="تغيير كلمة المرور"
-        accessibilityLanguage="ar"
       >
         تغيير كلمة المرور
       </Text>
@@ -119,10 +106,6 @@ const ChangePasswordScreen = () => {
       {/* كلمة المرور الحالية */}
       <Text
         style={styles.label}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel="كلمة المرور الحالية"
-        accessibilityLanguage="ar"
       >
         كلمة المرور الحالية
       </Text>
@@ -136,26 +119,15 @@ const ChangePasswordScreen = () => {
           onChangeText={setCurrentPw}
           textAlign="right"
           autoCapitalize="none"
-          accessible
-          accessibilityLabel="حقل إدخال كلمة المرور الحالية"
-          accessibilityHint="أدخل كلمة المرور التي تستخدمها حالياً"
-          accessibilityLanguage="ar"
         />
         <TouchableOpacity
           onPress={() => setShowCurrent(!showCurrent)}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel={showCurrent ? 'إخفاء كلمة المرور الحالية' : 'إظهار كلمة المرور الحالية'}
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name={showCurrent ? 'eye-off-outline' : 'eye-outline'}
             size={24}
             color={theme.colors.primary}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة إظهار أو إخفاء كلمة المرور"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
       </View>
@@ -163,10 +135,6 @@ const ChangePasswordScreen = () => {
       {/* كلمة المرور الجديدة */}
       <Text
         style={styles.label}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel="كلمة المرور الجديدة"
-        accessibilityLanguage="ar"
       >
         كلمة المرور الجديدة
       </Text>
@@ -180,26 +148,15 @@ const ChangePasswordScreen = () => {
           onChangeText={setNewPw}
           textAlign="right"
           autoCapitalize="none"
-          accessible
-          accessibilityLabel="حقل إدخال كلمة المرور الجديدة"
-          accessibilityHint="أدخل كلمة المرور الجديدة التي تريد استخدامها"
-          accessibilityLanguage="ar"
         />
         <TouchableOpacity
           onPress={() => setShowNew(!showNew)}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel={showNew ? 'إخفاء كلمة المرور الجديدة' : 'إظهار كلمة المرور الجديدة'}
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name={showNew ? 'eye-off-outline' : 'eye-outline'}
             size={24}
             color={theme.colors.primary}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة إظهار أو إخفاء كلمة المرور"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
       </View>
@@ -207,10 +164,6 @@ const ChangePasswordScreen = () => {
       {/* تأكيد كلمة المرور الجديدة */}
       <Text
         style={styles.label}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel="تأكيد كلمة المرور الجديدة"
-        accessibilityLanguage="ar"
       >
         تأكيد كلمة المرور الجديدة
       </Text>
@@ -224,26 +177,15 @@ const ChangePasswordScreen = () => {
           onChangeText={setConfirmPw}
           textAlign="right"
           autoCapitalize="none"
-          accessible
-          accessibilityLabel="حقل تأكيد كلمة المرور الجديدة"
-          accessibilityHint="أعد إدخال كلمة المرور الجديدة للتأكد من صحتها"
-          accessibilityLanguage="ar"
         />
         <TouchableOpacity
           onPress={() => setShowConfirm(!showConfirm)}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel={showConfirm ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name={showConfirm ? 'eye-off-outline' : 'eye-outline'}
             size={24}
             color={theme.colors.primary}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة إظهار أو إخفاء كلمة المرور"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
       </View>
@@ -253,16 +195,9 @@ const ChangePasswordScreen = () => {
         style={styles.button}
         onPress={handleSave}
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="حفظ كلمة المرور الجديدة"
-        accessibilityHint="يحفظ كلمة المرور الجديدة إذا كانت البيانات صحيحة"
-        accessibilityLanguage="ar"
       >
         <Text
           style={styles.buttonText}
-          accessibilityRole="text"
-          accessibilityLanguage="ar"
         >
           💾 حفظ
         </Text>
