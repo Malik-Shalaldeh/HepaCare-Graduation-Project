@@ -64,7 +64,6 @@ export default function LoginScreen({ navigation }) {
   return (
     <View
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         barStyle="light-content"
@@ -74,16 +73,9 @@ export default function LoginScreen({ navigation }) {
       {/* الهيدر */}
       <View
         style={styles.header}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="تسجيل الدخول إلى نظام هيباكير"
-        accessibilityLanguage="ar"
       >
         <Text
           style={styles.logo}
-          accessibilityRole="text"
-          accessibilityLabel="هيباكير"
-          accessibilityLanguage="ar"
         >
           HepaCare
         </Text>
@@ -98,9 +90,6 @@ export default function LoginScreen({ navigation }) {
             size={20}
             color={theme.colors.textMuted}
             style={styles.inputIcon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة مستخدم"
-            accessibilityLanguage="ar"
           />
           <TextInput
             placeholder="اسم المستخدم"
@@ -110,10 +99,6 @@ export default function LoginScreen({ navigation }) {
             value={username}
             textAlign="right"
             autoCapitalize="none"
-            accessible
-            accessibilityLabel="حقل اسم المستخدم"
-            accessibilityHint="أدخل اسم المستخدم الخاص بك"
-            accessibilityLanguage="ar"
           />
         </View>
 
@@ -124,9 +109,6 @@ export default function LoginScreen({ navigation }) {
             size={20}
             color={theme.colors.textMuted}
             style={styles.inputIcon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة قفل لكلمة المرور"
-            accessibilityLanguage="ar"
           />
           <TextInput
             placeholder="كلمة المرور"
@@ -137,29 +119,16 @@ export default function LoginScreen({ navigation }) {
             value={password}
             textAlign="right"
             autoCapitalize="none"
-            accessible
-            accessibilityLabel="حقل كلمة المرور"
-            accessibilityHint="أدخل كلمة المرور الخاصة بحسابك"
-            accessibilityLanguage="ar"
           />
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
             style={styles.eyeButton}
             activeOpacity={0.8}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel={
-              showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
-            }
-            accessibilityLanguage="ar"
           >
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={20}
               color={theme.colors.primary}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة إظهار أو إخفاء كلمة المرور"
-              accessibilityLanguage="ar"
             />
           </TouchableOpacity>
         </View>
@@ -169,16 +138,9 @@ export default function LoginScreen({ navigation }) {
           style={styles.button}
           onPress={handleLogin}
           activeOpacity={0.9}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="تسجيل الدخول"
-          accessibilityHint="يحاول تسجيل الدخول باستخدام اسم المستخدم وكلمة المرور المدخلة"
-          accessibilityLanguage="ar"
         >
           <Text
             style={styles.buttonText}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             دخول
           </Text>
