@@ -24,7 +24,6 @@ const Patients = () => {
   return (
     <View
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         backgroundColor={theme.colors.primary}
@@ -35,37 +34,21 @@ const Patients = () => {
       {/* الهيدر */}
       <View
         style={styles.header}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="شاشة إدارة المرضى"
-        accessibilityHint="تعرض خيارات لإضافة مريض جديد أو البحث عن مريض أو تتبع الأعراض"
-        accessibilityLanguage="ar"
       >
         {/* زر القائمة الجانبية */}
         <TouchableOpacity
           onPress={() => navigation.toggleDrawer()}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="فتح قائمة التنقل الجانبية"
-          accessibilityHint="يفتح القائمة الجانبية للتنقل بين شاشات الطبيب"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="menu"
             size={28}
             color={theme.colors.buttonPrimaryText}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة قائمة"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
 
         <Text
           style={styles.headerTitle}
-          accessibilityRole="text"
-          accessibilityLabel="المرضى"
-          accessibilityLanguage="ar"
         >
           المرضى
         </Text>
@@ -81,25 +64,15 @@ const Patients = () => {
           style={[styles.button, styles.addButton]}
           onPress={() => navigation.navigate("إضافة مريض")}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="إضافة مريض جديد"
-          accessibilityHint="ينقلك إلى شاشة إدخال بيانات مريض جديد"
-          accessibilityLanguage="ar"
         >
           <View style={styles.buttonContent}>
             <Ionicons
               name="person-add-outline"
               size={22}
               color={theme.colors.buttonPrimaryText}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة إضافة مريض"
-              accessibilityLanguage="ar"
             />
             <Text
               style={[styles.buttonText, styles.buttonTextPrimary]}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               إضافة مريض
             </Text>
@@ -111,25 +84,15 @@ const Patients = () => {
           style={[styles.button, styles.searchButton]}
           onPress={() => navigation.navigate("PatientListScreen")}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="البحث عن سجل مريض"
-          accessibilityHint="ينقلك إلى شاشة البحث عن مرضى وعرض سجلاتهم"
-          accessibilityLanguage="ar"
         >
           <View style={styles.buttonContent}>
             <Ionicons
               name="search-outline"
               size={22}
               color={theme.colors.buttonInfoText}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة بحث"
-              accessibilityLanguage="ar"
             />
             <Text
               style={[styles.buttonText, styles.buttonTextInfo]}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               البحث عن سجل مريض
             </Text>
@@ -141,25 +104,15 @@ const Patients = () => {
           style={[styles.button, styles.symptomsButton]}
           onPress={() => navigation.navigate("تتبع الأعراض")}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="تتبع الأعراض"
-          accessibilityHint="ينقلك إلى شاشة تسجيل وتتبع أعراض المرضى"
-          accessibilityLanguage="ar"
         >
           <View style={styles.buttonContent}>
             <Ionicons
               name="pulse-outline"
               size={22}
               color={theme.colors.buttonSecondaryText}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة نبض"
-              accessibilityLanguage="ar"
             />
             <Text
               style={[styles.buttonText, styles.buttonTextSecondary]}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               تتبع الأعراض
             </Text>
