@@ -37,22 +37,13 @@ export default function PatientDashboard() {
     <ScreenWithDrawer title="لوحة التحكم" showDrawerIcon>
       <View
         style={styles.screen}
-        accessibilityLanguage="ar"
       >
         {/* الهيدر */}
         <View
           style={styles.header}
-          accessible
-          accessibilityRole="header"
-          accessibilityLabel="لوحة التحكم للمريض في تطبيق هيباكير"
-          accessibilityHint="تعرض معلومات عامة ورسالة تشجيعية للمريض"
-          accessibilityLanguage="ar"
         >
           <Text
             style={styles.headerText}
-            accessibilityRole="text"
-            accessibilityLabel="هيباكير"
-            accessibilityLanguage="ar"
           >
             HepaCare
           </Text>
@@ -62,32 +53,21 @@ export default function PatientDashboard() {
           {/* بطاقة الترحيب */}
           <View
             style={styles.card}
-            accessible
-            accessibilityRole="summary"
-            accessibilityLabel={`مرحباً ${name || 'مستخدم'}. تاريخ اليوم ${formattedDate}`}
-            accessibilityLanguage="ar"
           >
             <Ionicons
               name="happy-outline"
               size={40}
               color={theme.colors.buttonInfo}
               style={styles.icon}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة وجه مبتسم"
-              accessibilityLanguage="ar"
             />
             <View>
               <Text
                 style={styles.title}
-                accessibilityRole="text"
-                accessibilityLanguage="ar"
               >
                 {name || 'مستخدم'}
               </Text>
               <Text
                 style={styles.subtitle}
-                accessibilityRole="text"
-                accessibilityLanguage="ar"
               >
                 {formattedDate}
               </Text>
@@ -97,24 +77,15 @@ export default function PatientDashboard() {
           {/* صندوق التشجيع */}
           <View
             style={styles.motivationBox}
-            accessible
-            accessibilityRole="summary"
-            accessibilityLabel="رسالة تشجيعية للمحافظة على صحة الكبد والالتزام بالأدوية والفحوصات"
-            accessibilityLanguage="ar"
           >
             <Ionicons
               name="heart-circle-outline"
               size={50}
               color={theme.colors.danger}
               style={{ marginBottom: theme.spacing.sm }}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة قلب"
-              accessibilityLanguage="ar"
             />
             <Text
               style={styles.motivationText}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               صحتك أمانة... تابع أدويتك وفحوصاتك بانتظام لتحمي كبدك ونحافظ على عافيتك
             </Text>
