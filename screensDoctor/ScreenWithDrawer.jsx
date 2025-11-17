@@ -17,19 +17,11 @@ const ScreenWithDrawer = ({ title, children, showDrawerIcon = true }) => {
               onPress={() => navigation.toggleDrawer()}
               style={styles.headerLeftButton}
               activeOpacity={0.8}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel="فتح قائمة التنقل الجانبية"
-              accessibilityHint="يضغط لفتح القائمة الجانبية للتنقل بين الشاشات"
-              accessibilityLanguage="ar"
             >
               <Ionicons
                 name="menu"
                 size={28}
                 color={theme.colors.buttonPrimaryText}
-                accessibilityRole="image"
-                accessibilityLabel="أيقونة قائمة"
-                accessibilityLanguage="ar"
               />
             </TouchableOpacity>
           )
@@ -58,7 +50,6 @@ const ScreenWithDrawer = ({ title, children, showDrawerIcon = true }) => {
     <SafeAreaView
       style={styles.container}
       edges={['left', 'right', 'bottom']}
-      accessibilityLanguage="ar"
     >
       {children}
     </SafeAreaView>
