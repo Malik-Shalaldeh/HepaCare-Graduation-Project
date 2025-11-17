@@ -81,10 +81,6 @@ const EvaluationVisitScreen = () => {
     <View style={styles.optionGroup}>
       <Text
         style={styles.label}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel={label}
-        accessibilityLanguage="ar"
       >
         {label}
       </Text>
@@ -98,12 +94,6 @@ const EvaluationVisitScreen = () => {
             ]}
             onPress={() => onSelect(option)}
             activeOpacity={0.85}
-            accessible
-            accessibilityRole="button"
-            accessibilityState={{ selected: selected === option }}
-            accessibilityLabel={`${label} - ${option}`}
-            accessibilityHint="اضغط لاختيار هذا الخيار"
-            accessibilityLanguage="ar"
           >
             <Text
               style={[
@@ -122,7 +112,6 @@ const EvaluationVisitScreen = () => {
   return (
     <SafeAreaView
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         backgroundColor={theme.colors.primary}
@@ -148,29 +137,17 @@ const EvaluationVisitScreen = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
             activeOpacity={0.8}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="رجوع"
-            accessibilityHint="العودة إلى الشاشة السابقة"
-            accessibilityLanguage="ar"
           >
             <Ionicons
               name="arrow-back"
               size={26}
               color={theme.colors.primary}
-              accessibilityRole="image"
-              accessibilityLabel="سهم الرجوع"
-              accessibilityLanguage="ar"
             />
           </TouchableOpacity>
 
           {/* العنوان */}
           <Text
             style={styles.title}
-            accessible
-            accessibilityRole="header"
-            accessibilityLabel="تقييم زيارة المريض"
-            accessibilityLanguage="ar"
           >
             تقييم زيارة المريض 🩺
           </Text>
@@ -178,10 +155,6 @@ const EvaluationVisitScreen = () => {
           {/* معلومات المريض */}
           <Text
             style={styles.patientInfo}
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel={`المريض ${selectedPatient.name}، رقم المريض ${selectedPatient.id}`}
-            accessibilityLanguage="ar"
           >
             المريض: {selectedPatient.name} ({selectedPatient.id})
           </Text>
@@ -202,10 +175,6 @@ const EvaluationVisitScreen = () => {
 
           <Text
             style={styles.label}
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel="3. ملاحظات الطبيب"
-            accessibilityLanguage="ar"
           >
             3. ملاحظات الطبيب
           </Text>
@@ -217,18 +186,10 @@ const EvaluationVisitScreen = () => {
             value={notes}
             onChangeText={setNotes}
             textAlign="right"
-            accessible
-            accessibilityLabel="حقل ملاحظات الطبيب"
-            accessibilityHint="أدخل الملاحظات الطبية المتعلقة بزيارة المريض"
-            accessibilityLanguage="ar"
           />
 
           <Text
             style={styles.label}
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel="4. ملاحظات نفسية أو اجتماعية"
-            accessibilityLanguage="ar"
           >
             4. ملاحظات نفسية / اجتماعية
           </Text>
@@ -240,10 +201,6 @@ const EvaluationVisitScreen = () => {
             value={psychosocial}
             onChangeText={setPsychosocial}
             textAlign="right"
-            accessible
-            accessibilityLabel="حقل الملاحظات النفسية والاجتماعية"
-            accessibilityHint="أدخل الملاحظات النفسية أو الاجتماعية المتعلقة بالمريض"
-            accessibilityLanguage="ar"
           />
 
           <View style={{ height: theme.spacing.lg }} />
@@ -253,11 +210,6 @@ const EvaluationVisitScreen = () => {
             style={styles.button}
             onPress={handleSave}
             activeOpacity={0.9}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="حفظ التقييم"
-            accessibilityHint="يحفظ تقييم الزيارة الحالية للمريض"
-            accessibilityLanguage="ar"
           >
             <Text style={styles.buttonText}>💾 حفظ التقييم</Text>
           </TouchableOpacity>
