@@ -59,48 +59,32 @@ const PrivacyPolicyScreen = () => {
     <ScreenWithDrawer title="سياسة الخصوصية">
       <SafeAreaView
         style={styles.safeArea}
-        accessibilityLanguage="ar"
       >
         {/* زر الرجوع */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="رجوع"
-          accessibilityHint="العودة إلى الشاشة السابقة"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="arrow-back"
             size={28}
             color={theme.colors.primary}
-            accessibilityRole="image"
-            accessibilityLabel="سهم الرجوع"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
-          accessibilityLanguage="ar"
         >
           {POLICY_ITEMS.map((item) => (
             <View
               key={item.id}
               style={styles.card}
-              accessible
-              accessibilityRole="text"
-              accessibilityLabel={`${item.title}. ${item.content}`}
-              accessibilityLanguage="ar"
             >
               <View style={styles.cardHeader}>
                 <Text
                   style={styles.cardTitle}
-                  accessibilityRole="text"
-                  accessibilityLanguage="ar"
                 >
                   {item.title}
                 </Text>
@@ -109,16 +93,11 @@ const PrivacyPolicyScreen = () => {
                     name="document-text-outline"
                     size={20}
                     color={theme.colors.primary}
-                    accessibilityRole="image"
-                    accessibilityLabel="أيقونة مستند"
-                    accessibilityLanguage="ar"
                   />
                 </View>
               </View>
               <Text
                 style={styles.cardContent}
-                accessibilityRole="text"
-                accessibilityLanguage="ar"
               >
                 {item.content}
               </Text>
