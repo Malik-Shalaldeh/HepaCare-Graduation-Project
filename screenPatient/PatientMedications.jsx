@@ -14,18 +14,12 @@ const PatientMedications = () => {
     <ScreenWithDrawer title="الأدوية">
       <View
         style={styles.container}
-        accessibilityLanguage="ar"
       >
         {/* ✅ زر "الأدوية التي أتناولها" */}
         <TouchableOpacity
           style={[styles.button, styles.currentMedsButton]}
           onPress={() => navigation.navigate('الأدوية التي أتناولها')}
           activeOpacity={0.9}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="الأدوية التي أتناولها"
-          accessibilityHint="يفتح شاشة تعرض قائمة الأدوية التي تم وصفها لك"
-          accessibilityLanguage="ar"
         >
           <View style={styles.buttonContent}>
             <Ionicons
@@ -33,14 +27,9 @@ const PatientMedications = () => {
               size={24}
               color={theme.colors.buttonPrimaryText}
               style={styles.icon}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة حقيبة دواء"
-              accessibilityLanguage="ar"
             />
             <Text
               style={styles.buttonText}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               الأدوية التي أتناولها
             </Text>
@@ -52,11 +41,6 @@ const PatientMedications = () => {
           style={[styles.button, styles.mohMedsButton]}
           onPress={() => navigation.navigate('الأدوية المتوفرة في الصحة')}
           activeOpacity={0.9}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="الأدوية المتوفرة في وزارة الصحة"
-          accessibilityHint="يفتح شاشة تعرض قائمة الأدوية المتوفرة في وزارة الصحة"
-          accessibilityLanguage="ar"
         >
           <View style={styles.buttonContent}>
             <Ionicons
@@ -64,14 +48,9 @@ const PatientMedications = () => {
               size={24}
               color={theme.colors.buttonPrimaryText}
               style={styles.icon}
-              accessibilityRole="image"
-              accessibilityLabel="أيقونة قائمة أدوية"
-              accessibilityLanguage="ar"
             />
             <Text
               style={styles.buttonText}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               الأدوية المتوفرة في الصحة
             </Text>
