@@ -1,4 +1,4 @@
-//sami
+// sami
 
 // PatientListScreen.js
 import React, { useState, useEffect } from "react";
@@ -11,13 +11,21 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  Platform,
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ENDPOINTS from "../samiendpoint";
+
+// ✅ استدعاء الثيم الموحّد
+import theme, {
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+} from "../style/theme";
 
 const PatientListScreen = () => {
   const navigation = useNavigation();
@@ -92,7 +100,9 @@ const PatientListScreen = () => {
             <Text style={styles.detailLabel}>العمر:</Text>
           </View>
           <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{formatDate(item.lastVisit)}</Text>
+            <Text style={styles.detailValue}>
+              {formatDate(item.lastVisit)}
+            </Text>
             <Text style={styles.detailLabel}>آخر زيارة:</Text>
           </View>
           <View style={styles.detailItem}>
@@ -147,7 +157,7 @@ const PatientListScreen = () => {
           <Text style={styles.visitHistoryButtonText}>سجل الزيارات</Text>
         </TouchableOpacity>
 
-        {/* ✅ الزر الجديد: بيانات المريض التفصيلية */}
+        {/* زر بيانات المريض التفصيلية */}
         <TouchableOpacity
           style={styles.patientDataButton}
           onPress={() =>
@@ -167,16 +177,14 @@ const PatientListScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <Ionicons
             name="search"
             size={20}
-            color="#666"
+            color={colors.textMuted}
             style={styles.searchIcon}
           />
           <TextInput
@@ -184,7 +192,7 @@ const PatientListScreen = () => {
             placeholder="البحث بالاسم أو رقم الهوية"
             value={searchQuery}
             onChangeText={handleSearch}
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textMuted}
           />
         </View>
       </View>
@@ -206,196 +214,246 @@ const PatientListScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: colors.backgroundLight,
+  },
+
+  // (حاليًا مش مستخدم في JSX، بس عدّلته وفق الثيم لو استخدمت الهيدر لاحقًا)
   backButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 5,
-    marginBottom: 5,
-    marginLeft: 16,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    marginLeft: spacing.lg,
   },
   header: {
     height: 60,
-    backgroundColor: "#A8E6A1",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    ...shadows.light,
   },
-  headerTitle: { fontSize: 20, fontWeight: "bold", color: "#333" },
+  headerTitle: {
+    fontSize: typography.headingMd,
+    fontFamily: typography.fontFamily,
+    color: colors.background,
+  },
+
   searchContainer: {
     flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#f8f8f8",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.backgroundLight,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: colors.border,
   },
   searchBar: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
     height: 40,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colors.border,
   },
-  searchIcon: { marginRight: 8 },
+  searchIcon: {
+    marginRight: spacing.sm,
+  },
   searchInput: {
     flex: 1,
     height: "100%",
-    fontSize: 16,
-    color: "#333",
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
     textAlign: "right",
   },
-  patientList: { padding: 16, paddingBottom: 80 },
+
+  patientList: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
+  },
+
   patientCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#eee",
+    borderColor: colors.border,
+    ...shadows.light,
   },
-  patientInfo: { marginBottom: 12 },
+  patientInfo: {
+    marginBottom: spacing.sm,
+  },
   patientName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
     textAlign: "right",
   },
-  patientDetails: { marginBottom: 8 },
+  patientDetails: {
+    marginBottom: spacing.xs,
+  },
   detailItem: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
-  detailLabel: { fontSize: 14, color: "#666", marginLeft: 4 },
+  detailLabel: {
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
+    marginLeft: spacing.xs,
+  },
   detailValue: {
-    fontSize: 14,
-    color: "#333",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
     fontWeight: "500",
-    marginLeft: 4,
+    marginLeft: spacing.xs,
   },
+
   cardActions: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: spacing.sm,
     flexWrap: "wrap",
   },
 
   medicalFileButton: {
-    backgroundColor: "#A8E6A1",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: colors.buttonSuccess,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
+    ...shadows.light,
   },
-  medicalFileButtonText: { color: "#333", fontWeight: "bold", fontSize: 14 },
+  medicalFileButtonText: {
+    color: colors.buttonSuccessText,
+    fontWeight: "700",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+  },
 
   visitHistoryButton: {
-    backgroundColor: "#00b29c",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: colors.buttonPrimary,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 8,
-    marginRight: 8,
+    marginLeft: spacing.sm,
+    marginRight: spacing.sm,
+    ...shadows.light,
   },
-  visitHistoryButtonText: { color: "#fff", fontWeight: "bold", fontSize: 14 },
+  visitHistoryButtonText: { 
+    color: colors.buttonPrimaryText,
+    fontWeight: "700",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+  },
 
-  // ✅ ستايل زر بيانات المريض (محافظ على نفس روح التصميم)
   patientDataButton: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    backgroundColor: colors.buttonSecondary,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     alignItems: "center",
     justifyContent: "center",
-    flexBasis: "100%", // 👈 يخلي الزر بعرض الكارد كامل
-    marginTop: 10, // 👈 مسافة بسيطة بينه وبين الأزرار فوق
+   // marginTop: spacing.sm,
+    ...shadows.light,
+    //flexBasis: "100%",-عبد زرك ماخد سطر بحالة تقول البطاقة مكتوبة باسمك
   },
   patientDataButtonText: {
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: 13,
+    color: colors.buttonSecondaryText,
+    fontWeight: "700",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
   },
 
   fab: {
     position: "absolute",
-    right: 20,
-    bottom: 20,
+    right: spacing.xl,
+    bottom: spacing.xl,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#A8E6A1",
+    backgroundColor: colors.buttonPrimary,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    ...shadows.medium,
   },
+
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: colors.overlay,
   },
   modalContent: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 20,
+    backgroundColor: colors.background,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    paddingBottom: spacing.lg,
     maxHeight: "80%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 15,
+    padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: colors.border,
   },
-  modalTitle: { fontSize: 18, fontWeight: "bold", color: "#333" },
-  formContainer: { padding: 15 },
-  inputGroup: { marginBottom: 15 },
+  modalTitle: {
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
+    color: colors.textPrimary,
+  },
+  formContainer: {
+    padding: spacing.md,
+  },
+  inputGroup: {
+    marginBottom: spacing.md,
+  },
   inputLabel: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 5,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
     textAlign: "right",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    padding: spacing.sm,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     textAlign: "right",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: colors.backgroundLight,
   },
   addButton: {
-    backgroundColor: "#A8E6A1",
-    borderRadius: 8,
-    padding: 15,
+    backgroundColor: colors.buttonPrimary,
+    borderRadius: radii.md,
+    padding: spacing.md,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: spacing.sm,
+    ...shadows.light,
   },
-  addButtonText: { color: "#333", fontWeight: "bold", fontSize: 16 },
+  addButtonText: {
+    color: colors.buttonPrimaryText,
+    fontWeight: "700",
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
@@ -403,8 +461,9 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   emptyText: {
-    fontSize: 18,
-    color: "#666",
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
   },
 });
 

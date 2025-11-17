@@ -13,11 +13,11 @@ import PatientChartScreen from "../screensDoctor/PatientChartScreen";
 // import AddPatientsScreen from '../screensDoctor/AddPatientsScreen';
 // ✅ وبداله:
 import AddPatientStack from "./AddPatientStack";
-
+import {colors,typography} from "../style/theme";
 import SymptomStack from "./SymptomStack";
 
 const Stack = createStackNavigator();
-const primary = "#00b29c";
+const primary = colors.primary;
 
 const backBtn = (navigation) => (
   <TouchableOpacity
