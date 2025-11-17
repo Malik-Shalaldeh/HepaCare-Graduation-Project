@@ -32,29 +32,15 @@ export default function TestResultsScreen() {
   const renderItem = ({ item }) => (
     <View
       style={styles.card}
-      accessible
-      accessibilityRole="summary"
-      accessibilityLanguage="ar"
-      accessibilityLabel={
-        `فحص ${item.test_name}. ` +
-        `النتيجة: ${item.result_value} ${item.unit || ''}. ` +
-        `التقييم: ${item.is_normal ? 'طبيعي' : 'غير طبيعي'}. ` +
-        `ملاحظة: ${item.comments || 'لا توجد ملاحظات'}. ` +
-        `التاريخ: ${item.test_date}`
-      }
     >
       <Text
         style={styles.title}
-        accessibilityRole="text"
-        accessibilityLanguage="ar"
       >
         🧪 {item.test_name}
       </Text>
 
       <Text
         style={styles.rowText}
-        accessibilityRole="text"
-        accessibilityLanguage="ar"
       >
         📊 النتيجة: {item.result_value} {item.unit || ''}
       </Text>
@@ -64,24 +50,18 @@ export default function TestResultsScreen() {
           styles.rowText,
           item.is_normal ? styles.normalText : styles.abnormalText,
         ]}
-        accessibilityRole="text"
-        accessibilityLanguage="ar"
       >
         📈 التقييم: {item.is_normal ? 'طبيعي' : 'غير طبيعي'}
       </Text>
 
       <Text
         style={styles.rowText}
-        accessibilityRole="text"
-        accessibilityLanguage="ar"
       >
         💬 ملاحظة: {item.comments || '—'}
       </Text>
 
       <Text
         style={styles.rowText}
-        accessibilityRole="text"
-        accessibilityLanguage="ar"
       >
         📅 التاريخ: {item.test_date}
       </Text>
@@ -93,11 +73,6 @@ export default function TestResultsScreen() {
 
         <Text
           style={styles.header}
-          accessible
-          accessibilityRole="header"
-          accessibilityLabel="نتائج الفحوصات الخاصة بك"
-          accessibilityHint="تعرض قائمة بالفحوصات التي تم تسجيلها مع نتائجها وتقييمها"
-          accessibilityLanguage="ar"
         >
           🧾 فحوصاتي
         </Text>
@@ -110,8 +85,6 @@ export default function TestResultsScreen() {
           ListEmptyComponent={
             <Text
               style={styles.empty}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               لا توجد فحوصات
             </Text>
