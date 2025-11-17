@@ -66,15 +66,10 @@ export default function PatientChartScreen() {
     return (
       <SafeAreaView
         style={styles.loading}
-        accessibilityLanguage="ar"
       >
         <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text
           style={styles.loadingText}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel="جارِ تحميل بيانات المريض"
-          accessibilityLanguage="ar"
         >
           جارِ تحميل البيانات...
         </Text>
@@ -93,7 +88,6 @@ export default function PatientChartScreen() {
   return (
     <SafeAreaView
       style={styles.safeArea}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         barStyle="dark-content"
@@ -105,29 +99,17 @@ export default function PatientChartScreen() {
         onPress={() => navigation.navigate('PatientListScreen')}
         style={styles.backBtn}
         activeOpacity={0.8}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="رجوع إلى قائمة المرضى"
-        accessibilityHint="يعيدك إلى شاشة قائمة المرضى"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="arrow-back"
           size={24}
           color={theme.colors.textPrimary}
-          accessibilityRole="image"
-          accessibilityLabel="سهم الرجوع"
-          accessibilityLanguage="ar"
         />
       </TouchableOpacity>
 
       {/* عنوان الصفحة */}
       <Text
         style={styles.pageTitle}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="تطور حالة المريض"
-        accessibilityLanguage="ar"
       >
         تطور حالة المريض
       </Text>
@@ -135,10 +117,6 @@ export default function PatientChartScreen() {
       {/* معلومات المريض */}
       <Text
         style={styles.patientInfo}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel={`اسم المريض ${patientName}، رقم المريض ${patientId}`}
-        accessibilityLanguage="ar"
       >
         {patientName} ({patientId})
       </Text>
@@ -146,10 +124,6 @@ export default function PatientChartScreen() {
       {/* وسيلة الإيضاح (Legend) */}
       <View
         style={styles.legend}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel="الألوان المستخدمة لكل فحص في المخطط"
-        accessibilityLanguage="ar"
       >
         {TESTS.map((t, i) => (
           <View key={t.key} style={styles.legendItem}>
@@ -167,11 +141,6 @@ export default function PatientChartScreen() {
       {/* المخطط */}
       <View
         style={styles.chartWrapper}
-        accessible
-        accessibilityRole="summary"
-        accessibilityLabel="مخطط يوضح تغير نتائج الفحوصات مع الزمن"
-        accessibilityHint="يمكنك النظر إلى اتجاه الخطوط لمعرفة تحسن أو تدهور حالة المريض"
-        accessibilityLanguage="ar"
       >
         {records.length > 0 ? (
           <LineChart
@@ -203,10 +172,6 @@ export default function PatientChartScreen() {
           <View style={styles.emptyChart}>
             <Text
               style={styles.emptyText}
-              accessible
-              accessibilityRole="text"
-              accessibilityLabel="لا توجد بيانات لعرضها في المخطط"
-              accessibilityLanguage="ar"
             >
               لا توجد بيانات لعرضها
             </Text>
