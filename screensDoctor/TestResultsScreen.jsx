@@ -51,11 +51,6 @@ export default function TestResultsScreen() {
   const renderItem = ({ item }) => (
     <View
       style={styles.card}
-      accessible
-      accessibilityRole="text"
-      accessibilityLabel={`نتيجة فحص للمريض ${item.name}، رقم المريض ${item.patientId}، نوع الفحص ${item.test}، النتيجة ${item.result}، التقييم ${item.evaluation}`}
-      accessibilityHint="يعرض تفاصيل نتيجة الفحص مع إمكانية فتح الملف المرفق إن وجد"
-      accessibilityLanguage="ar"
     >
       <Text style={styles.name}>
         👤 {item.name} (رقم: {item.patientId})
@@ -74,11 +69,6 @@ export default function TestResultsScreen() {
             : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="فتح ملف الفحص"
-        accessibilityHint="يفتح ملف الفحص المرفق إن كان متوفراً"
-        accessibilityLanguage="ar"
       >
         <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
@@ -88,26 +78,17 @@ export default function TestResultsScreen() {
   return (
     <View
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       {/* زر الرجوع */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="رجوع"
-        accessibilityHint="العودة إلى الشاشة السابقة"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="arrow-back"
           size={24}
           color={theme.colors.textPrimary}
-          accessibilityRole="image"
-          accessibilityLabel="سهم الرجوع"
-          accessibilityLanguage="ar"
         />
         <Text style={styles.backText}>رجوع</Text>
       </TouchableOpacity>
@@ -115,10 +96,6 @@ export default function TestResultsScreen() {
       {/* العنوان */}
       <Text
         style={styles.header}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="ابحث عن فحوصات المريض"
-        accessibilityLanguage="ar"
       >
        ابحث عن فحوصات المريض
       </Text>
@@ -132,11 +109,6 @@ export default function TestResultsScreen() {
         value={searchInput}
         textAlign="right"
         autoCapitalize="none"
-        accessible
-        accessibilityRole="search"
-        accessibilityLabel="حقل البحث عن المريض"
-        accessibilityHint="أدخل اسم المريض أو رقمه ثم اضغط على زر بحث لعرض النتائج"
-        accessibilityLanguage="ar"
       />
 
       {/* زر البحث */}
@@ -144,19 +116,11 @@ export default function TestResultsScreen() {
         style={styles.searchButton}
         onPress={handleSearch}
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="بحث عن نتائج الفحوصات"
-        accessibilityHint="يضغط للبحث عن نتائج الفحوصات بناءً على الاسم أو الرقم المدخل"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="search"
           size={20}
           color={theme.colors.background}
-          accessibilityRole="image"
-          accessibilityLabel="أيقونة بحث"
-          accessibilityLanguage="ar"
         />
         <Text style={styles.searchButtonText}>بحث</Text>
       </TouchableOpacity>
@@ -170,10 +134,6 @@ export default function TestResultsScreen() {
           filteredResults.length === 0 && searchInput.trim() !== '' ? (
             <Text
               style={styles.emptyText}
-              accessible
-              accessibilityRole="text"
-              accessibilityLabel="لا يوجد نتائج مطابقة لبيانات البحث"
-              accessibilityLanguage="ar"
             >
               لا يوجد نتائج
             </Text>
