@@ -14,24 +14,14 @@ const Tests = () => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="رجوع"
-        accessibilityHint="العودة إلى الشاشة السابقة"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="arrow-back"
           size={24}
           color={theme.colors.textPrimary}
-          accessibilityRole="image"
-          accessibilityLabel="سهم الرجوع"
-          accessibilityLanguage="ar"
         />
         <Text
           style={styles.backText}
-          accessibilityRole="text"
-          accessibilityLanguage="ar"
         >
           رجوع
         </Text>
@@ -42,11 +32,6 @@ const Tests = () => {
         style={[styles.testButton, styles.entryButton]}
         onPress={() => navigation.navigate('InputTestResultScreen')}
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="إدخال نتائج الفحوصات"
-        accessibilityHint="يفتح شاشة لإدخال نتائج الفحوصات للمرضى"
-        accessibilityLanguage="ar"
       >
         <View style={styles.testButtonContent}>
           <Ionicons
@@ -54,14 +39,9 @@ const Tests = () => {
             size={24}
             color={theme.colors.buttonPrimaryText}
             style={styles.icon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة إدخال"
-            accessibilityLanguage="ar"
           />
           <Text
             style={[styles.testButtonText, styles.testButtonTextOnPrimary]}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             ادخال نتائج الفحوصات
           </Text>
@@ -73,11 +53,6 @@ const Tests = () => {
         style={[styles.testButton, styles.resultsButton]}
         onPress={() => navigation.navigate('TestResultsScreen')}
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="نتائج فحوصات المرضى"
-        accessibilityHint="يفتح شاشة لمشاهدة نتائج الفحوصات المخزنة للمرضى"
-        accessibilityLanguage="ar"
       >
         <View style={styles.testButtonContent}>
           <Ionicons
@@ -85,14 +60,9 @@ const Tests = () => {
             size={24}
             color={theme.colors.buttonSecondaryText}
             style={styles.icon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة ملف نتائج"
-            accessibilityLanguage="ar"
           />
           <Text
             style={[styles.testButtonText, styles.testButtonTextOnSecondary]}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             نتائج فحوصات المرضى
           </Text>
@@ -104,11 +74,6 @@ const Tests = () => {
         style={[styles.testButton, styles.indicatorsButton]}
         onPress={() => navigation.navigate('MedicalIndicatorsScreen')}
         activeOpacity={0.9}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="حساب القيم الطبية"
-        accessibilityHint="يفتح شاشة لحساب المؤشرات والقيم الطبية بناءً على مدخلاتك"
-        accessibilityLanguage="ar"
       >
         <View style={styles.testButtonContent}>
           <Ionicons
@@ -116,14 +81,9 @@ const Tests = () => {
             size={24}
             color={theme.colors.buttonInfoText}
             style={styles.icon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة حقيبة طبية"
-            accessibilityLanguage="ar"
           />
           <Text
             style={[styles.testButtonText, styles.testButtonTextOnInfo]}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             حساب القيم الطبية
           </Text>
