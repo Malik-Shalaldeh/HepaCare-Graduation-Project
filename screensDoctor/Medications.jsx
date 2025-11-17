@@ -18,7 +18,6 @@ export default function Medications() {
   return (
     <View
       style={styles.container}
-      accessibilityLanguage="ar"
     >
       {/* شريط الحالة */}
       <StatusBar
@@ -30,38 +29,22 @@ export default function Medications() {
       {/* الهيدر */}
       <View
         style={styles.header}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel="شاشة إدارة الأدوية"
-        accessibilityHint="تعرض خيارات لجدولة الأدوية للمرضى أو عرض أدوية وزارة الصحة"
-        accessibilityLanguage="ar"
       >
         {/* زر القائمة الجانبية */}
         <TouchableOpacity
           onPress={() => navigation.toggleDrawer()}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="فتح قائمة التنقل الجانبية"
-          accessibilityHint="يفتح القائمة الجانبية للتنقل بين شاشات الطبيب"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="menu"
             size={28}
             color={theme.colors.buttonPrimaryText}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة قائمة"
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
 
         {/* عنوان الهيدر */}
         <Text
           style={styles.headerTitle}
-          accessibilityRole="text"
-          accessibilityLabel="الأدوية"
-          accessibilityLanguage="ar"
         >
           الأدوية
         </Text>
@@ -77,25 +60,15 @@ export default function Medications() {
           style={[styles.button, styles.scheduleButton]}
           onPress={() => navigation.navigate('MedPatientsScreen')}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="جدولة دواء لمريض"
-          accessibilityHint="يفتح شاشة لاختيار مريض وتحديد دواء ووقت تناوله"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="calendar-outline"
             size={24}
             color={theme.colors.buttonPrimaryText}
             style={styles.icon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة تقويم لجدولة الدواء"
-            accessibilityLanguage="ar"
           />
           <Text
             style={[styles.buttonText, styles.buttonTextPrimary]}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             جدولة دواء لمريض
           </Text>
@@ -106,25 +79,15 @@ export default function Medications() {
           style={[styles.button, styles.healthMedsButton]}
           onPress={() => navigation.navigate('HealthMedicationsDisplay')}
           activeOpacity={0.8}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="عرض أدوية وزارة الصحة"
-          accessibilityHint="يفتح شاشة لعرض قائمة الأدوية المتوفرة في وزارة الصحة"
-          accessibilityLanguage="ar"
         >
           <Ionicons
             name="medkit-outline"
             size={24}
             color={theme.colors.buttonInfoText}
             style={styles.icon}
-            accessibilityRole="image"
-            accessibilityLabel="أيقونة حقيبة أدوية"
-            accessibilityLanguage="ar"
           />
           <Text
             style={[styles.buttonText, styles.buttonTextInfo]}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             عرض أدوية الصحة
           </Text>
