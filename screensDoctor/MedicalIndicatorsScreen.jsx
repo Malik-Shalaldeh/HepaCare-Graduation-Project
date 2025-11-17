@@ -63,7 +63,6 @@ const MedicalIndicatorsScreen = () => {
   return (
     <SafeAreaView
       style={styles.safeArea}
-      accessibilityLanguage="ar"
     >
       <StatusBar
         backgroundColor={theme.colors.primary}
@@ -75,24 +74,14 @@ const MedicalIndicatorsScreen = () => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
-        accessible
-        accessibilityRole="button"
-        accessibilityLabel="رجوع"
-        accessibilityHint="العودة إلى الشاشة السابقة"
-        accessibilityLanguage="ar"
       >
         <Ionicons
           name="arrow-back"
           size={24}
           color={theme.colors.textPrimary}
-          accessibilityRole="image"
-          accessibilityLabel="سهم الرجوع"
-          accessibilityLanguage="ar"
         />
         <Text
           style={styles.backText}
-          accessibilityRole="text"
-          accessibilityLanguage="ar"
         >
           رجوع
         </Text>
@@ -101,25 +90,14 @@ const MedicalIndicatorsScreen = () => {
       {/* اختيار الفحص (dropdown) */}
       <View
         style={styles.dropdownContainer}
-        accessible
-        accessibilityRole="text"
-        accessibilityLabel="اختر الفحص الذي تريد حساب قيمه"
-        accessibilityLanguage="ar"
       >
         <TouchableOpacity
           style={styles.dropdownButton}
           onPress={toggleDropdown}
           activeOpacity={0.85}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="اختيار الفحص"
-          accessibilityHint="اضغط لعرض قائمة الفحوصات المتاحة"
-          accessibilityLanguage="ar"
         >
           <Text
             style={styles.dropdownText}
-            accessibilityRole="text"
-            accessibilityLanguage="ar"
           >
             اختر الفحص
           </Text>
@@ -127,9 +105,6 @@ const MedicalIndicatorsScreen = () => {
             name={showDropdown ? 'chevron-up' : 'chevron-down'}
             size={20}
             color={theme.colors.textPrimary}
-            accessibilityRole="image"
-            accessibilityLabel={showDropdown ? 'طي القائمة' : 'فتح القائمة'}
-            accessibilityLanguage="ar"
           />
         </TouchableOpacity>
 
@@ -141,16 +116,9 @@ const MedicalIndicatorsScreen = () => {
                 style={styles.dropdownItem}
                 onPress={() => selectTest(test.key)}
                 activeOpacity={0.85}
-                accessible
-                accessibilityRole="button"
-                accessibilityLabel={`اختيار فحص ${test.label}`}
-                accessibilityHint="اضغط لإضافة هذا الفحص إلى قائمة الفحوصات التي سيتم حسابها"
-                accessibilityLanguage="ar"
               >
                 <Text
                   style={styles.dropdownItemText}
-                  accessibilityRole="text"
-                  accessibilityLanguage="ar"
                 >
                   {test.label}
                 </Text>
@@ -163,7 +131,6 @@ const MedicalIndicatorsScreen = () => {
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
-        accessibilityLanguage="ar"
       >
         {/* بطاقات إدخال الفحوصات المختارة */}
         {tests.map(key => (
@@ -182,16 +149,9 @@ const MedicalIndicatorsScreen = () => {
             style={styles.calcButton}
             onPress={analyze}
             activeOpacity={0.9}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="احسب القيم الطبية"
-            accessibilityHint="يضغط لحساب المؤشرات والقيم الطبية اعتماداً على البيانات المدخلة"
-            accessibilityLanguage="ar"
           >
             <Text
               style={styles.calcText}
-              accessibilityRole="text"
-              accessibilityLanguage="ar"
             >
               احسب
             </Text>
