@@ -1,6 +1,4 @@
-// By sami: شاشة الزيارات الأصلية مع زر إضافي لسجل الزيارات
-// By sami: واجهة الزيارات الجديدة – تبدأ بالبحث ثم تظهر الخيارات
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,81 +8,75 @@ import {
   TextInput,
   SafeAreaView,
   ScrollView,
-  Platform,
-  Alert
-} from 'react-native';
-import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import ENDPOINTS from '../samiendpoint';
+  Alert,
+} from "react-native";
+import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import ENDPOINTS from "../samiendpoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-
-const primary = '#00b29c';
+const primary = colors.buttonPrimary;
 
 const Visits = () => {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // جلب معرف الطبيب عند تحميل الشاشة
   useEffect(() => {
     const fetchDoctorId = async () => {
       try {
-        const doctorId = await AsyncStorage.getItem('doctor_id');
+        const doctorId = await AsyncStorage.getItem("doctor_id");
         if (!doctorId) {
-          Alert.alert('خطأ', 'يرجى تسجيل الدخول مرة أخرى');
+          Alert.alert("خطأ", "يرجى تسجيل الدخول مرة أخرى");
           return;
         }
-        
-        // جلب المرضى
         await searchPatients(doctorId);
       } catch (error) {
-        console.error('خطأ في جلب معرف الطبيب:', error);
-        Alert.alert('خطأ', 'تعذر جلب بيانات الطبيب');
+        console.error("خطأ في جلب معرف الطبيب:", error);
+        Alert.alert("خطأ", "تعذر جلب بيانات الطبيب");
       }
     };
 
     fetchDoctorId();
   }, []);
 
-  // البحث عن المرضى
-  const searchPatients = async (doctorId, query = '') => {
+  const searchPatients = async (doctorId, query = "") => {
     setLoading(true);
     try {
       const response = await axios.get(ENDPOINTS.searchPatients, {
-        params: { 
+        params: {
           query: query,
-          doctor_id: doctorId 
-        }
+          doctor_id: doctorId,
+        },
       });
-      
+
       setPatients(response.data || []);
     } catch (error) {
-      console.error('خطأ في البحث عن المرضى:', error);
-      Alert.alert('خطأ', 'تعذر جلب قائمة المرضى');
+      console.error("خطأ في البحث عن المرضى:", error);
+      Alert.alert("خطأ", "تعذر جلب قائمة المرضى");
     } finally {
       setLoading(false);
     }
   };
 
-  // تصفية المرضى محليًا
-  const filteredPatients = patients.filter(p =>
-    p.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    String(p.id).includes(searchText)
+  const filteredPatients = patients.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      String(p.id).includes(searchText)
   );
 
-  // إعادة تعيين selectedPatient عند دخول الشاشة
   useEffect(() => {
     setSelectedPatient(null);
   }, []);
 
   return (
     <ScreenWithDrawer title="الزيارات">
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundLight }}>
         {!selectedPatient ? (
           <>
             <View style={styles.searchContainer}>
@@ -94,24 +86,30 @@ const Visits = () => {
                 value={searchText}
                 onChangeText={async (text) => {
                   setSearchText(text);
-                  const doctorId = await AsyncStorage.getItem('doctor_id');
+                  const doctorId = await AsyncStorage.getItem("doctor_id");
                   if (doctorId) {
                     searchPatients(doctorId, text);
                   }
                 }}
+                placeholderTextColor={colors.textMuted}
               />
-              <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+              <Ionicons
+                name="search"
+                size={20}
+                color={colors.textMuted}
+                style={styles.searchIcon}
+              />
             </View>
 
             {loading ? (
               <View style={styles.loadingContainer}>
-                <Text>جار التحميل...</Text>
+                <Text style={styles.loadingText}>جار التحميل...</Text>
               </View>
             ) : (
               searchText.trim().length > 0 && (
                 <FlatList
                   data={filteredPatients}
-                  keyExtractor={item => item.id}
+                  keyExtractor={(item) => item.id}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.resultItem}
@@ -122,10 +120,12 @@ const Visits = () => {
                   )}
                   ListEmptyComponent={
                     filteredPatients.length === 0 ? (
-                      <Text style={styles.noResults}>لا يوجد نتائج مطابقة.</Text>
+                      <Text style={styles.noResults}>
+                        لا يوجد نتائج مطابقة.
+                      </Text>
                     ) : null
                   }
-                  contentContainerStyle={{ paddingBottom: 10 }}
+                  contentContainerStyle={{ paddingBottom: spacing.sm }}
                 />
               )
             )}
@@ -141,39 +141,57 @@ const Visits = () => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('تقييم الزيارة', {
-                patientId: selectedPatient.id,
-                patientName: selectedPatient.name,
-              })}
+              onPress={() =>
+                navigation.navigate("تقييم الزيارة", {
+                  patientId: selectedPatient.id,
+                  patientName: selectedPatient.name,
+                })
+              }
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="document-text-outline" size={24} color="#fff" />
+                <Ionicons
+                  name="document-text-outline"
+                  size={24}
+                  color={colors.buttonPrimaryText}
+                />
                 <Text style={styles.buttonText}>تقييم زيارة المريض</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('سجل الزيارات', {
-                patientId: selectedPatient.id,
-                patientName: selectedPatient.name,
-              })}
+              onPress={() =>
+                navigation.navigate("سجل الزيارات", {
+                  patientId: selectedPatient.id,
+                  patientName: selectedPatient.name,
+                })
+              }
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="calendar-outline" size={24} color="#fff" />
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color={colors.buttonPrimaryText}
+                />
                 <Text style={styles.buttonText}>عرض سجل الزيارات</Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('ملخص الزيارات', {
-                patientId: selectedPatient.id,
-                patientName: selectedPatient.name,
-              })}
+              onPress={() =>
+                navigation.navigate("ملخص الزيارات", {
+                  patientId: selectedPatient.id,
+                  patientName: selectedPatient.name,
+                })
+              }
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="logo-reddit" size={24} color="#fff" />
+                <Ionicons
+                  name="logo-reddit"
+                  size={24}
+                  color={colors.buttonPrimaryText}
+                />
                 <Text style={styles.buttonText}> ملخص الزيارات</Text>
               </View>
             </TouchableOpacity>
@@ -186,67 +204,82 @@ const Visits = () => {
 
 const styles = StyleSheet.create({
   searchContainer: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 12,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.background,
   },
   searchInput: {
     flex: 1,
-    textAlign: 'right',
-    fontSize: 14,
+    textAlign: "right",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
   },
   searchIcon: {
-    marginLeft: 6,
+    marginLeft: spacing.xs,
   },
   resultItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.lg,
     borderBottomWidth: 0.5,
-    borderColor: '#ccc',
+    borderColor: colors.border,
+    backgroundColor: colors.background,
   },
   resultText: {
-    textAlign: 'right',
-    fontSize: 16,
+    textAlign: "right",
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
   },
   noResults: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#666',
+    textAlign: "center",
+    marginTop: spacing.lg,
+    color: colors.textSecondary,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
   scrollContainer: {
-    padding: 20,
-    paddingTop: 10,
+    padding: spacing.lg,
+    paddingTop: spacing.md,
   },
   backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginBottom: spacing.lg,
   },
   button: {
     backgroundColor: primary,
-    padding: 15,
-    borderRadius: 14,
-    marginBottom: 20,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    marginBottom: spacing.lg,
+    ...shadows.light,
   },
   buttonContent: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 8,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colors.buttonPrimaryText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    fontWeight: "bold",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
   },
 });
 
