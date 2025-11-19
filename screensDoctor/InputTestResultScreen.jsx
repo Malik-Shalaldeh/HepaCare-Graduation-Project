@@ -31,10 +31,6 @@ function toYMD(d) {
 export default function InputTestResultScreen() {
   const navigation = useNavigation();
 
-  useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
-
   // ================== منطق فقط (بدون أي تغيير بصري) ==================
   const [doctorId, setDoctorId] = useState(null);
 
@@ -211,12 +207,6 @@ export default function InputTestResultScreen() {
   if (!selectedPatient) {
     return (
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
         <Text style={styles.header}>🩺 إدخال نتائج الفحص</Text>
         <TextInput
           style={[styles.input, styles.rtlText]}

@@ -13,20 +13,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HelpButton from '../componentHelp/ButtonHelp';
 import ENDPOINTS from '../malikEndPoint';
-
-// ✅ استدعاء ملف الثيم
 import theme from '../style/theme';
 
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
-  const navigation = useNavigation();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   const handleSearch = async () => {
     const query = searchInput.trim();
@@ -42,7 +34,8 @@ export default function TestResultsScreen() {
       });
 
       setFilteredResults(res.data);
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Error fetching results:', error);
       Alert.alert('خطأ', 'فشل في جلب البيانات. تأكد من الاتصال أو من صلاحية الدخول.');
     }
@@ -55,6 +48,7 @@ export default function TestResultsScreen() {
       <Text style={styles.name}>
         👤 {item.name} (رقم: {item.patientId})
       </Text>
+
       <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
       <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
       <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
@@ -68,7 +62,7 @@ export default function TestResultsScreen() {
             ? Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
             : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
         }
-        activeOpacity={0.9}
+        activeOpacity={0.8}
       >
         <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
@@ -79,19 +73,7 @@ export default function TestResultsScreen() {
     <View
       style={styles.container}
     >
-      {/* زر الرجوع */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={theme.colors.textPrimary}
-        />
-        <Text style={styles.backText}>رجوع</Text>
-      </TouchableOpacity>
+
 
       {/* العنوان */}
       <Text
@@ -108,7 +90,6 @@ export default function TestResultsScreen() {
         onChangeText={setSearchInput}
         value={searchInput}
         textAlign="right"
-        autoCapitalize="none"
       />
 
       {/* زر البحث */}

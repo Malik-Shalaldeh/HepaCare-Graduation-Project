@@ -1,6 +1,5 @@
 import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   createDrawerNavigator,
@@ -25,8 +24,20 @@ import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
-
 import theme from "../style/theme";
+import { useNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
+
+
+
+function shouldShowTestsHeader(route) {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'TestsMain';
+  if (routeName === 'TestsMain') {
+    return true;
+  }
+  return false;
+}
+
+
 
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
@@ -169,16 +180,18 @@ function NavigatorDoctor() {
           }}
         />
 
-        <Drawer.Screen
-          name="الفحوصات"
-          component={TestsStack}
-          options={{
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="analytics-outline" size={size} color={color} />
-            ),
-          }}
-        />
+       <Drawer.Screen
+         name="الفحوصات"
+         component={TestsStack}
+        options={({ route }) => ({
+        headerShown: shouldShowTestsHeader(route),
+        drawerIcon: ({ size, color }) => (
+          <Ionicons name="analytics-outline" size={size} color={color} />
+        ),
+       })}
+      />
 
+          
         <Drawer.Screen
           name="المحتوى التثقيفي"
           component={EducationalContentStack}

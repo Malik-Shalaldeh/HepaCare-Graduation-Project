@@ -25,7 +25,6 @@ import {
 import theme from '../style/theme';
 
 const MedicalIndicatorsScreen = () => {
-  const navigation = useNavigation();
 
   const [tests, setTests] = useState([]);
   const [values, setValues] = useState({});
@@ -68,24 +67,6 @@ const MedicalIndicatorsScreen = () => {
         backgroundColor={theme.colors.primary}
         barStyle="light-content"
       />
-
-      {/* زر الرجوع */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={theme.colors.textPrimary}
-        />
-        <Text
-          style={styles.backText}
-        >
-          رجوع
-        </Text>
-      </TouchableOpacity>
 
       {/* اختيار الفحص (dropdown) */}
       <View

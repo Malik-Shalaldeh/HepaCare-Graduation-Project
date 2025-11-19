@@ -20,14 +20,10 @@ const Tests = () => {
           size={24}
           color={theme.colors.textPrimary}
         />
-        <Text
-          style={styles.backText}
-        >
-          رجوع
-        </Text>
+        <Text style={styles.backText}> رجوع</Text>
       </TouchableOpacity>
 
-      {/* زر إدخال نتائج الفحوصات (أساسي) */}
+      {/* زر إدخال نتائج الفحوصات */}
       <TouchableOpacity
         style={[styles.testButton, styles.entryButton]}
         onPress={() => navigation.navigate('InputTestResultScreen')}
@@ -114,27 +110,25 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     ...theme.shadows.light,
   },
-  // توزيع الألوان حسب الثيم
   entryButton: {
-    backgroundColor: theme.colors.buttonPrimary,   // أهم زر
+    backgroundColor: theme.colors.buttonPrimary,  
   },
   resultsButton: {
-    backgroundColor: theme.colors.buttonSecondary, // ثانوي
+    backgroundColor: theme.colors.buttonSecondary, 
   },
   indicatorsButton: {
-    backgroundColor: theme.colors.buttonInfo,      // معلومات/حسابات
+    backgroundColor: theme.colors.buttonInfo,     
   },
   testButtonContent: {
-    flexDirection: 'row-reverse', // لأن النص بالعربي
+    flexDirection: 'row-reverse', 
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',   
   },
   testButtonText: {
     fontSize: theme.typography.headingSm,
     fontWeight: 'bold',
-    textAlign: 'right',
+    textAlign: 'center',
     fontFamily: theme.typography.fontFamily,
-    flex: 1,
   },
   testButtonTextOnPrimary: {
     color: theme.colors.buttonPrimaryText,

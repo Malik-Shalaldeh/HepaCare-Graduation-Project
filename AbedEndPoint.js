@@ -4,8 +4,8 @@ import { Platform } from "react-native";
 const BASE_URL =
 
   Platform.OS === 'android'
-    ? 'http://192.168.1.122:8000'
-    : 'http://192.168.1.122:8000';
+    ? 'http://192.168.1.9:8000'
+    : 'http://192.168.1.9:8000';
 
 const AbedEndPoint = {
   BASE_URL,
