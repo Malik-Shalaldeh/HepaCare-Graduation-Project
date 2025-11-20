@@ -5,10 +5,7 @@ import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import AbedEndPoint from "../AbedEndPoint";
-
-const primary = "#2C3E50";
-const accent = "#2980B9";
-const textColor = "#34495E";
+import { colors } from "../style/theme";
 
 const LapDashboard = () => {
   const navigation = useNavigation();
@@ -85,7 +82,7 @@ const LapDashboard = () => {
           <Ionicons
             name="happy-outline"
             size={40}
-            color={accent}
+            color={colors.accent}
             style={styles.icon}
           />
           <View>
@@ -101,7 +98,7 @@ const LapDashboard = () => {
           <Ionicons
             name="heart-circle-outline"
             size={50}
-            color="#E74C3C"
+            color={colors.danger}
             style={{ marginBottom: 10 }}
           />
           <Text style={styles.motivationText}>
@@ -119,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 32,
     paddingTop: 60,
-    backgroundColor: "#F8FAFB",
+    backgroundColor: colors.backgroundLight,
     alignItems: "center",
   },
 
@@ -127,7 +124,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
     padding: 20,
     borderRadius: 20,
     marginBottom: 20,
@@ -145,18 +142,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: primary,
+    color: colors.textPrimary,
     marginBottom: 4,
   },
 
   subtitle: {
     fontSize: 14,
-    color: textColor,
+    color: colors.textSecondary,
   },
 
   header: {
     width: "100%",
-    backgroundColor: accent,
+    backgroundColor: colors.primary,
     paddingVertical: 20,
     paddingHorizontal: 24,
     borderRadius: 16,
@@ -178,7 +175,7 @@ const styles = StyleSheet.create({
 
   motivationBox: {
     width: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.background,
     padding: 24,
     borderRadius: 20,
     alignItems: "center",
@@ -193,7 +190,7 @@ const styles = StyleSheet.create({
   motivationText: {
     fontSize: 16,
     fontWeight: "500",
-    color: primary,
+    color: colors.textPrimary,
     textAlign: "center",
     lineHeight: 24,
   },

@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function HealthMedComponent() {
   const [meds, setMeds] = useState([]); // [{id, Name, isAvailable}]
@@ -99,7 +100,7 @@ export default function HealthMedComponent() {
     <View style={styles.card}>
       <View style={styles.cardRow}>
         <View style={styles.cardIconWrap}>
-          <Ionicons name="bandage-outline" size={22} color="#00b29c" />
+          <Ionicons name="bandage-outline" size={22} color={colors.accent} />
         </View>
         <Text style={[styles.cardTitle, styles.rtl]} numberOfLines={2}>
           {String(item?.Name ?? "")}
@@ -145,7 +146,7 @@ export default function HealthMedComponent() {
               typeof item?.id !== "undefined" ? String(item.id) : String(index)
             }
             renderItem={renderMedCard}
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: spacing.xl }}
             keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -174,10 +175,17 @@ export default function HealthMedComponent() {
                     <Switch
                       value={!!availableMedsMap?.[item?.id]}
                       onValueChange={() => handleToggle(item)}
+                      trackColor={{
+                        false: colors.border,
+                        true: colors.accent,
+                      }}
+                      thumbColor={
+                        Platform.OS === "android" ? colors.primary : undefined
+                      }
                     />
                   </View>
                 )}
-                style={{ marginBottom: 20, maxHeight: 320 }}
+                style={{ marginBottom: spacing.lg, maxHeight: 320 }}
               />
 
               <TouchableOpacity
@@ -197,142 +205,159 @@ export default function HealthMedComponent() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
+  safeArea: { flex: 1, backgroundColor: colors.backgroundLight },
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingHorizontal: 16,
-    paddingTop: 12, // بدون StatusBar.currentHeight لتجنّب التعارض مع هيدر الStack
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md, // بدون StatusBar.currentHeight لتجنّب التعارض مع هيدر الStack
   },
-  rtl: { writingDirection: "rtl", textAlign: "right" },
+  rtl: {
+    writingDirection: "rtl",
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
 
   header: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: "#333" },
+  headerTitle: {
+    fontSize: typography.headingSm,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+  },
   manageBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#4CAF50",
-    paddingVertical: Platform.select({ ios: 10, android: 8 }),
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.buttonSuccess,
+    paddingVertical: Platform.select({ ios: spacing.md, android: spacing.sm }),
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.md,
+    ...shadows.light,
   },
   manageBtnText: {
-    color: "#fff",
-    fontSize: 14,
+    color: colors.buttonSuccessText,
+    fontSize: typography.bodyMd,
     fontWeight: "700",
-    marginLeft: 6,
+    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily,
   },
 
   // بطاقة الدواء
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 14,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    marginVertical: spacing.xs + 2,
+    ...shadows.light,
   },
   cardRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   cardIconWrap: {
     width: 40,
     height: 40,
-    borderRadius: 12,
-    backgroundColor: "rgba(0,178,156,0.12)",
+    borderRadius: radii.md,
+    backgroundColor: colors.buttonMuted,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 10,
+    marginLeft: spacing.sm,
   },
-  cardTitle: { flex: 1, fontSize: 16, fontWeight: "700", color: "#333" },
+  cardTitle: {
+    flex: 1,
+    fontSize: typography.bodyLg,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+  },
 
   badgeRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
   },
   badge: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 999,
+    gap: spacing.xs + 2,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md - 2,
+    borderRadius: radii.pill,
   },
   badgeSuccess: {
-    backgroundColor: "rgba(76,175,80,0.1)",
+    backgroundColor: "rgba(47, 164, 169, 0.12)",
   },
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 999,
-    backgroundColor: "#4CAF50",
+    borderRadius: radii.pill,
+    backgroundColor: colors.success,
   },
-  badgeText: { color: "#2e7d32", fontWeight: "700", fontSize: 12 },
+  badgeText: {
+    color: colors.success,
+    fontWeight: "700",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+  },
 
   // نصوص ومودال
   emptyText: {
     textAlign: "center",
-    marginTop: 40,
-    color: "#888",
-    fontSize: 15,
+    marginTop: spacing.xl + 16,
+    color: colors.textMuted,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.3)" },
+  modalOverlay: { flex: 1, backgroundColor: colors.overlay },
   modalContent: {
     marginTop: Platform.select({ ios: 100, android: 60 }),
-    marginHorizontal: 20,
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 20,
-    paddingBottom: 26,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    marginHorizontal: spacing.xl,
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    padding: spacing.xl,
+    paddingBottom: spacing.xl + 2,
+    ...shadows.medium,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: typography.headingSm,
     fontWeight: "800",
-    color: "#333",
+    color: colors.textPrimary,
     textAlign: "center",
-    marginBottom: 14,
+    marginBottom: spacing.md,
+    fontFamily: typography.fontFamily,
   },
   switchRow: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: spacing.sm + 2,
   },
-  switchText: { fontSize: 15, color: "#444", width: "80%" },
+  switchText: {
+    fontSize: typography.bodyLg,
+    color: colors.textSecondary,
+    width: "80%",
+    fontFamily: typography.fontFamily,
+  },
   modalButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
   },
-  closeBtn: { backgroundColor: "#F44336" },
+  closeBtn: { backgroundColor: colors.buttonDanger },
   modalBtnText: {
-    color: "#FFF",
+    color: colors.buttonDangerText,
     fontWeight: "700",
-    fontSize: 15,
-    marginLeft: 6,
+    fontSize: typography.bodyLg,
+    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily,
   },
 });

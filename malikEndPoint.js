@@ -5,7 +5,7 @@ const ENDPOINTS = {
   BASE_URL,
   TEST_RESULTS: {
     SEARCH: `${BASE_URL}/test-results/`,
-    FILE_BASE: "http://192.168.1.9",
+    FILE_BASE: "http://192.168.1.128",
   },
   PATIENT_CHART: {
     GET: `${BASE_URL}/patient-chart`,

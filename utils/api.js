@@ -3,7 +3,7 @@
  * استخدم هذا الملف لجميع API calls في التطبيق
  */
 
-const BASE_URL = 'http://192.168.1.122:8000';
+const BASE_URL = 'http://192.168.1.128:8000';
 
 /**
  * GET request

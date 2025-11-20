@@ -5,6 +5,7 @@ import MedPatientsScreen from "../screensDoctor/MedPatientsScreen";
 import PatientMedicationsScreen from "../screensDoctor/PatientMedicationsScreen";
 import MedicationFormScreen from "../screensDoctor/MedicationFormScreen";
 import HealthMedicationsDisplay from "../screensDoctor/HealthMedicationsDisplay";
+import { colors, typography } from "../style/theme";
 
 const Stack = createStackNavigator();
 
@@ -15,11 +16,15 @@ const MedicationsStackScreen = () => {
       screenOptions={{
         headerShown: true,
         headerTitleAlign: "center",
-        headerTintColor: "#fff",
+        headerTintColor: colors.background,
         headerStyle: {
-          backgroundColor: "#00b29c",
+          backgroundColor: colors.primary,
         },
-        headerTitleStyle: { fontSize: 18, fontWeight: "700" },
+        headerTitleStyle: {
+          fontSize: typography.headingSm,
+          fontWeight: "700",
+          fontFamily: typography.fontFamily,
+        },
         headerBackTitleVisible: false,
         headerBackTitle: "",
         gestureEnabled: true,

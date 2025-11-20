@@ -15,8 +15,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const PRIMARY = "#00b29c";
+const PRIMARY = colors.primary;
 
 const FALLBACK_CITIES = [
   { id: 1, name: "Hebron" }, // مطابق لقاعدة البيانات الحالية
@@ -110,17 +111,13 @@ export default function LabAddScreen() {
   const disabled = !name || !cityId || saving;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.kb}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
-          contentContainerStyle={{
-            alignItems: "center",
-            padding: 16,
-            paddingBottom: 24,
-          }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled
         >
@@ -130,7 +127,7 @@ export default function LabAddScreen() {
             <TextInput
               style={styles.input}
               placeholder="اكتب اسم المختبر"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={name}
               onChangeText={setName}
               textAlign="right"
@@ -144,7 +141,7 @@ export default function LabAddScreen() {
               <Picker
                 selectedValue={cityId ?? null}
                 onValueChange={(v) => setCityId(v || undefined)}
-                style={{ color: "#0F172A" }}
+                style={{ color: colors.textPrimary }}
               >
                 <Picker.Item label="اختر المدينة" value={null} />
                 {cities.map((c) => (
@@ -160,7 +157,7 @@ export default function LabAddScreen() {
             <TextInput
               style={styles.input}
               placeholder="العنوان (اختياري)"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={address}
               onChangeText={setAddress}
               textAlign="right"
@@ -173,7 +170,7 @@ export default function LabAddScreen() {
             <TextInput
               style={styles.input}
               placeholder="رقم الهاتف (اختياري)"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -187,7 +184,7 @@ export default function LabAddScreen() {
             <TextInput
               style={styles.input}
               placeholder="example@mail.com (اختياري)"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -202,7 +199,7 @@ export default function LabAddScreen() {
             <TextInput
               style={styles.input}
               placeholder="https://maps.google.com/..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={locationUrl}
               onChangeText={setLocationUrl}
               textAlign="right"
@@ -239,55 +236,86 @@ export default function LabAddScreen() {
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  kb: {
+    flex: 1,
+  },
+  scrollContent: {
+    alignItems: "center",
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
   label: {
-    color: "#0F172A",
-    fontSize: 14,
+    color: colors.textPrimary,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
     textAlign: "right",
     alignSelf: "flex-end",
-    marginBottom: 6,
-    marginTop: 8,
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
     width: "88%",
   },
   row: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 10,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
     width: "88%",
+    ...shadows.light,
   },
-  input: { flex: 1, color: "#0F172A", fontSize: 15, textAlign: "right" },
+  input: {
+    flex: 1,
+    color: colors.textPrimary,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    textAlign: "right",
+  },
   switchRow: {
     width: "88%",
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 6,
+    marginTop: spacing.sm,
   },
-  switchItem: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
-  switchText: { color: "#0F172A", fontWeight: "700" },
+  switchItem: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  switchText: {
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
+    fontSize: typography.bodyMd,
+  },
   actionBtn: {
     backgroundColor: PRIMARY,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    marginTop: 12,
+    gap: spacing.sm,
+    marginTop: spacing.lg,
     minWidth: 170,
+    ...shadows.medium,
   },
   actionText: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     fontWeight: "800",
-    marginStart: 6,
+    marginStart: spacing.sm,
   },
 });

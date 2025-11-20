@@ -13,8 +13,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const PRIMARY = "#00b29c";
+const PRIMARY = colors.primary;
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -55,9 +56,7 @@ export default function LabDeleteScreen() {
           item.is_accredited === true ||
           item.is_approved === true ||
           item.isAccredited === true,
-        is_active:
-          item.is_active !== false &&
-          item.isActive !== false,
+        is_active: item.is_active !== false && item.isActive !== false,
       }));
   };
 
@@ -112,10 +111,14 @@ export default function LabDeleteScreen() {
     try {
       const term = q.trim();
       const url = term
-        ? `${AbedEndPoint.labsSearch}?q=${encodeURIComponent(term)}&_=${Date.now()}`
+        ? `${AbedEndPoint.labsSearch}?q=${encodeURIComponent(
+            term
+          )}&_=${Date.now()}`
         : `${AbedEndPoint.labsList}?_=${Date.now()}`;
 
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
 
       if (!res.ok) {
         if (res.status === 404) {
@@ -181,17 +184,13 @@ export default function LabDeleteScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.kb}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
-          contentContainerStyle={{
-            alignItems: "center",
-            padding: 16,
-            paddingBottom: 24,
-          }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.label}>ابحث عن المختبر (بالرقم أو الاسم)</Text>
@@ -200,7 +199,7 @@ export default function LabDeleteScreen() {
             <TextInput
               style={styles.input}
               placeholder="مثال: 2 أو مختبر الشفاء"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={colors.textMuted}
               value={q}
               onChangeText={handleChangeQuery}
               textAlign="right"
@@ -228,27 +227,33 @@ export default function LabDeleteScreen() {
                 <TouchableOpacity
                   onPress={() => onDelete(lab)}
                   disabled={deleting}
-                  style={{ padding: 4, marginLeft: 6 }}
+                  style={{ padding: 4, marginLeft: spacing.sm }}
                 >
-                  <Ionicons name="trash-outline" size={22} color="#ef4444" />
+                  <Ionicons
+                    name="trash-outline"
+                    size={22}
+                    color={colors.danger}
+                  />
                 </TouchableOpacity>
 
                 <Ionicons
                   name="flask-outline"
                   size={24}
                   color={PRIMARY}
-                  style={{ marginLeft: 6 }}
+                  style={{ marginLeft: spacing.sm }}
                 />
                 <View style={{ flex: 1, alignItems: "flex-end" }}>
                   <Text style={styles.cardTitle}>{lab.name}</Text>
                   <Text style={styles.cardMeta}>
-                    ID: {lab.id} — المدينة: {lab.city_name || cityName(lab.city_id)}
+                    ID: {lab.id} — المدينة:{" "}
+                    {lab.city_name || cityName(lab.city_id)}
                   </Text>
                   <Text style={styles.cardMeta}>
                     الهاتف: {lab.phone || "—"} — البريد: {lab.email || "—"}
                   </Text>
                   <Text style={styles.cardMeta}>
-                    المعتمد: {lab.is_accredited ? "نعم" : "لا"} — فعال: {lab.is_active ? "نعم" : "لا"}
+                    المعتمد: {lab.is_accredited ? "نعم" : "لا"} — فعال:{" "}
+                    {lab.is_active ? "نعم" : "لا"}
                   </Text>
                 </View>
               </View>
@@ -261,82 +266,109 @@ export default function LabDeleteScreen() {
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  kb: {
+    flex: 1,
+  },
+  scrollContent: {
+    alignItems: "center",
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
   label: {
-    color: "#0F172A",
-    fontSize: 14,
+    color: colors.textPrimary,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
     textAlign: "right",
     alignSelf: "flex-end",
-    marginBottom: 6,
-    marginTop: 8,
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
     width: "88%",
   },
   row: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 10,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
     width: "88%",
+    ...shadows.light,
   },
-  input: { flex: 1, color: "#0F172A", fontSize: 15, textAlign: "right" },
+  input: {
+    flex: 1,
+    color: colors.textPrimary,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    textAlign: "right",
+  },
   iconBtn: {
     backgroundColor: PRIMARY,
     width: 42,
     height: 42,
-    borderRadius: 10,
+    borderRadius: radii.sm,
     alignItems: "center",
     justifyContent: "center",
+    ...shadows.light,
   },
   card: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
     width: "88%",
-    marginTop: 10,
-    marginBottom: 6,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+    ...shadows.light,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
     fontWeight: "800",
-    color: "#0F172A",
-    marginBottom: 2,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
     textAlign: "right",
     width: "100%",
   },
   cardMeta: {
-    fontSize: 13,
-    color: "#64748B",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
     textAlign: "right",
     width: "100%",
+    lineHeight: typography.lineHeightNormal,
   },
   deleteBtn: {
-    backgroundColor: "#ef4444",
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: colors.buttonDanger,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    marginTop: 12,
+    gap: spacing.sm,
+    marginTop: spacing.lg,
     minWidth: 170,
+    ...shadows.medium,
   },
   deleteText: {
-    color: "#FFFFFF",
-    fontSize: 14,
+    color: colors.buttonDangerText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     fontWeight: "800",
-    marginStart: 6,
+    marginStart: spacing.sm,
   },
 });

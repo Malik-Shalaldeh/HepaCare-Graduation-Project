@@ -1,23 +1,27 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const PatientMedications = ({ navigation }) => {
   return (
     <ScreenWithDrawer>
-
       {/* ✅ "زر داخال نتائج الفحوصات" */}
       <TouchableOpacity
-      style={{...styles.Button,backgroundColor:'#00796B'}}
-        onPress={() => navigation.navigate('ادخال نتيجة الفحص')}
+        style={[styles.Button, styles.primaryButton]}
+        onPress={() => navigation.navigate("ادخال نتيجة الفحص")}
       >
         <View style={styles.ButtonContent}>
-          <Ionicons name="list-outline" size={24} color="#fff" style={styles.icon} />
+          <Ionicons
+            name="list-outline"
+            size={24}
+            color={colors.buttonPrimaryText}
+            style={styles.icon}
+          />
           <Text style={styles.ButtonText}>ادخال نتيجة الفحص</Text>
         </View>
       </TouchableOpacity>
-
     </ScreenWithDrawer>
   );
 };
@@ -25,46 +29,48 @@ const PatientMedications = ({ navigation }) => {
 const styles = StyleSheet.create({
   header: {
     height: 60,
-    backgroundColor: '#00b29c',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: spacing.md,
   },
   menuButton: {
-    marginRight: 10,
+    marginRight: spacing.sm,
   },
   headerTitle: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: colors.background,
+    fontSize: typography.headingMd,
+    fontWeight: "bold",
     flex: 1,
-    textAlign: 'center',
-    marginRight: 28, // لتعويض الأيقونة من جهة اليمين
+    textAlign: "center",
+    marginRight: spacing.xl,
+    fontFamily: typography.fontFamily,
   },
+
   Button: {
-    backgroundColor: '#90A4AE',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    margin: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.buttonMuted,
+    borderRadius: radii.md,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    margin: spacing.sm,
+    ...shadows.light,
+  },
+  primaryButton: {
+    backgroundColor: colors.buttonSuccess,
   },
   ButtonContent: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   ButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: colors.buttonSuccessText,
+    fontSize: typography.headingSm,
+    fontWeight: "bold",
+    fontFamily: typography.fontFamily,
   },
   icon: {
-    marginLeft: 10,
+    marginLeft: spacing.sm,
   },
 });
 

@@ -13,8 +13,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const PRIMARY = "#00b29c";
+const PRIMARY = colors.primary;
 
 const CITIES = [
   { id: 1, name: "القدس" },
@@ -94,7 +95,7 @@ export default function LabsListScreen() {
         <TextInput
           style={styles.input}
           placeholder="اسم، رقم، مدينة، هاتف، بريد.."
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor={colors.textMuted}
           value={q}
           onChangeText={setQ}
           textAlign="right"
@@ -113,16 +114,7 @@ export default function LabsListScreen() {
         </View>
       </View>
       {!!loadError && (
-        <Text
-          style={{
-            color: "#EF4444",
-            marginTop: 4,
-            width: "88%",
-            textAlign: "right",
-          }}
-        >
-          {loadError}
-        </Text>
+        <Text style={styles.errorText}>{loadError}</Text>
       )}
     </View>
   );
@@ -133,7 +125,7 @@ export default function LabsListScreen() {
         name="flask-outline"
         size={24}
         color={PRIMARY}
-        style={{ marginLeft: 6 }}
+        style={{ marginLeft: spacing.sm }}
       />
       <View style={{ flex: 1, alignItems: "flex-end" }}>
         <Text style={styles.cardTitle}>{item.name}</Text>
@@ -177,6 +169,7 @@ export default function LabsListScreen() {
             <TouchableOpacity
               style={[styles.badge, styles.badgeLink]}
               onPress={() => openLocation(item.location_url)}
+              activeOpacity={0.9}
             >
               <Ionicons name="navigate-outline" size={14} color="#fff" />
               <Text style={styles.badgeText}>الموقع</Text>
@@ -188,15 +181,11 @@ export default function LabsListScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <SafeAreaView style={styles.safe}>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color={PRIMARY} />
-          <Text style={{ marginTop: 8, color: "#64748B" }}>
-            جاري تحميل المختبرات...
-          </Text>
+          <Text style={styles.loadingText}>جاري تحميل المختبرات...</Text>
         </View>
       ) : (
         <FlatList
@@ -204,17 +193,9 @@ export default function LabsListScreen() {
           keyExtractor={(item) => String(item.id)}
           ListHeaderComponent={Header}
           renderItem={renderItem}
-          contentContainerStyle={{
-            paddingTop: 6,
-            paddingBottom: 20,
-            alignItems: "center",
-          }}
+          contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <Text
-              style={{ marginTop: 16, color: "#64748B", fontWeight: "600" }}
-            >
-              لا توجد نتائج مطابقة
-            </Text>
+            <Text style={styles.emptyText}>لا توجد نتائج مطابقة</Text>
           }
           keyboardShouldPersistTaps="handled"
         />
@@ -224,84 +205,150 @@ export default function LabsListScreen() {
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   label: {
-    color: "#0F172A",
-    fontSize: 14,
+    color: colors.textPrimary,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
     textAlign: "right",
     alignSelf: "flex-end",
-    marginBottom: 6,
-    marginTop: 8,
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
     width: "88%",
   },
   row: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
     width: "88%",
+    ...shadows.light,
   },
-  input: { flex: 1, color: "#0F172A", fontSize: 15, textAlign: "right" },
+  input: {
+    flex: 1,
+    color: colors.textPrimary,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    textAlign: "right",
+  },
+
   filters: {
     width: "88%",
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 6,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
-  filterItem: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
-  filterText: { color: "#0F172A", fontWeight: "700" },
-
-  card: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+  filterItem: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
+  },
+  filterText: {
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyMd,
+    fontWeight: "700",
+  },
+
+  errorText: {
+    color: colors.danger,
+    marginTop: spacing.xs,
     width: "88%",
-    marginTop: 10,
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodySm,
+  },
+
+  card: {
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: spacing.sm,
+    width: "88%",
+    marginTop: spacing.md,
+    ...shadows.light,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
     fontWeight: "800",
-    color: "#0F172A",
-    marginBottom: 2,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
     textAlign: "right",
     width: "100%",
   },
   cardMeta: {
-    fontSize: 13,
-    color: "#64748B",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
     textAlign: "right",
     width: "100%",
+    lineHeight: typography.lineHeightNormal,
   },
 
   badges: {
-    marginTop: 6,
+    marginTop: spacing.sm,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.sm,
   },
   badge: {
-    borderRadius: 999,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    borderRadius: radii.pill,
+    paddingVertical: spacing.sm - 2,
+    paddingHorizontal: spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 6,
+    gap: spacing.xs + 2,
   },
-  badgeYes: { backgroundColor: "#10B981" },
-  badgeNo: { backgroundColor: "#EF4444" },
+  badgeYes: { backgroundColor: colors.success },
+  badgeNo: { backgroundColor: colors.danger },
   badgeLink: { backgroundColor: PRIMARY },
-  badgeText: { color: "#fff", fontSize: 12, fontWeight: "800" },
+  badgeText: {
+    color: "#fff",
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    fontWeight: "800",
+  },
+
+  loadingWrap: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: spacing.sm,
+    color: colors.textMuted,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyMd,
+  },
+
+  listContent: {
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xl,
+    alignItems: "center",
+  },
+  emptyText: {
+    marginTop: spacing.lg,
+    color: colors.textMuted,
+    fontFamily: typography.fontFamily,
+    fontWeight: "600",
+    fontSize: typography.bodyMd,
+  },
 });

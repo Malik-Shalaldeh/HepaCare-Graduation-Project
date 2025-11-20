@@ -19,7 +19,8 @@ import * as DocumentPicker from "expo-document-picker";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AbedEndPoint from "../AbedEndPoint"; // <-- استخدام الايندبوينت
+import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 function toYMD(d) {
   const yyyy = d.getFullYear();
@@ -31,10 +32,8 @@ function toYMD(d) {
 export default function InputTestResultScreen() {
   const navigation = useNavigation();
 
-  // ================== منطق فقط (بدون أي تغيير بصري) ==================
   const [doctorId, setDoctorId] = useState(null);
 
-  // جلب doctor_id من AsyncStorage
   useEffect(() => {
     (async () => {
       try {
@@ -46,27 +45,25 @@ export default function InputTestResultScreen() {
     })();
   }, []);
 
-  const [testsList, setTestsList] = useState([]);          // [{id,name}]
+  const [testsList, setTestsList] = useState([]);
   const [searchInput, setSearchInput] = useState("");
-  const [filteredPatients, setFilteredPatients] = useState([]); // [{id,name}]
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const [selectedTestId, setSelectedTestId] = useState(null); // بدلاً من selectedTest (اسم)
+  const [selectedTestId, setSelectedTestId] = useState(null);
   const [file, setFile] = useState(null);
-  const [resultValue, setResultValue] = useState("");     // واجهة فقط (الباك إند الحالي لا يعتمدها)
+  const [resultValue, setResultValue] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isNormal, setIsNormal] = useState(true);
   const [note, setNote] = useState("");
-  // ====================================================================
 
-  // جلب قائمة الفحوصات من الباك إند كـ [{id,name}]
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch(AbedEndPoint.testsList);
         if (!res.ok) throw new Error();
-        const data = await res.json(); // نتوقع [{id,name}]
+        const data = await res.json();
         if (Array.isArray(data)) {
           setTestsList(
             data
@@ -85,14 +82,17 @@ export default function InputTestResultScreen() {
   const handlePatientSearch = async () => {
     try {
       if (!doctorId) {
-        return Alert.alert("تنبيه", "لم يتم التعرّف على هوية الطبيب. أعد تسجيل الدخول.");
+        return Alert.alert(
+          "تنبيه",
+          "لم يتم التعرّف على هوية الطبيب. أعد تسجيل الدخول."
+        );
       }
       const url = `${AbedEndPoint.patientsSearch}?query=${encodeURIComponent(
         searchInput.trim()
       )}&doctor_id=${doctorId}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json(); // نتوقع [{id, fullName, ...}]
+      const data = await res.json();
       setFilteredPatients(
         Array.isArray(data)
           ? data.map((x) => ({
@@ -144,7 +144,10 @@ export default function InputTestResultScreen() {
 
   const handleSave = async () => {
     if (!doctorId) {
-      return Alert.alert("تنبيه", "لم يتم التعرّف على هوية الطبيب. أعد تسجيل الدخول.");
+      return Alert.alert(
+        "تنبيه",
+        "لم يتم التعرّف على هوية الطبيب. أعد تسجيل الدخول."
+      );
     }
     if (!selectedPatient) return Alert.alert("تنبيه", "اختر المريض أولاً");
     if (!selectedTestId) return Alert.alert("تنبيه", "اختر اسم الفحص");
@@ -211,6 +214,7 @@ export default function InputTestResultScreen() {
         <TextInput
           style={[styles.input, styles.rtlText]}
           placeholder="...ابحث برقم أو اسم المريض"
+          placeholderTextColor={colors.textMuted}
           value={searchInput}
           onChangeText={setSearchInput}
           textAlign="right"
@@ -218,14 +222,15 @@ export default function InputTestResultScreen() {
         <TouchableOpacity
           style={styles.searchButton}
           onPress={handlePatientSearch}
+          activeOpacity={0.9}
         >
-          <Ionicons name="search" size={20} color="#fff" />
+          <Ionicons name="search" size={20} color={colors.buttonInfoText} />
           <Text style={[styles.searchButtonText, styles.rtlText]}>بحث</Text>
         </TouchableOpacity>
         <FlatList
           data={filteredPatients}
           keyExtractor={(item) => item.id}
-          style={{ marginTop: 10 }}
+          style={{ marginTop: spacing.sm }}
           ListEmptyComponent={() =>
             searchInput !== "" ? (
               <Text style={[styles.emptyText, styles.rtlText]}>
@@ -237,6 +242,7 @@ export default function InputTestResultScreen() {
             <TouchableOpacity
               style={styles.card}
               onPress={() => setSelectedPatient(item)}
+              activeOpacity={0.9}
             >
               <Text style={[styles.name, styles.rtlText]}>👤 {item.name}</Text>
               <Text style={[styles.subInfo, styles.rtlText]}>
@@ -257,10 +263,13 @@ export default function InputTestResultScreen() {
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => setSelectedPatient(null)}
+        activeOpacity={0.8}
       >
-        <Ionicons name="arrow-back" size={24} color="#000" />
+        <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
       </TouchableOpacity>
+
       <Text style={styles.header}>🩺 إدخال نتائج الفحص</Text>
+
       <View style={styles.card}>
         <Text style={[styles.name, styles.rtlText]}>
           👤 {selectedPatient.name} (#{selectedPatient.id})
@@ -289,12 +298,14 @@ export default function InputTestResultScreen() {
               <TouchableOpacity
                 style={styles.dateButton}
                 onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.9}
               >
                 <Text style={[styles.dateButtonText, styles.rtlText]}>
                   اختر التاريخ
                 </Text>
               </TouchableOpacity>
             </View>
+
             {showDatePicker && (
               <DateTimePicker
                 value={date}
@@ -311,6 +322,7 @@ export default function InputTestResultScreen() {
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="ادخل قيمة الفحص"
+              placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
               value={resultValue}
               onChangeText={setResultValue}
@@ -321,8 +333,13 @@ export default function InputTestResultScreen() {
             <TouchableOpacity
               style={styles.uploadButton}
               onPress={pickDocument}
+              activeOpacity={0.9}
             >
-              <Ionicons name="cloud-upload-outline" size={20} color="#2980B9" />
+              <Ionicons
+                name="cloud-upload-outline"
+                size={20}
+                color={colors.buttonInfo}
+              />
               <Text style={[styles.uploadText, styles.rtlText]}>
                 {file?.name ? file.name : "اضغط لرفع الملف"}
               </Text>
@@ -333,13 +350,24 @@ export default function InputTestResultScreen() {
               <Text style={[styles.switchLabel, styles.rtlText]}>
                 {isNormal ? "طبيعي" : "غير طبيعي"}
               </Text>
-              <Switch value={isNormal} onValueChange={setIsNormal} />
+              <Switch
+                value={isNormal}
+                onValueChange={setIsNormal}
+                trackColor={{
+                  false: colors.border,
+                  true: colors.accent,
+                }}
+                thumbColor={
+                  Platform.OS === "android" ? colors.primary : undefined
+                }
+              />
             </View>
 
             <Text style={[styles.label, styles.rtlText]}>ملاحظات الطبيب:</Text>
             <TextInput
               style={[styles.input, { height: 80 }, styles.rtlText]}
               placeholder="اكتب ملاحظاتك هنا"
+              placeholderTextColor={colors.textMuted}
               multiline
               value={note}
               onChangeText={setNote}
@@ -348,16 +376,18 @@ export default function InputTestResultScreen() {
 
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={[styles.searchButton, { backgroundColor: "#27ae60" }]}
+                style={[styles.searchButton, { backgroundColor: colors.buttonSuccess }]}
                 onPress={handleSave}
+                activeOpacity={0.9}
               >
                 <Text style={[styles.searchButtonText, styles.rtlText]}>
                   حفظ
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.searchButton, { backgroundColor: "#c0392b" }]}
+                style={[styles.searchButton, { backgroundColor: colors.buttonDanger }]}
                 onPress={() => setSelectedPatient(null)}
+                activeOpacity={0.9}
               >
                 <Text style={[styles.searchButtonText, styles.rtlText]}>
                   إلغاء
@@ -372,96 +402,151 @@ export default function InputTestResultScreen() {
 }
 
 const styles = StyleSheet.create({
-  /* كل الستايل كما هو بدون أي تعديل */
   container: {
     flex: 1,
-    backgroundColor: "#F4F6F8",
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 30,
-    paddingBottom: Platform.OS === "android" ? 40 : 20,
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.xl, // قريب من 20
+    paddingTop:
+      Platform.OS === "android"
+        ? (StatusBar.currentHeight || 0) + spacing.sm
+        : 30,
+    paddingBottom: Platform.OS === "android" ? 40 : spacing.lg,
   },
-  contentContainer: { paddingBottom: Platform.OS === "android" ? 40 : 20 },
-  backButton: { marginBottom: 15 },
+  contentContainer: {
+    paddingBottom: Platform.OS === "android" ? 40 : spacing.lg,
+  },
+  backButton: {
+    marginBottom: spacing.md + 3, // قريب من 15
+  },
   header: {
-    fontSize: 22,
+    fontSize: typography.headingMd,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2C3E50",
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
-  rtlText: { writingDirection: "rtl", textAlign: "right" },
+  rtlText: {
+    writingDirection: "rtl",
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
   input: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 10,
-    borderColor: "#ddd",
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    fontSize: typography.bodyLg,
+    marginBottom: spacing.sm + 2,
+    borderColor: colors.border,
     borderWidth: 1,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+    ...shadows.light,
   },
   searchButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2980B9",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    backgroundColor: colors.buttonInfo,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radii.md,
     alignSelf: "flex-start",
-    marginBottom: 10,
+    marginBottom: spacing.sm + 2,
+    ...shadows.light,
   },
   searchButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 8,
+    color: colors.buttonInfoText,
+    fontSize: typography.bodyLg,
+    marginLeft: spacing.sm,
     fontWeight: "bold",
+    fontFamily: typography.fontFamily,
   },
-  emptyText: { fontSize: 16, color: "#aaa" },
+  emptyText: {
+    fontSize: typography.bodyLg,
+    color: colors.textMuted,
+    fontFamily: typography.fontFamily,
+  },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    ...shadows.light,
   },
-  name: { fontWeight: "bold", fontSize: 18, marginBottom: 8, color: "#34495E" },
-  subInfo: { fontSize: 15, color: "#7f8c8d", marginBottom: 12 },
-  label: { fontSize: 16, color: "#2C3E50", marginTop: 12, marginBottom: 6 },
+  name: {
+    fontWeight: "bold",
+    fontSize: typography.headingSm,
+    marginBottom: spacing.sm,
+    color: colors.textSecondary,
+    fontFamily: typography.fontFamily,
+  },
+  subInfo: {
+    fontSize: typography.bodyMd,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
+    fontFamily: typography.fontFamily,
+  },
+  label: {
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs + 2,
+    fontFamily: typography.fontFamily,
+  },
   pickerWrapper: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 12,
+    backgroundColor: colors.buttonMuted,
+    borderRadius: radii.md,
     overflow: "hidden",
   },
   uploadButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    backgroundColor: "#eef6fb",
-    borderRadius: 12,
-    marginBottom: 10,
+    padding: spacing.md,
+    backgroundColor: colors.buttonMuted,
+    borderRadius: radii.md,
+    marginBottom: spacing.sm + 2,
   },
-  uploadText: { marginLeft: 8, fontSize: 16, color: "#2980B9" },
-  switchRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
-  switchLabel: { fontSize: 16, marginRight: 10 },
+  uploadText: {
+    marginLeft: spacing.sm,
+    fontSize: typography.bodyLg,
+    color: colors.buttonInfo,
+    fontFamily: typography.fontFamily,
+  },
+  switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  switchLabel: {
+    fontSize: typography.bodyLg,
+    marginRight: spacing.sm + 2,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+  },
   dateRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  dateText: { fontSize: 16, color: "#2C3E50" },
-  dateButton: {
-    backgroundColor: "#2980B9",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+  dateText: {
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
   },
-  dateButtonText: { color: "#fff", fontSize: 14 },
+  dateButton: {
+    backgroundColor: colors.buttonInfo,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.sm,
+  },
+  dateButtonText: {
+    color: colors.buttonInfoText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+  },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: spacing.lg,
   },
 });

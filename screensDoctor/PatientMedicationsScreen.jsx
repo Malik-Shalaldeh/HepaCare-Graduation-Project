@@ -14,6 +14,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function PatientMedicationsScreen({ route, navigation }) {
   const { patientId, patientName } = route.params;
@@ -103,41 +104,67 @@ export default function PatientMedicationsScreen({ route, navigation }) {
   const renderMedicationItem = ({ item }) => (
     <View style={styles.medItem}>
       <View style={{ flex: 1 }}>
-        <Text style={[styles.medName, styles.rtlText]}>
+        <Text style={[styles.medName, styles.rtlText]} numberOfLines={2}>
           {item.name || item.medication_name}
         </Text>
-        <Text style={[styles.infoText, styles.rtlText]}>
-          <Ionicons name="flask-outline" size={16} /> الجرعة: {item.dosage}
-        </Text>
-        <Text style={[styles.infoText, styles.rtlText]}>
-          <Ionicons name="repeat-outline" size={16} /> التكرار: {item.frequency}
-        </Text>
-        <Text style={[styles.infoText, styles.rtlText]}>
-          <Ionicons name="time-outline" size={16} /> وقت الجرعة: {item.doseTime}
-        </Text>
-        <Text style={[styles.infoText, styles.rtlText]}>
-          <Ionicons name="alarm-outline" size={16} /> الساعة المخصصة:{" "}
-          {item.timeToTake}
-        </Text>
-        {item.additionalInstructions ? (
+
+        <View style={styles.infoRow}>
+          <Ionicons name="flask-outline" size={16} color={colors.accent} />
           <Text style={[styles.infoText, styles.rtlText]}>
-            <Ionicons name="information-circle-outline" size={16} /> تعليمات:{" "}
-            {item.additionalInstructions}
+            الجرعة: {item.dosage || "-"}
           </Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="repeat-outline" size={16} color={colors.accent} />
+          <Text style={[styles.infoText, styles.rtlText]}>
+            التكرار: {item.frequency || "-"}
+          </Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="time-outline" size={16} color={colors.accent} />
+          <Text style={[styles.infoText, styles.rtlText]}>
+            وقت الجرعة: {item.doseTime || "-"}
+          </Text>
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="alarm-outline" size={16} color={colors.accent} />
+          <Text style={[styles.infoText, styles.rtlText]}>
+            الساعة المخصصة: {item.timeToTake || "-"}
+          </Text>
+        </View>
+
+        {item.additionalInstructions ? (
+          <View style={styles.infoRow}>
+            <Ionicons
+              name="information-circle-outline"
+              size={16}
+              color={colors.accent}
+            />
+            <Text style={[styles.infoText, styles.rtlText]}>
+              تعليمات: {item.additionalInstructions}
+            </Text>
+          </View>
         ) : null}
       </View>
+
       <View style={styles.medActions}>
         <TouchableOpacity
           style={[styles.actionBtn, styles.editBtn]}
           onPress={() => goToEdit(item)}
+          activeOpacity={0.9}
         >
-          <Ionicons name="create-outline" size={20} color="#fff" />
+          <Ionicons name="create-outline" size={20} color={colors.buttonPrimaryText} />
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.actionBtn, styles.deleteBtn]}
           onPress={() => deleteMedication(item)}
+          activeOpacity={0.9}
         >
-          <Ionicons name="trash-outline" size={20} color="#fff" />
+          <Ionicons name="trash-outline" size={20} color={colors.buttonDangerText} />
         </TouchableOpacity>
       </View>
     </View>
@@ -150,8 +177,8 @@ export default function PatientMedicationsScreen({ route, navigation }) {
           متابعات {patientName}
         </Text>
 
-        <TouchableOpacity style={styles.addButton} onPress={goToAdd}>
-          <Ionicons name="add-circle" size={24} color="#fff" />
+        <TouchableOpacity style={styles.addButton} onPress={goToAdd} activeOpacity={0.9}>
+          <Ionicons name="add-circle" size={24} color={colors.buttonSuccessText} />
           <Text style={styles.addButtonText}>جــدول دواء</Text>
         </TouchableOpacity>
 
@@ -168,8 +195,9 @@ export default function PatientMedicationsScreen({ route, navigation }) {
             data={medications}
             keyExtractor={(item) => String(item.id)}
             renderItem={renderMedicationItem}
-            contentContainerStyle={{ paddingBottom: 100 }}
+            contentContainerStyle={{ paddingBottom: spacing.xxl + 40 }}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           />
         )}
       </View>
@@ -178,71 +206,106 @@ export default function PatientMedicationsScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
+  safeArea: { flex: 1, backgroundColor: colors.backgroundLight },
+
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm + 4,
   },
-  rtlText: { writingDirection: "rtl", textAlign: "right" },
+
+  rtlText: {
+    writingDirection: "rtl",
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
   subtitle: {
-    fontSize: 20,
+    fontSize: typography.headingSm,
     fontWeight: "bold",
-    color: "#444",
-    marginBottom: 8,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    fontFamily: typography.fontFamily,
   },
+
   noMedsText: {
     textAlign: "center",
-    marginTop: 20,
-    color: "#888",
-    fontSize: 16,
+    marginTop: spacing.lg,
+    color: colors.textMuted,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
+
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
-    paddingVertical: Platform.select({ ios: 12, android: 10 }),
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 10,
+    backgroundColor: colors.buttonSuccess,
+    paddingVertical: Platform.select({ ios: spacing.md, android: spacing.sm + 2 }),
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.sm,
+    ...shadows.medium,
+    marginBottom: spacing.sm + 2,
     alignSelf: "flex-start",
   },
+
   addButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 6,
+    color: colors.buttonSuccessText,
+    fontSize: typography.bodyLg,
+    fontWeight: "700",
+    marginLeft: spacing.xs + 2,
+    fontFamily: typography.fontFamily,
   },
+
   medItem: {
     flexDirection: "row-reverse",
-    backgroundColor: "#FFF",
-    padding: Platform.select({ ios: 16, android: 14 }),
-    borderRadius: 10,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    backgroundColor: colors.background,
+    padding: Platform.select({ ios: spacing.lg, android: spacing.md + 2 }),
+    borderRadius: radii.md,
+    marginVertical: spacing.xs + 2,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.accent,
+    ...shadows.light,
   },
-  medName: { fontSize: 18, fontWeight: "bold", color: "#333", marginBottom: 6 },
-  infoText: { fontSize: 14, color: "#555", marginBottom: 2 },
-  medActions: { justifyContent: "space-between", marginRight: 10 },
+
+  medName: {
+    fontSize: typography.bodyLg,
+    fontWeight: "bold",
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+    fontFamily: typography.fontFamily,
+  },
+
+  infoRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    marginBottom: spacing.xs + 1,
+    gap: spacing.xs + 2,
+  },
+
+  infoText: {
+    fontSize: typography.bodyMd,
+    color: colors.textSecondary,
+    fontFamily: typography.fontFamily,
+    flex: 1,
+  },
+
+  medActions: {
+    justifyContent: "space-between",
+    marginRight: spacing.sm,
+  },
+
   actionBtn: {
-    padding: 8,
-    borderRadius: 6,
-    marginVertical: 2,
+    padding: spacing.sm - 2,
+    borderRadius: radii.sm - 2,
+    marginVertical: spacing.xs,
     width: 36,
     height: 36,
     justifyContent: "center",
     alignItems: "center",
+    ...shadows.light,
   },
-  editBtn: { backgroundColor: "#2196F3" },
-  deleteBtn: { backgroundColor: "#F44336" },
+
+  editBtn: { backgroundColor: colors.buttonPrimary },
+  deleteBtn: { backgroundColor: colors.buttonDanger },
 });

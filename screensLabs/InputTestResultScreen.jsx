@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function InputTestResultScreen() {
   const navigation = useNavigation();
@@ -110,10 +111,10 @@ export default function InputTestResultScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F4F6F8" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundLight }}>
       <StatusBar
         barStyle={Platform.OS === "ios" ? "dark-content" : "light-content"}
-        backgroundColor={Platform.OS === "android" ? "#2980B9" : undefined}
+        backgroundColor={Platform.OS === "android" ? colors.primary : undefined}
       />
       {!selectedPatient ? (
         <View style={styles.container}>
@@ -130,18 +131,19 @@ export default function InputTestResultScreen() {
             value={searchInput}
             onChangeText={setSearchInput}
             textAlign="right"
+            placeholderTextColor={colors.textMuted}
           />
           <TouchableOpacity
             style={styles.searchButton}
             onPress={handlePatientSearch}
           >
-            <Ionicons name="search" size={20} color="#fff" />
+            <Ionicons name="search" size={20} color={colors.buttonInfoText} />
             <Text style={[styles.searchButtonText, styles.rtlText]}>بحث</Text>
           </TouchableOpacity>
           <FlatList
             data={filteredPatients}
             keyExtractor={(item) => item.id}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: spacing.sm }}
             ListEmptyComponent={() =>
               searchInput !== "" ? (
                 <Text style={[styles.emptyText, styles.rtlText]}>
@@ -233,6 +235,7 @@ export default function InputTestResultScreen() {
                   value={resultValue}
                   onChangeText={setResultValue}
                   textAlign="right"
+                  placeholderTextColor={colors.textMuted}
                 />
 
                 <Text style={[styles.label, styles.rtlText]}>
@@ -245,7 +248,7 @@ export default function InputTestResultScreen() {
                   <Ionicons
                     name="cloud-upload-outline"
                     size={20}
-                    color="#2980B9"
+                    color={colors.buttonInfo}
                   />
                   <Text style={[styles.uploadText, styles.rtlText]}>
                     {file ? file.name : "اضغط لرفع الملف"}
@@ -257,7 +260,17 @@ export default function InputTestResultScreen() {
                   <Text style={[styles.switchLabel, styles.rtlText]}>
                     {isNormal ? "طبيعي" : "غير طبيعي"}
                   </Text>
-                  <Switch value={isNormal} onValueChange={setIsNormal} />
+                  <Switch
+                    value={isNormal}
+                    onValueChange={setIsNormal}
+                    trackColor={{
+                      false: colors.border,
+                      true: colors.accent,
+                    }}
+                    thumbColor={
+                      Platform.OS === "android" ? colors.primary : undefined
+                    }
+                  />
                 </View>
 
                 <Text style={[styles.label, styles.rtlText]}>
@@ -270,11 +283,12 @@ export default function InputTestResultScreen() {
                   value={note}
                   onChangeText={setNote}
                   textAlign="right"
+                  placeholderTextColor={colors.textMuted}
                 />
 
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
-                    style={[styles.searchButton, { backgroundColor: "#27ae60" }]}
+                    style={[styles.searchButton, styles.saveButton]}
                     onPress={handleSave}
                   >
                     <Text style={[styles.searchButtonText, styles.rtlText]}>
@@ -282,7 +296,7 @@ export default function InputTestResultScreen() {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.searchButton, { backgroundColor: "#c0392b" }]}
+                    style={[styles.searchButton, styles.cancelButton]}
                     onPress={() => setSelectedPatient(null)}
                   >
                     <Text style={[styles.searchButtonText, styles.rtlText]}>
@@ -302,110 +316,127 @@ export default function InputTestResultScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F4F6F8",
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 10,
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg,
+    paddingTop:
+      Platform.OS === "android"
+        ? StatusBar.currentHeight + spacing.sm
+        : spacing.sm,
   },
   contentContainer: {
-    paddingBottom: Platform.OS === "android" ? 40 : 20,
+    paddingBottom: Platform.OS === "android" ? spacing.xxl : spacing.xl,
   },
   backButton: {
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   header: {
-    fontSize: 22,
+    fontSize: typography.headingMd,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#2C3E50",
+    marginBottom: spacing.xl,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
   rtlText: {
     writingDirection: "rtl",
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
   input: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 10,
-    borderColor: "#ddd",
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    fontSize: typography.bodyLg,
+    marginBottom: spacing.sm,
+    borderColor: colors.border,
     borderWidth: 1,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
   },
   searchButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2980B9",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    backgroundColor: colors.buttonInfo,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radii.md,
     alignSelf: "flex-start",
-    marginBottom: 10,
+    marginBottom: spacing.sm,
+    ...shadows.light,
   },
   searchButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 8,
+    color: colors.buttonInfoText,
+    fontSize: typography.bodyLg,
+    marginLeft: spacing.sm,
     fontWeight: "bold",
+    fontFamily: typography.fontFamily,
   },
   emptyText: {
-    fontSize: 16,
-    color: "#aaa",
+    fontSize: typography.bodyLg,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    ...shadows.medium,
   },
   name: {
     fontWeight: "bold",
-    fontSize: 18,
-    marginBottom: 8,
-    color: "#34495E",
+    fontSize: typography.headingSm,
+    marginBottom: spacing.sm,
+    color: colors.textSecondary,
+    fontFamily: typography.fontFamily,
   },
   subInfo: {
-    fontSize: 15,
-    color: "#7f8c8d",
-    marginBottom: 12,
+    fontSize: typography.bodyLg,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
+    fontFamily: typography.fontFamily,
   },
   label: {
-    fontSize: 16,
-    color: "#2C3E50",
-    marginTop: 12,
-    marginBottom: 6,
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.xs,
+    fontFamily: typography.fontFamily,
   },
   pickerWrapper: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 12,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   uploadButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    backgroundColor: "#eef6fb",
-    borderRadius: 12,
-    marginBottom: 10,
+    padding: spacing.md,
+    backgroundColor: colors.buttonMuted,
+    borderRadius: radii.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   uploadText: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: "#2980B9",
+    marginLeft: spacing.sm,
+    fontSize: typography.bodyLg,
+    color: colors.buttonInfo,
+    fontFamily: typography.fontFamily,
   },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: spacing.md,
+    justifyContent: "space-between",
   },
   switchLabel: {
-    fontSize: 16,
-    marginRight: 10,
+    fontSize: typography.bodyLg,
+    marginRight: spacing.sm,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
   },
   dateRow: {
     flexDirection: "row",
@@ -413,22 +444,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dateText: {
-    fontSize: 16,
-    color: "#2C3E50",
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
   },
   dateButton: {
-    backgroundColor: "#2980B9",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    backgroundColor: colors.buttonSecondary,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.sm,
   },
   dateButtonText: {
-    color: "#fff",
-    fontSize: 14,
+    color: colors.buttonSecondaryText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: spacing.xl,
+  },
+  saveButton: {
+    backgroundColor: colors.buttonSuccess,
+  },
+  cancelButton: {
+    backgroundColor: colors.buttonDanger,
   },
 });

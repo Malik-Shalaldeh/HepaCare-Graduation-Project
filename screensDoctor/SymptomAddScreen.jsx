@@ -16,15 +16,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
-
-const COLORS = {
-  primary: "#00b29c",
-  bg: "#f5f7f8",
-  card: "#ffffff",
-  text: "#1f2937",
-  mutetxt: "#6b7280",
-  border: "#e5e7eb",
-};
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function SymptomAddScreen() {
   const route = useRoute();
@@ -45,40 +37,59 @@ export default function SymptomAddScreen() {
   });
 
   useEffect(() => {
+    let mounted = true;
+
     const init = async () => {
       try {
         const id = await AsyncStorage.getItem("doctor_id");
-        if (id) setDoctorId(parseInt(id, 10));
+        if (mounted) setDoctorId(id ? parseInt(id, 10) : null);
       } catch (e) {
-        console.log("Error loading doctor_id", e);
+        if (mounted) setDoctorId(null);
       }
-      await fetchSymptoms();
+
+      await fetchSymptoms(mounted);
     };
+
     init();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const fetchSymptoms = async () => {
+  const fetchSymptoms = async (mountedFlag = true) => {
     try {
       setLoadingSymptoms(true);
-      const res = await fetch(AbedEndPoint.symptomSymptoms);
-      if (!res.ok) {
-        console.log("Failed to load symptoms", res.status);
-        return;
-      }
+      const res = await fetch(AbedEndPoint.symptomSymptoms, {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
-      setApiSymptoms(data || []);
+
+      const safe = Array.isArray(data)
+        ? data
+            .filter((s) => s && typeof s.id !== "undefined" && s.name)
+            .map((s) => ({
+              id: s.id,
+              name: s.name,
+              code: s.code || "",
+            }))
+        : [];
+
+      if (mountedFlag) setApiSymptoms(safe);
     } catch (err) {
+      if (mountedFlag) setApiSymptoms([]);
       console.log("Error fetching symptoms", err);
     } finally {
-      setLoadingSymptoms(false);
+      if (mountedFlag) setLoadingSymptoms(false);
     }
   };
 
   const generalSymptoms = apiSymptoms.filter(
-    (s) => !s.code || !s.code.toUpperCase().startsWith("SIGN-")
+    (s) => !s.code || !String(s.code).toUpperCase().startsWith("SIGN-")
   );
-  const signSymptoms = apiSymptoms.filter(
-    (s) => s.code && s.code.toUpperCase().startsWith("SIGN-")
+  const signSymptoms = apiSymptoms.filter((s) =>
+    String(s.code).toUpperCase().startsWith("SIGN-")
   );
 
   const toggleSymptom = (id) => {
@@ -134,7 +145,7 @@ export default function SymptomAddScreen() {
       }
 
       Alert.alert("تم", "تم حفظ العرض بنجاح.");
-      navigation.goBack(); // يرجع لسجل الأعراض
+      navigation.goBack();
     } catch (err) {
       console.log("Error saving entry", err);
       Alert.alert("خطأ", "تعذر الاتصال بالخادم.");
@@ -150,7 +161,7 @@ export default function SymptomAddScreen() {
           <Ionicons
             name="person-circle-outline"
             size={40}
-            color={COLORS.primary}
+            color={colors.accent}
           />
           <View style={{ flex: 1 }}>
             <Text style={styles.patientName}>{patient?.name}</Text>
@@ -165,7 +176,7 @@ export default function SymptomAddScreen() {
         <Text style={styles.sectionTitle}>الأعراض</Text>
         {loadingSymptoms ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.mutetxt}>جارٍ تحميل الأعراض...</Text>
           </View>
         ) : generalSymptoms.length === 0 ? (
@@ -185,7 +196,7 @@ export default function SymptomAddScreen() {
         <Text style={styles.sectionTitle}>علامات التهاب</Text>
         {loadingSymptoms ? (
           <View style={styles.center}>
-            <ActivityIndicator size="small" color={COLORS.primary} />
+            <ActivityIndicator size="small" color={colors.primary} />
           </View>
         ) : signSymptoms.length === 0 ? (
           <Text style={styles.mutetxt}>لا توجد علامات التهاب مسجلة.</Text>
@@ -261,91 +272,102 @@ export default function SymptomAddScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.backgroundLight,
   },
   container: {
-    padding: 16,
-    paddingBottom: 24,
+    flexGrow: 1,
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   patientCard: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: COLORS.card,
-    borderRadius: 10,
-    padding: 12,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: 12,
+    borderColor: colors.textMuted,
+    marginBottom: spacing.md,
+    ...shadows.card,
   },
   patientName: {
-    fontSize: 17,
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
-    color: COLORS.text,
+    color: colors.textPrimary,
     textAlign: "right",
   },
   patientSub: {
-    fontSize: 13,
-    color: COLORS.mutetxt,
+    fontSize: typography.caption,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
     textAlign: "right",
-    marginTop: 2,
+    marginTop: spacing.xs,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
-    color: COLORS.text,
-    marginTop: 10,
-    marginBottom: 6,
+    color: colors.textPrimary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
     textAlign: "right",
   },
   checkboxRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 6,
+    paddingVertical: spacing.sm,
   },
   checkboxLabel: {
-    fontSize: 14,
-    color: COLORS.text,
+    fontSize: typography.body,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
     flex: 1,
     textAlign: "right",
-    marginLeft: 10,
+    marginLeft: spacing.sm,
   },
   notesInput: {
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    backgroundColor: COLORS.card,
+    borderColor: colors.textMuted,
+    borderRadius: radii.lg,
+    backgroundColor: colors.background,
     minHeight: 90,
     textAlignVertical: "top",
-    padding: 10,
-    fontSize: 14,
+    padding: spacing.md,
+    fontSize: typography.body,
+    fontFamily: typography.fontFamily,
     textAlign: "right",
   },
   btnWrapper: {
-    marginTop: 18,
+    marginTop: spacing.xl,
   },
   btn: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
-    borderRadius: 22,
+    paddingVertical: spacing.md,
+    borderRadius: radii.pill,
   },
   saveBtn: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   btnTxt: {
     color: "#fff",
+    fontFamily: typography.fontFamily,
+    fontSize: typography.body,
     fontWeight: "600",
-    marginLeft: 6,
+    marginHorizontal: spacing.sm,
   },
   center: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8,
+    paddingVertical: spacing.md,
   },
   mutetxt: {
-    color: COLORS.mutetxt,
-    marginTop: 4,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.caption,
   },
 });
