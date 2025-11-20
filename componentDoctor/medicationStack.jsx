@@ -1,7 +1,5 @@
 // navigation/MedicationsStackScreen.js
-import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import Medications from "../screensDoctor/Medications";
 import MedPatientsScreen from "../screensDoctor/MedPatientsScreen";
 import PatientMedicationsScreen from "../screensDoctor/PatientMedicationsScreen";
@@ -15,36 +13,22 @@ const MedicationsStackScreen = () => {
     <Stack.Navigator
       initialRouteName="Medications"
       screenOptions={{
-        // هيدر موحّد
         headerShown: true,
         headerTitleAlign: "center",
         headerTintColor: "#fff",
         headerStyle: {
           backgroundColor: "#00b29c",
-          elevation: 0,
-          shadowOpacity: 0,
         },
         headerTitleStyle: { fontSize: 18, fontWeight: "700" },
-
-        // إبقاء السهم فقط (بدون Back/اسم الشاشة السابقة)
         headerBackTitleVisible: false,
         headerBackTitle: "",
-
         gestureEnabled: true,
       }}
     >
-      {/* الرئيسية (هيدر داخليها الخاص) */}
       <Stack.Screen
         name="Medications"
         component={Medications}
         options={{ headerShown: false }}
-      />
-
-      {/* المرضى */}
-      <Stack.Screen
-        name="MedPatients"
-        component={MedPatientsScreen}
-        options={{ title: "أدوية المرضى" }}
       />
       <Stack.Screen
         name="MedPatientsScreen"
@@ -52,7 +36,6 @@ const MedicationsStackScreen = () => {
         options={{ title: "أدوية المرضى" }}
       />
 
-      {/* أدوية المريض — عنوان ثابت بدون اسم المريض */}
       <Stack.Screen
         name="PatientMedications"
         component={PatientMedicationsScreen}

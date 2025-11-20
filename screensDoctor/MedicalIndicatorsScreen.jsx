@@ -10,9 +10,7 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 import { AVAILABLE_TESTS } from '../componentDoctor/availableTestsindicators';
 import TestCard from '../componentDoctor/TestCardindicator';
 import ResultCard from '../componentDoctor/ResultCardincedators';
@@ -21,7 +19,6 @@ import {
   analyzeTests,
   removeResultByKey,
 } from '../componentDoctor/FunctionsMedicalIndicators';
-
 import theme from '../style/theme';
 
 const MedicalIndicatorsScreen = () => {

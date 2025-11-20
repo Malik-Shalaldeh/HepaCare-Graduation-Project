@@ -8,16 +8,14 @@ import {
   ActivityIndicator,
   Platform,
   StatusBar,
-  TouchableOpacity,
   Alert,
+  ScrollView, 
 } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
-import HelpButton from '../componentHelp/ButtonHelp';
 import ENDPOINTS from '../malikEndPoint';
-import theme from '../style/theme';
+import theme, { colors } from '../style/theme';
 
 const TESTS = [
   { key: 'ALT',       label: 'ALT (U/L)' },
@@ -29,18 +27,22 @@ const TESTS = [
   { key: 'APRI',      label: 'APRI' },
 ];
 
-// ألوان مخصصة لخطوط المخطط والـ legend (مسموح تكون متنوعة)
-const COLORS = ['#0B4F6C','#1876A6','#2FA4A9','#7B1FA2','#00796B','#3F8EDB','#145E80'];
+const COLORS = [
+  '#1E88E5', 
+  '#43A047', 
+  '#FB8C00', 
+  '#8E24AA', 
+  '#00ACC1', 
+  '#F4511E', 
+  '#3949AB', 
+];
 
 const { width } = Dimensions.get('window');
 
 export default function PatientChartScreen() {
   const route = useRoute();
-  const navigation = useNavigation();
-
   const patientId = route.params.patientId;
   const patientName = route.params.patientName;
-
   const [records, setRecords] = useState(null);
 
   useEffect(() => {
@@ -50,7 +52,8 @@ export default function PatientChartScreen() {
           `${ENDPOINTS.PATIENT_CHART.GET}?patient_id=${patientId}`
         );
         setRecords(response.data);
-      } catch (error) {
+      } 
+      catch (error) {
         Alert.alert(
           'خطأ',
           'تأكد من اتصالك بالإنترنت',
@@ -64,13 +67,9 @@ export default function PatientChartScreen() {
 
   if (records === null) {
     return (
-      <SafeAreaView
-        style={styles.loading}
-      >
+      <SafeAreaView style={styles.loading}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text
-          style={styles.loadingText}
-        >
+        <Text style={styles.loadingText}>
           جارِ تحميل البيانات...
         </Text>
       </SafeAreaView>
@@ -86,45 +85,16 @@ export default function PatientChartScreen() {
   }));
 
   return (
-    <SafeAreaView
-      style={styles.safeArea}
-    >
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.colors.background}
-      />
-
-      {/* زر الرجوع */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('PatientListScreen')}
-        style={styles.backBtn}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={theme.colors.textPrimary}
-        />
-      </TouchableOpacity>
-
-      {/* عنوان الصفحة */}
-      <Text
-        style={styles.pageTitle}
-      >
-        تطور حالة المريض
-      </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" />
 
       {/* معلومات المريض */}
-      <Text
-        style={styles.patientInfo}
-      >
+      <Text style={styles.patientInfo}>
         {patientName} ({patientId})
       </Text>
 
-      {/* وسيلة الإيضاح (Legend) */}
-      <View
-        style={styles.legend}
-      >
+      {/*  (Legend) */}
+      <View style={styles.legend}>
         {TESTS.map((t, i) => (
           <View key={t.key} style={styles.legendItem}>
             <View
@@ -138,51 +108,48 @@ export default function PatientChartScreen() {
         ))}
       </View>
 
-      {/* المخطط */}
-      <View
-        style={styles.chartWrapper}
-      >
+      {/* المخطط مع Scroll أفقي */}
+      <View style={styles.chartWrapper}>
         {records.length > 0 ? (
-          <LineChart
-            data={{ labels, datasets }}
-            width={width - 40}
-            height={280}
-            fromZero
-            withDots
-            bezier
-            chartConfig={{
-              backgroundColor: theme.colors.background,
-              backgroundGradientFrom: theme.colors.background,
-              backgroundGradientTo: theme.colors.background,
-              decimalPlaces: 1,
-              color: (opacity = 1) =>
-                `rgba(11, 79, 108, ${opacity})`, // قريب من primary
-              labelColor: (opacity = 1) =>
-                `rgba(13, 30, 46, ${opacity})`, // textPrimary
-              style: { borderRadius: theme.radii.md },
-              propsForDots: {
-                r: '4',
-                strokeWidth: '2',
-                stroke: theme.colors.accent,
-              },
-            }}
-            style={styles.chart}
-          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={true}
+          >
+            <LineChart
+              data={{ labels, datasets }}
+              width={labels.length * 80}
+              height={400}
+              fromZero
+              withDots
+              bezier
+              chartConfig={{
+                backgroundColor: theme.colors.background,
+                backgroundGradientFrom: theme.colors.background,
+                backgroundGradientTo: theme.colors.background,
+                decimalPlaces: 1,
+                color: (opacity = 1) => `rgba(11, 70, 108, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(13, 30, 46, ${opacity})`,
+                style: { borderRadius: theme.radii.md },
+                propsForDots: {
+                  r: '4',
+                  strokeWidth: '2',
+                  stroke: theme.colors.accent,
+                },
+                propsForLabels: {
+                  fontSize: 10,
+                },
+              }}
+              style={styles.chart}
+            />
+          </ScrollView>
         ) : (
           <View style={styles.emptyChart}>
-            <Text
-              style={styles.emptyText}
-            >
+            <Text style={styles.emptyText}>
               لا توجد بيانات لعرضها
             </Text>
           </View>
         )}
       </View>
-
-      <HelpButton
-        title="مساعدة - مخططات المريض"
-        info="تعرض هذه الشاشة تطوّر نتائج الفحوصات للمريض على شكل مخطط زمني. استخدمها لمتابعة الاستجابة أو التدهور. الألوان توضّح كل فحص."
-      />
     </SafeAreaView>
   );
 }
@@ -203,17 +170,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     fontSize: theme.typography.bodyMd,
     color: theme.colors.textSecondary,
-    fontFamily: theme.typography.fontFamily,
-  },
-  backBtn: {
-    margin: theme.spacing.md,
-  },
-  pageTitle: {
-    fontSize: theme.typography.headingMd,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    textAlign: 'center',
-    marginTop: theme.spacing.xs,
     fontFamily: theme.typography.fontFamily,
   },
   patientInfo: {
@@ -256,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radii.md,
   },
   emptyChart: {
-    width: width - 40,
+    width: width - 20,
     height: 280,
     justifyContent: 'center',
     alignItems: 'center',

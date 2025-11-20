@@ -28,7 +28,7 @@ const EvaluationVisitScreen = () => {
   const [notes, setNotes] = useState('');
   const [psychosocial, setPsychosocial] = useState('');
 
-  useEffect(() => {
+  useEffect(() =>{
     if (!patientId) {
       navigation.goBack();
     }
@@ -72,7 +72,8 @@ const EvaluationVisitScreen = () => {
       setAdherence('');
       setNotes('');
       setPsychosocial('');
-    } catch (error) {
+    } 
+    catch (error) {
       Alert.alert('خطأ', 'تأكد من الاتصال أو البيانات.');
     }
   };
@@ -173,11 +174,8 @@ const EvaluationVisitScreen = () => {
             setAdherence
           )}
 
-          <Text
-            style={styles.label}
-          >
-            3. ملاحظات الطبيب
-          </Text>
+          <Text style={styles.label}> 3. ملاحظات الطبيب</Text>
+
           <TextInput
             placeholder="ملاحظات طبية..."
             placeholderTextColor={theme.colors.textMuted}
@@ -188,11 +186,8 @@ const EvaluationVisitScreen = () => {
             textAlign="right"
           />
 
-          <Text
-            style={styles.label}
-          >
-            4. ملاحظات نفسية / اجتماعية
-          </Text>
+          <Text style={styles.label}> 4. ملاحظات نفسية / اجتماعية</Text>
+          
           <TextInput
             placeholder="مثال: اكتئاب، قلق، دعم عائلي..."
             placeholderTextColor={theme.colors.textMuted}

@@ -6,8 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import ENDPOINTS from '../malikEndPoint';
 import axios from 'axios';
-
-// استدعاء الثيم الموحد
 import theme from '../style/theme';
 
 const Dashboard = () => {
@@ -52,7 +50,8 @@ const Dashboard = () => {
 
         setDoctorName(data.doctor_name || '');
         setPatientsCount(Number(data.patients_count) || 0);
-      } catch (err) {
+      } 
+      catch (err) {
         console.log('Dashboard error:', err?.message || err);
         if (active) {
           Alert.alert('خطأ', 'تعذر جلب بيانات لوحة التحكم.');
@@ -139,6 +138,7 @@ const Dashboard = () => {
               عرض توزيع المرضى حسب المحافظة
             </Text>
           </View>
+          
         </TouchableOpacity>
       </View>
     </ScreenWithDrawer>

@@ -1,19 +1,14 @@
-import React from "react";
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import Patients from "../screensDoctor/Patients";
 import DataPatientsListScreen from "../screensDoctor/SearchDataPatientSecreen";
 import PatientListScreen from "../screensDoctor/PatientListScreen";
 import Medications from "../screensDoctor/Medications";
 import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
 import PatientChartScreen from "../screensDoctor/PatientChartScreen";
-// ❌ احذف هذا:
-// import AddPatientsScreen from '../screensDoctor/AddPatientsScreen';
-// ✅ وبداله:
 import AddPatientStack from "./AddPatientStack";
-import {colors,typography} from "../style/theme";
+import theme, {colors} from "../style/theme";
 import SymptomStack from "./SymptomStack";
 
 const Stack = createStackNavigator();
@@ -34,7 +29,19 @@ export default function PatientsStack() {
       screenOptions={{
         animation: "slide_from_right",
          headerBackTitleVisible: false,
+          headerStyle: {
+          backgroundColor: theme.colors.primary,          //  لون الهيدر 
+        },
+        headerTintColor: theme.colors.buttonPrimaryText,  // لون النص والأيقونة (زر الرجوع)
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.headingSm,
+        },
       }}
+
+      
     >
       <Stack.Screen
         name="Patients"
@@ -66,7 +73,6 @@ export default function PatientsStack() {
         options={{ headerShown: false }}
       />
 
-      {/* ✅ إضافة مريض صار Stack من 3 شاشات */}
       <Stack.Screen
         name="إضافة مريض"
         component={AddPatientStack}
@@ -83,7 +89,9 @@ export default function PatientsStack() {
       <Stack.Screen
         name="PatientChartScreen"
         component={PatientChartScreen}
-        options={{ headerShown: false }}
+        options={{
+          title: "تطور المؤشرات المخبرية للمريض", 
+        }}
       />
 
       <Stack.Screen

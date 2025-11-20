@@ -1,7 +1,5 @@
 // navigation/TestsStack.js
-import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import Tests from '../screensDoctor/Tests';
 import TestResultsScreen from '../screensDoctor/TestResultsScreen';
 import MedicalIndicatorsScreen from '../screensDoctor/MedicalIndicatorsScreen';
@@ -15,7 +13,7 @@ const TestsStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.colors.primary,          // نفس لون الهيدر تبع الدكتور
+          backgroundColor: theme.colors.primary,        
         },
         headerTintColor: theme.colors.buttonPrimaryText,  // لون النص والأيقونة (زر الرجوع)
         headerTitleAlign: 'center',

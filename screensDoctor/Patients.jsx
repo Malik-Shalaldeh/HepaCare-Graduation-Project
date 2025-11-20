@@ -1,5 +1,4 @@
 // Patients.jsx
-import { useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -14,12 +13,6 @@ import theme from "../style/theme";
 
 const Patients = () => {
   const navigation = useNavigation();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
 
   return (
     <View
@@ -53,13 +46,12 @@ const Patients = () => {
           المرضى
         </Text>
 
-        {/* عنصر فارغ للموازنة البصرية */}
         <View style={{ width: 28 }} />
       </View>
 
       {/* المحتوى */}
       <View style={styles.content}>
-        {/* زر إضافة مريض - أساسي */}
+      
         <TouchableOpacity
           style={[styles.button, styles.addButton]}
           onPress={() => navigation.navigate("إضافة مريض")}
@@ -79,7 +71,7 @@ const Patients = () => {
           </View>
         </TouchableOpacity>
 
-        {/* زر البحث عن سجل مريض - Info */}
+        {/* زر البحث عن سجل مريض */}
         <TouchableOpacity
           style={[styles.button, styles.searchButton]}
           onPress={() => navigation.navigate("PatientListScreen")}
@@ -99,7 +91,7 @@ const Patients = () => {
           </View>
         </TouchableOpacity>
 
-        {/* زر تتبع الأعراض - Secondary */}
+        {/* زر تتبع الأعراض -*/}
         <TouchableOpacity
           style={[styles.button, styles.symptomsButton]}
           onPress={() => navigation.navigate("تتبع الأعراض")}

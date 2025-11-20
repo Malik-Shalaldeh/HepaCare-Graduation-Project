@@ -1,4 +1,3 @@
-import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -8,7 +7,6 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
 import Visits from "../screensDoctor/Visits";
 import LoginScreen from "../Login/LoginScreen";
 import LabsScreen from "../screensDoctor/LabsScreen";
@@ -28,15 +26,11 @@ import theme from "../style/theme";
 import { useNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 
-
-function shouldShowTestsHeader(route) {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? 'TestsMain';
-  if (routeName === 'TestsMain') {
-    return true;
-  }
-  return false;
+function shouldShowTestsHeader(route) 
+{
+  const routeName = getFocusedRouteNameFromRoute(route) || 'TestsMain';
+  return routeName === 'TestsMain';
 }
-
 
 
 function CustomDrawerContent(props) {
@@ -73,6 +67,7 @@ function CustomDrawerContent(props) {
 }
 
 const Tab = createBottomTabNavigator();
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -129,6 +124,7 @@ function MainTabs() {
 }
 
 const Drawer = createDrawerNavigator();
+
 function NavigatorDoctor() {
   return (
     <>
@@ -183,10 +179,10 @@ function NavigatorDoctor() {
        <Drawer.Screen
          name="الفحوصات"
          component={TestsStack}
-        options={({ route }) => ({
-        headerShown: shouldShowTestsHeader(route),
-        drawerIcon: ({ size, color }) => (
-          <Ionicons name="analytics-outline" size={size} color={color} />
+          options={({ route }) => ({
+            headerShown: shouldShowTestsHeader(route),
+            drawerIcon: ({ size, color }) => (
+            <Ionicons name="analytics-outline" size={size} color={color} />
         ),
        })}
       />

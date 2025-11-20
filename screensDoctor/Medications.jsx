@@ -1,5 +1,4 @@
 // screensDoctor/Medications.jsx
-import React from 'react';
 import {
   View,
   Text,
@@ -19,7 +18,6 @@ export default function Medications() {
     <View
       style={styles.container}
     >
-      {/* شريط الحالة */}
       <StatusBar
         backgroundColor={theme.colors.primary}
         barStyle="light-content"
@@ -42,19 +40,17 @@ export default function Medications() {
           />
         </TouchableOpacity>
 
-        {/* عنوان الهيدر */}
         <Text
           style={styles.headerTitle}
         >
           الأدوية
         </Text>
-
-        {/* عنصر فارغ للموازنة البصرية */}
         <View style={{ width: 28 }} />
       </View>
 
       {/* المحتوى */}
       <View style={styles.content}>
+
         {/* زر جدولة دواء لمريض */}
         <TouchableOpacity
           style={[styles.button, styles.scheduleButton]}
@@ -93,7 +89,6 @@ export default function Medications() {
           </Text>
         </TouchableOpacity>
 
-        {/* تقدر تضيف أزرار أخرى بنفس النمط لاحقاً */}
       </View>
     </View>
   );
@@ -134,7 +129,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     ...theme.shadows.light,
   },
-  // ألوان الأزرار من الثيم (كلها باردة وقريبة من الأساسي)
   scheduleButton: {
     backgroundColor: theme.colors.buttonPrimary,
   },
