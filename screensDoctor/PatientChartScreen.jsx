@@ -11,11 +11,11 @@ import {
   Alert,
   ScrollView, 
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
-import theme, { colors } from '../style/theme';
+import theme from '../style/theme';
 
 const TESTS = [
   { key: 'ALT',       label: 'ALT (U/L)' },

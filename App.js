@@ -1,5 +1,5 @@
 // App.js
-
+import { I18nManager } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -12,6 +12,10 @@ import { EducationalContentProvider } from "./contexts/EducationalContentContext
 import NavigatorLab from "./componentLap/LapDrawerNavigator";
 import AdminTabs from "./screensAdmin/AdminTabs";
 import HealthDrawerNavigator from "./componentHealth/HealthDrawerNavigator";
+
+// 🟢 أوقف RTL ومنعه تماماً داخل التطبيق
+I18nManager.forceRTL(false);
+I18nManager.allowRTL(false);
 
 const Stack = createNativeStackNavigator();
 

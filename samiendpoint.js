@@ -2,13 +2,7 @@
 // Add new endpoints here and import this file wherever needed.
 // This makes maintaining URL changes easy and avoids hard-coding strings.
 
-import { Platform } from 'react-native';
-
-// تحديد الـ BASE URL بناءً على المنصة
-const BASE_URL = Platform.OS === 'android' 
-
-  ?  'http://192.168.1.122:8000'  // للأندرويد
-  :  'http://192.168.1.122:8000'; // للماك/ويندوز
+const BASE_URL = "https://luminous-possibility-production.up.railway.app";
 
 
 const ENDPOINTS = {
