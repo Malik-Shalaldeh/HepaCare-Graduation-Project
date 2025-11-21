@@ -1,7 +1,7 @@
 // sami
 
 // PatientListScreen.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -27,12 +27,13 @@ import theme, {
   shadows,
 } from "../style/theme";
 
+const ESTIMATED_CARD_HEIGHT = 200;
+
 const PatientListScreen = () => {
   const navigation = useNavigation();
 
   const [patients, setPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredPatients, setFilteredPatients] = useState([]);
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -44,7 +45,7 @@ const PatientListScreen = () => {
           return;
         }
 
-        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`;
+        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}&minimal=true`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -53,8 +54,24 @@ const PatientListScreen = () => {
 
         const patientsData = await response.json();
 
-        setPatients(patientsData || []);
-        setFilteredPatients(patientsData || []);
+        // ✅ توحيد شكل البيانات القادمة من الـ API
+        const sanitizedPatients = (patientsData || []).map((patient) => ({
+          id: patient.id,
+          name:
+            patient.name ||
+            patient.full_name ||
+            `مريض رقم ${patient.id ?? ""}`,
+          nationalId: patient.nationalId || patient.national_id || "غير متوفر",
+          phone: patient.phone || patient.phone_number || null,
+          address: patient.address || null,
+          age:
+            typeof patient.age === "number" || typeof patient.age === "string"
+              ? patient.age
+              : "--",
+          lastVisit: patient.lastVisit || patient.last_visit || null,
+        }));
+
+        setPatients(sanitizedPatients);
       } catch (error) {
         console.error("خطأ في جلب المرضى:", error);
         Alert.alert("خطأ", "تعذر جلب قائمة المرضى");
@@ -64,115 +81,129 @@ const PatientListScreen = () => {
     loadPatients();
   }, []);
 
-  const handleSearch = (text) => {
+  const handleSearch = useCallback((text) => {
     setSearchQuery(text);
-    const filtered =
-      text.trim() === ""
-        ? patients
-        : patients.filter(
-            (patient) =>
-              (patient.name || "").toLowerCase().includes(text.toLowerCase()) ||
-              (patient.nationalId || "").includes(text)
-          );
-    setFilteredPatients(filtered);
-  };
+  }, []);
+
+  const filteredPatients = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return patients;
+
+    return patients.filter((patient) => {
+      const nameMatch = (patient.name || "")
+        .toLowerCase()
+        .includes(query);
+      const idMatch = (patient.nationalId || "").includes(
+        searchQuery.trim()
+      );
+      return nameMatch || idMatch;
+    });
+  }, [patients, searchQuery]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "غير محدد";
-    return new Date(dateString).toLocaleDateString("ar-EG", {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "غير محدد";
+    return date.toLocaleDateString("ar-EG", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
   };
 
-  const renderPatientItem = ({ item }) => (
-    <View style={styles.patientCard}>
-      <View style={styles.patientInfo}>
-        <Text style={styles.patientName}>{item.name}</Text>
-        <View style={styles.patientDetails}>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.nationalId}</Text>
-            <Text style={styles.detailLabel}>رقم الهوية:</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.age} سنة</Text>
-            <Text style={styles.detailLabel}>العمر:</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>
-              {formatDate(item.lastVisit)}
-            </Text>
-            <Text style={styles.detailLabel}>آخر زيارة:</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.symptoms}</Text>
-            <Text style={styles.detailLabel}>الأعراض:</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailValue}>{item.medications}</Text>
-            <Text style={styles.detailLabel}>الأدوية:</Text>
-          </View>
-          {item.phone && (
+  const renderPatientItem = useCallback(
+    ({ item }) => (
+      <View style={styles.patientCard}>
+        <View style={styles.patientInfo}>
+          <Text style={styles.patientName}>{item.name}</Text>
+          <View style={styles.patientDetails}>
             <View style={styles.detailItem}>
-              <Text style={styles.detailValue}>{item.phone}</Text>
-              <Text style={styles.detailLabel}>رقم الهاتف:</Text>
+              <Text style={styles.detailValue}>{item.nationalId}</Text>
+              <Text style={styles.detailLabel}>رقم الهوية:</Text>
             </View>
-          )}
-          {item.address && (
             <View style={styles.detailItem}>
-              <Text style={styles.detailValue}>{item.address}</Text>
-              <Text style={styles.detailLabel}>العنوان:</Text>
+              <Text style={styles.detailValue}>{item.age} سنة</Text>
+              <Text style={styles.detailLabel}>العمر:</Text>
             </View>
-          )}
+            <View style={styles.detailItem}>
+              <Text style={styles.detailValue}>
+                {formatDate(item.lastVisit)}
+              </Text>
+              <Text style={styles.detailLabel}>آخر زيارة:</Text>
+            </View>
+            {item.phone && (
+              <View style={styles.detailItem}>
+                <Text style={styles.detailValue}>{item.phone}</Text>
+                <Text style={styles.detailLabel}>رقم الهاتف:</Text>
+              </View>
+            )}
+            {item.address && (
+              <View style={styles.detailItem}>
+                <Text style={styles.detailValue}>{item.address}</Text>
+                <Text style={styles.detailLabel}>العنوان:</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.cardActions}>
+          {/* زر حالة المريض */}
+          <TouchableOpacity
+            style={styles.medicalFileButton}
+            onPress={() =>
+              navigation.navigate("PatientChartScreen", {
+                patientId: item.id,
+                patientName: item.name,
+              })
+            }
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.medicalFileButtonText}>حالة المريض</Text>
+          </TouchableOpacity>
+
+          {/* زر سجل الزيارات */}
+          <TouchableOpacity
+            style={styles.visitHistoryButton}
+            onPress={() =>
+              navigation.navigate("سجل الزيارات", {
+                patientId: item.id,
+                patientName: item.name,
+              })
+            }
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.visitHistoryButtonText}>سجل الزيارات</Text>
+          </TouchableOpacity>
+
+          {/* زر بيانات المريض التفصيلية */}
+          <TouchableOpacity
+            style={styles.patientDataButton}
+            onPress={() =>
+              navigation.navigate("SearchDataPatientSecreen", {
+                fromList: true,
+                patientId: item.id,
+                patientName: item.name,
+              })
+            }
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.patientDataButtonText}>بيانات المريض</Text>
+          </TouchableOpacity>
         </View>
       </View>
+    ),
+    [navigation]
+  );
 
-      <View style={styles.cardActions}>
-        {/* زر حالة المريض */}
-        <TouchableOpacity
-          style={styles.medicalFileButton}
-          onPress={() =>
-            navigation.navigate("PatientChartScreen", {
-              patientId: item.id,
-              patientName: item.name,
-            })
-          }
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.medicalFileButtonText}>حالة المريض</Text>
-        </TouchableOpacity>
+  const keyExtractor = useCallback((item) => String(item.id), []);
 
-        {/* زر سجل الزيارات */}
-        <TouchableOpacity
-          style={styles.visitHistoryButton}
-          onPress={() =>
-            navigation.navigate("سجل الزيارات", {
-              patientId: item.id,
-              patientName: item.name,
-            })
-          }
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.visitHistoryButtonText}>سجل الزيارات</Text>
-        </TouchableOpacity>
-
-        {/* زر بيانات المريض التفصيلية */}
-        <TouchableOpacity
-          style={styles.patientDataButton}
-          onPress={() =>
-            navigation.navigate("SearchDataPatientSecreen", {
-              fromList: true,
-              patientId: item.id,
-              patientName: item.name,
-            })
-          }
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.patientDataButtonText}>بيانات المريض</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+  const getItemLayout = useCallback(
+    (_, index) => ({
+      length: ESTIMATED_CARD_HEIGHT,
+      offset: ESTIMATED_CARD_HEIGHT * index,
+      index,
+    }),
+    []
   );
 
   return (
@@ -200,9 +231,14 @@ const PatientListScreen = () => {
       <FlatList
         data={filteredPatients}
         renderItem={renderPatientItem}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={keyExtractor}
         contentContainerStyle={styles.patientList}
         showsVerticalScrollIndicator={false}
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        windowSize={5}
+        removeClippedSubviews
+        getItemLayout={getItemLayout}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>لا يوجد مرضى</Text>
@@ -219,7 +255,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundLight,
   },
 
-  // (حاليًا مش مستخدم في JSX، بس عدّلته وفق الثيم لو استخدمت الهيدر لاحقًا)
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -332,7 +367,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
-    ...shadows.light,
+    // ❌ بدون shadow هنا
   },
   medicalFileButtonText: {
     color: colors.buttonSuccessText,
@@ -350,9 +385,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: spacing.sm,
     marginRight: spacing.sm,
-    ...shadows.light,
+    // ❌ بدون shadow
   },
-  visitHistoryButtonText: { 
+  visitHistoryButtonText: {
     color: colors.buttonPrimaryText,
     fontWeight: "700",
     fontSize: typography.bodySm,
@@ -366,9 +401,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     alignItems: "center",
     justifyContent: "center",
-   // marginTop: spacing.sm,
-    ...shadows.light,
-    //flexBasis: "100%",-عبد زرك ماخد سطر بحالة تقول البطاقة مكتوبة باسمك
+    // ❌ بدون shadow
   },
   patientDataButtonText: {
     color: colors.buttonSecondaryText,
