@@ -1,7 +1,6 @@
 // sami
 
-// PatientListScreen.js
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -17,17 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ENDPOINTS from "../samiendpoint";
-
-// ✅ استدعاء الثيم الموحّد
-import theme, {
-  colors,
-  spacing,
-  radii,
-  typography,
-  shadows,
-} from "../style/theme";
-
-const ESTIMATED_CARD_HEIGHT = 200;
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const PatientListScreen = () => {
   const navigation = useNavigation();
@@ -45,33 +34,15 @@ const PatientListScreen = () => {
           return;
         }
 
-        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}&minimal=true`;
+        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`;
         const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error("Failed to fetch patients");
         }
 
-        const patientsData = await response.json();
-
-        // ✅ توحيد شكل البيانات القادمة من الـ API
-        const sanitizedPatients = (patientsData || []).map((patient) => ({
-          id: patient.id,
-          name:
-            patient.name ||
-            patient.full_name ||
-            `مريض رقم ${patient.id ?? ""}`,
-          nationalId: patient.nationalId || patient.national_id || "غير متوفر",
-          phone: patient.phone || patient.phone_number || null,
-          address: patient.address || null,
-          age:
-            typeof patient.age === "number" || typeof patient.age === "string"
-              ? patient.age
-              : "--",
-          lastVisit: patient.lastVisit || patient.last_visit || null,
-        }));
-
-        setPatients(sanitizedPatients);
+        const data = await response.json();
+        setPatients(data || []);
       } catch (error) {
         console.error("خطأ في جلب المرضى:", error);
         Alert.alert("خطأ", "تعذر جلب قائمة المرضى");
@@ -81,24 +52,9 @@ const PatientListScreen = () => {
     loadPatients();
   }, []);
 
-  const handleSearch = useCallback((text) => {
+  const handleSearch = (text) => {
     setSearchQuery(text);
-  }, []);
-
-  const filteredPatients = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return patients;
-
-    return patients.filter((patient) => {
-      const nameMatch = (patient.name || "")
-        .toLowerCase()
-        .includes(query);
-      const idMatch = (patient.nationalId || "").includes(
-        searchQuery.trim()
-      );
-      return nameMatch || idMatch;
-    });
-  }, [patients, searchQuery]);
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "غير محدد";
@@ -111,99 +67,85 @@ const PatientListScreen = () => {
     });
   };
 
-  const renderPatientItem = useCallback(
-    ({ item }) => (
-      <View style={styles.patientCard}>
-        <View style={styles.patientInfo}>
-          <Text style={styles.patientName}>{item.name}</Text>
-          <View style={styles.patientDetails}>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailValue}>{item.nationalId}</Text>
-              <Text style={styles.detailLabel}>رقم الهوية:</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailValue}>{item.age} سنة</Text>
-              <Text style={styles.detailLabel}>العمر:</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailValue}>
-                {formatDate(item.lastVisit)}
-              </Text>
-              <Text style={styles.detailLabel}>آخر زيارة:</Text>
-            </View>
-            {item.phone && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailValue}>{item.phone}</Text>
-                <Text style={styles.detailLabel}>رقم الهاتف:</Text>
-              </View>
-            )}
-            {item.address && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailValue}>{item.address}</Text>
-                <Text style={styles.detailLabel}>العنوان:</Text>
-              </View>
-            )}
+  const filteredPatients = patients.filter((patient) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    const name = (patient.name || "").toLowerCase();
+    const nationalId = patient.nationalId || "";
+    return name.includes(q) || nationalId.includes(searchQuery.trim());
+  });
+
+  const renderPatientItem = ({ item }) => (
+    <View style={styles.patientCard}>
+      <View style={styles.patientInfo}>
+        <Text style={styles.patientName}>{item.name}</Text>
+        <View style={styles.patientDetails}>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.nationalId}</Text>
+            <Text style={styles.detailLabel}>رقم الهوية:</Text>
           </View>
-        </View>
-
-        <View style={styles.cardActions}>
-          {/* زر حالة المريض */}
-          <TouchableOpacity
-            style={styles.medicalFileButton}
-            onPress={() =>
-              navigation.navigate("PatientChartScreen", {
-                patientId: item.id,
-                patientName: item.name,
-              })
-            }
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.medicalFileButtonText}>حالة المريض</Text>
-          </TouchableOpacity>
-
-          {/* زر سجل الزيارات */}
-          <TouchableOpacity
-            style={styles.visitHistoryButton}
-            onPress={() =>
-              navigation.navigate("سجل الزيارات", {
-                patientId: item.id,
-                patientName: item.name,
-              })
-            }
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.visitHistoryButtonText}>سجل الزيارات</Text>
-          </TouchableOpacity>
-
-          {/* زر بيانات المريض التفصيلية */}
-          <TouchableOpacity
-            style={styles.patientDataButton}
-            onPress={() =>
-              navigation.navigate("SearchDataPatientSecreen", {
-                fromList: true,
-                patientId: item.id,
-                patientName: item.name,
-              })
-            }
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.patientDataButtonText}>بيانات المريض</Text>
-          </TouchableOpacity>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{item.age} سنة</Text>
+            <Text style={styles.detailLabel}>العمر:</Text>
+          </View>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailValue}>{formatDate(item.lastVisit)}</Text>
+            <Text style={styles.detailLabel}>آخر زيارة:</Text>
+          </View>
+          {item.phone && (
+            <View style={styles.detailItem}>
+              <Text style={styles.detailValue}>{item.phone}</Text>
+              <Text style={styles.detailLabel}>رقم  الهاتف:</Text>
+            </View>
+          )}
+          {item.address && (
+            <View style={styles.detailItem}>
+              <Text style={styles.detailValue}>{item.address}</Text>
+              <Text style={styles.detailLabel}>العنوان:</Text>
+            </View>
+          )}
         </View>
       </View>
-    ),
-    [navigation]
-  );
 
-  const keyExtractor = useCallback((item) => String(item.id), []);
+      <View style={styles.cardActions}>
+        <TouchableOpacity
+          style={styles.medicalFileButton}
+          onPress={() =>
+            navigation.navigate("PatientChartScreen", {
+              patientId: item.id,
+              patientName: item.name,
+            })
+          }
+        >
+          <Text style={styles.medicalFileButtonText}>حالة المريض</Text>
+        </TouchableOpacity>
 
-  const getItemLayout = useCallback(
-    (_, index) => ({
-      length: ESTIMATED_CARD_HEIGHT,
-      offset: ESTIMATED_CARD_HEIGHT * index,
-      index,
-    }),
-    []
+        <TouchableOpacity
+          style={styles.visitHistoryButton}
+          onPress={() =>
+            navigation.navigate("سجل الزيارات", {
+              patientId: item.id,
+              patientName: item.name,
+            })
+          }
+        >
+          <Text style={styles.visitHistoryButtonText}>سجل الزيارات</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.patientDataButton}
+          onPress={() =>
+            navigation.navigate("SearchDataPatientSecreen", {
+              fromList: true,
+              patientId: item.id,
+              patientName: item.name,
+            })
+          }
+        >
+          <Text style={styles.patientDataButtonText}>بيانات المريض</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   return (
@@ -231,14 +173,9 @@ const PatientListScreen = () => {
       <FlatList
         data={filteredPatients}
         renderItem={renderPatientItem}
-        keyExtractor={keyExtractor}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={styles.patientList}
         showsVerticalScrollIndicator={false}
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
-        windowSize={5}
-        removeClippedSubviews
-        getItemLayout={getItemLayout}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>لا يوجد مرضى</Text>
@@ -254,27 +191,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.backgroundLight,
   },
-
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: spacing.xs,
-    marginBottom: spacing.xs,
-    marginLeft: spacing.lg,
-  },
-  header: {
-    height: 60,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    ...shadows.light,
-  },
-  headerTitle: {
-    fontSize: typography.headingMd,
-    fontFamily: typography.fontFamily,
-    color: colors.background,
-  },
-
   searchContainer: {
     flexDirection: "row",
     paddingHorizontal: spacing.lg,
@@ -305,12 +221,10 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: "right",
   },
-
   patientList: {
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-
   patientCard: {
     backgroundColor: colors.background,
     borderRadius: radii.lg,
@@ -352,14 +266,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginLeft: spacing.xs,
   },
-
   cardActions: {
     flexDirection: "row-reverse",
     alignItems: "center",
     marginTop: spacing.sm,
     flexWrap: "wrap",
   },
-
   medicalFileButton: {
     backgroundColor: colors.buttonSuccess,
     borderRadius: radii.md,
@@ -367,7 +279,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     alignItems: "center",
     justifyContent: "center",
-    // ❌ بدون shadow هنا
   },
   medicalFileButtonText: {
     color: colors.buttonSuccessText,
@@ -375,7 +286,6 @@ const styles = StyleSheet.create({
     fontSize: typography.bodySm,
     fontFamily: typography.fontFamily,
   },
-
   visitHistoryButton: {
     backgroundColor: colors.buttonPrimary,
     borderRadius: radii.md,
@@ -385,7 +295,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: spacing.sm,
     marginRight: spacing.sm,
-    // ❌ بدون shadow
   },
   visitHistoryButtonText: {
     color: colors.buttonPrimaryText,
@@ -393,7 +302,6 @@ const styles = StyleSheet.create({
     fontSize: typography.bodySm,
     fontFamily: typography.fontFamily,
   },
-
   patientDataButton: {
     backgroundColor: colors.buttonSecondary,
     borderRadius: radii.md,
@@ -401,7 +309,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     alignItems: "center",
     justifyContent: "center",
-    // ❌ بدون shadow
   },
   patientDataButtonText: {
     color: colors.buttonSecondaryText,
@@ -409,84 +316,6 @@ const styles = StyleSheet.create({
     fontSize: typography.bodySm,
     fontFamily: typography.fontFamily,
   },
-
-  fab: {
-    position: "absolute",
-    right: spacing.xl,
-    bottom: spacing.xl,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.buttonPrimary,
-    justifyContent: "center",
-    alignItems: "center",
-    ...shadows.medium,
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: colors.overlay,
-  },
-  modalContent: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: radii.lg,
-    borderTopRightRadius: radii.lg,
-    paddingBottom: spacing.lg,
-    maxHeight: "80%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  modalTitle: {
-    fontSize: typography.headingSm,
-    fontFamily: typography.fontFamily,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  formContainer: {
-    padding: spacing.md,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  inputLabel: {
-    fontSize: typography.bodyMd,
-    fontFamily: typography.fontFamily,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-    textAlign: "right",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    padding: spacing.sm,
-    fontSize: typography.bodyMd,
-    fontFamily: typography.fontFamily,
-    textAlign: "right",
-    backgroundColor: colors.backgroundLight,
-  },
-  addButton: {
-    backgroundColor: colors.buttonPrimary,
-    borderRadius: radii.md,
-    padding: spacing.md,
-    alignItems: "center",
-    marginTop: spacing.sm,
-    ...shadows.light,
-  },
-  addButtonText: {
-    color: colors.buttonPrimaryText,
-    fontWeight: "700",
-    fontSize: typography.bodyMd,
-    fontFamily: typography.fontFamily,
-  },
-
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
