@@ -7,9 +7,11 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import ENDPOINTS from "../samiendpoint";
@@ -18,6 +20,8 @@ import { colors, spacing, radii, typography, shadows } from "../style/theme";
 const primary = colors.primary;
 
 const PatientAppointmentsScreen = () => {
+  const navigation = useNavigation();
+
   const [appointments, setAppointments] = useState([]);
   const [clinicName, setClinicName] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -114,6 +118,15 @@ const PatientAppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      {/* زر الرجوع على الشمال (نفس ستايل الشاشات الثانية) */}
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="arrow-back" size={24} color={primary} />
+      </TouchableOpacity>
+
       <View style={styles.container}>
         <Text style={styles.clinicName}>
           {clinicName || "مواعيدي"}
@@ -160,9 +173,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.backgroundLight,
   },
+  backButton: {
+    position: "absolute",
+    top: spacing.md,
+    left: spacing.lg,
+    padding: spacing.sm,
+    borderRadius: 25,
+    backgroundColor: colors.background,
+    zIndex: 1,
+    ...shadows.small,
+  },
   container: {
     flex: 1,
     padding: spacing.lg,
+    paddingTop: spacing.xxl * 2, // عشان ما يتغطى العنوان بزر الرجوع
   },
   clinicName: {
     fontSize: typography.bodyLg,
