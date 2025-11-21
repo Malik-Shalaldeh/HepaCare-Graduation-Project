@@ -63,10 +63,15 @@ export default function TestResultsScreen() {
         onPress={() => {
           if (item.filePath) {
             const normalizedPath = item.filePath.replace(/\\/g, '/');
-            const url = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${normalizedPath}`;
-            navigation.navigate('FileViewer', { fileUrl: url });
+            const directUrl = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${normalizedPath}`;
+            const encodedUrl = encodeURIComponent(directUrl);
+
+            // افتح PDF داخل Google Viewer
+            navigation.navigate("FileViewer", {
+              fileUrl: `https://docs.google.com/gview?embedded=true&url=${encodedUrl}`
+            });
           } else {
-            Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }]);
+            Alert.alert("تنبيه", "لا يوجد ملف مرفق لهذا الفحص");
           }
         }}
         activeOpacity={0.8}

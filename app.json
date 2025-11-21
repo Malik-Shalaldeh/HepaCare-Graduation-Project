@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "firstCopy",
-    "slug": "firstCopy",
+    "name": "HepaCare",
+    "slug": "hepacare",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/hepacare-logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -24,9 +24,6 @@
       "package": "com.anonymous.firstCopy"
     },
     "runtimeVersion": "1",
-    "updates": {
-    "url": "https://u.expo.dev/de9a1790-6c60-49ad-b68b-7281ec18cc62"
-    },
     "web": {
       "favicon": "./assets/favicon.png"
     },

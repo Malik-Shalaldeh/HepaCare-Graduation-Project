@@ -10,16 +10,15 @@ export default function FileViewerScreen({ route }) {
   return (
     <View style={{ flex: 1 }}>
       <WebView
+        originWhitelist={['*']}
         source={{ uri: fileUrl }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
         startInLoadingState={true}
-        renderLoading={() => (
-          <ActivityIndicator
-            size="large"
-            color={theme.colors.primary}
-            style={{ marginTop: 20 }}
-          />
-        )}
+        allowFileAccess={true}
+        allowsInlineMediaPlayback={true}
       />
+
     </View>
   );
 }
