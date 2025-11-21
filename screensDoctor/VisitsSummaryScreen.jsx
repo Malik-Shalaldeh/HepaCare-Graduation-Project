@@ -16,7 +16,7 @@ import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const AI_URL = "http://192.168.1.122:11434/api/generate";
+const AI_URL = "http://192.168.1.128:11434/api/generate";
 const AI_MODEL = "Hepa_care_version_17:latest";
 
 const VisitsSummaryScreen = ({ route }) => {

@@ -8,7 +8,7 @@ import Medications from "../screensDoctor/Medications";
 import EvaluationVisitScreen from "../screensDoctor/EvaluationVisitScreen";
 import PatientChartScreen from "../screensDoctor/PatientChartScreen";
 import AddPatientStack from "./AddPatientStack";
-import theme, {colors} from "../style/theme";
+import { colors, typography, spacing } from "../style/theme";
 import SymptomStack from "./SymptomStack";
 
 const Stack = createStackNavigator();
@@ -17,9 +17,13 @@ const primary = colors.primary;
 const backBtn = (navigation) => (
   <TouchableOpacity
     onPress={() => navigation.goBack()}
-    style={{ paddingHorizontal: 12 }}
+    style={{ paddingHorizontal: spacing.md }}
   >
-    <Ionicons name="arrow-back" size={24} color="#fff" />
+    <Ionicons
+      name="arrow-back"
+      size={24}
+      color={colors.buttonPrimaryText}
+    />
   </TouchableOpacity>
 );
 
@@ -28,20 +32,18 @@ export default function PatientsStack() {
     <Stack.Navigator
       screenOptions={{
         animation: "slide_from_right",
-         headerBackTitleVisible: false,
-          headerStyle: {
-          backgroundColor: theme.colors.primary,          //  لون الهيدر 
+        headerBackTitleVisible: false,
+        headerStyle: {
+          backgroundColor: primary,
         },
-        headerTintColor: theme.colors.buttonPrimaryText,  // لون النص والأيقونة (زر الرجوع)
-        headerTitleAlign: 'center',
+        headerTintColor: colors.buttonPrimaryText,
+        headerTitleAlign: "center",
         headerTitleStyle: {
-          fontWeight: 'bold',
-          fontFamily: theme.typography.fontFamily,
-          fontSize: theme.typography.headingSm,
+          fontWeight: "bold",
+          fontFamily: typography.fontFamily,
+          fontSize: typography.headingSm,
         },
       }}
-
-      
     >
       <Stack.Screen
         name="Patients"
@@ -57,7 +59,7 @@ export default function PatientsStack() {
           headerTitle: "البحث عن سجل مريض",
           headerTitleAlign: "center",
           headerStyle: { backgroundColor: primary },
-          headerTintColor: "#fff",
+          headerTintColor: colors.buttonPrimaryText,
           headerLeft: () => backBtn(navigation),
         })}
       />
@@ -77,7 +79,7 @@ export default function PatientsStack() {
         name="إضافة مريض"
         component={AddPatientStack}
         options={{
-          headerShown: false, // الهيدر من AddPatientStack
+          headerShown: false,
         }}
       />
 
@@ -90,7 +92,7 @@ export default function PatientsStack() {
         name="PatientChartScreen"
         component={PatientChartScreen}
         options={{
-          title: "تطور المؤشرات المخبرية للمريض", 
+          title: "تطور المؤشرات المخبرية للمريض",
         }}
       />
 

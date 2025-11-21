@@ -17,15 +17,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
-
-const COLORS = {
-  primary: "#00b29c",
-  bg: "#f5f7f8",
-  card: "#ffffff",
-  text: "#1f2937",
-  mutetxt: "#6b7280",
-  border: "#e5e7eb",
-};
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function SymptomRecordsScreen() {
   const route = useRoute();
@@ -37,33 +29,87 @@ export default function SymptomRecordsScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     const loadDoctor = async () => {
       try {
         const id = await AsyncStorage.getItem("doctor_id");
-        if (id) setDoctorId(parseInt(id, 10));
+        if (mounted) setDoctorId(id ? parseInt(id, 10) : null);
       } catch (e) {
-        console.log("Error loading doctor_id", e);
+        if (mounted) setDoctorId(null);
       }
     };
     loadDoctor();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
+  const normalizeRecords = (data) => {
+    const arr = Array.isArray(data) ? data : [];
+    return arr.map((item) => {
+      const visitDate =
+        item.visitDate ||
+        item.visit_date ||
+        item.test_date ||
+        item.created_at ||
+        item.date ||
+        item.createdTime ||
+        "";
+
+      let symptomsText = "";
+      const s = item.symptoms || item.symptom_names || item.symptomNames;
+
+      if (Array.isArray(s)) {
+        symptomsText = s
+          .map((x) => x?.name || x?.label || x)
+          .filter(Boolean)
+          .join("، ");
+      } else if (typeof s === "string") {
+        symptomsText = s;
+      }
+
+      const notes =
+        item.notes ||
+        item.comment ||
+        item.comments ||
+        item.instructions ||
+        "";
+
+      return {
+        id: item.id ?? `${visitDate}-${Math.random()}`,
+        visitDate,
+        symptoms: symptomsText,
+        notes,
+      };
+    });
+  };
+
   const loadPatientEntries = async () => {
-    if (!doctorId || !patient?.patientId) return;
+    const pid = patient?.patientId ?? patient?.patient_id ?? patient?.id;
+    if (!doctorId || !pid) {
+      setRecords([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const url =
         `${AbedEndPoint.symptomEntries}` +
-        `?patient_id=${patient.patientId}&doctor_id=${doctorId}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.log("Failed to load entries", res.status);
-        return;
-      }
+        `?patient_id=${encodeURIComponent(pid)}` +
+        `&doctor_id=${encodeURIComponent(doctorId)}`;
+
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setRecords(data || []);
+
+      setRecords(normalizeRecords(data));
     } catch (err) {
       console.log("Error loading entries", err);
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -72,16 +118,18 @@ export default function SymptomRecordsScreen() {
   useFocusEffect(
     useCallback(() => {
       loadPatientEntries();
-    }, [doctorId, patient?.patientId])
+    }, [doctorId, patient?.patientId, patient?.id])
   );
 
   const renderRecord = ({ item, index }) => (
     <View style={styles.recordCard}>
       <Text style={styles.recordTitle}>
-        تتبع #{index + 1} - {item.visitDate}
+        تتبع #{index + 1} - {item.visitDate || "-"}
       </Text>
       <Text style={styles.recordLabel}>الأعراض:</Text>
-      <Text style={styles.recordText}>{item.symptoms || "لا توجد أعراض"}</Text>
+      <Text style={styles.recordText}>
+        {item.symptoms && item.symptoms.trim() ? item.symptoms : "لا توجد أعراض"}
+      </Text>
 
       {item.notes ? (
         <>
@@ -107,7 +155,7 @@ export default function SymptomRecordsScreen() {
           <Ionicons
             name="person-circle-outline"
             size={36}
-            color={COLORS.primary}
+            color={colors.accent}
           />
         </View>
 
@@ -116,6 +164,7 @@ export default function SymptomRecordsScreen() {
           <TouchableOpacity
             style={styles.addBtn}
             onPress={() => navigation.navigate("SymptomAdd", { patient })}
+            activeOpacity={0.9}
           >
             <Ionicons name="add-circle" size={22} color="#fff" />
             <Text style={styles.addTxt}>تسجيل عرض</Text>
@@ -124,7 +173,7 @@ export default function SymptomRecordsScreen() {
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.mutetxt}>جارٍ تحميل السجل...</Text>
           </View>
         ) : records.length === 0 ? (
@@ -136,9 +185,10 @@ export default function SymptomRecordsScreen() {
         ) : (
           <FlatList
             data={records}
-            keyExtractor={(_, i) => i.toString()}
+            keyExtractor={(item, i) => (item.id ? String(item.id) : String(i))}
             renderItem={renderRecord}
-            contentContainerStyle={{ paddingVertical: 8 }}
+            contentContainerStyle={{ paddingVertical: spacing.sm }}
+            showsVerticalScrollIndicator={false}
           />
         )}
       </View>
@@ -149,58 +199,64 @@ export default function SymptomRecordsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.backgroundLight,
   },
   container: {
     flex: 1,
-    padding: 16,
+    padding: spacing.lg,
   },
   patientCard: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: COLORS.card,
-    borderRadius: 10,
-    padding: 12,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: 12,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+    ...shadows.light,
   },
   patientName: {
-    fontSize: 17,
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
-    color: COLORS.text,
+    color: colors.textPrimary,
     textAlign: "right",
   },
   patientSub: {
-    fontSize: 13,
-    color: COLORS.mutetxt,
-    marginTop: 2,
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
     textAlign: "right",
   },
   headerRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 17,
+    fontSize: typography.headingSm,
+    fontFamily: typography.fontFamily,
     fontWeight: "700",
-    color: COLORS.text,
+    color: colors.textPrimary,
   },
   addBtn: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 18,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.pill,
+    ...shadows.light,
   },
   addTxt: {
     color: "#fff",
-    marginLeft: 6,
+    marginHorizontal: spacing.sm,
     fontWeight: "600",
-    fontSize: 14,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyMd,
   },
   center: {
     flex: 1,
@@ -208,34 +264,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   mutetxt: {
-    color: COLORS.mutetxt,
-    marginTop: 8,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyMd,
   },
   recordCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
+    ...shadows.light,
   },
   recordTitle: {
     fontWeight: "700",
-    fontSize: 15,
-    marginBottom: 6,
-    color: COLORS.text,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyLg,
+    marginBottom: spacing.sm,
+    color: colors.textPrimary,
     textAlign: "right",
   },
   recordLabel: {
     fontWeight: "600",
-    marginTop: 4,
-    marginBottom: 2,
-    color: COLORS.text,
+    fontFamily: typography.fontFamily,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontSize: typography.bodyMd,
   },
   recordText: {
-    fontSize: 14,
-    color: COLORS.mutetxt,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
     textAlign: "right",
+    lineHeight: typography.lineHeightNormal,
   },
 });

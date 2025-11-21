@@ -5,18 +5,22 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AddPatientStep1Screen from "../screensDoctor/AddPatientStep1Screen";
 import AddPatientStep2Screen from "../screensDoctor/AddPatientStep2Screen";
 import AddPatientStep3Screen from "../screensDoctor/AddPatientStep3Screen";
+import { colors, typography } from "../style/theme";
 
 const Stack = createStackNavigator();
-const primary = "#00b29c";
 
 export default function AddPatientStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: primary },
-        headerTintColor: "#fff",
+        headerStyle: { backgroundColor: colors.primary },
+        headerTintColor: colors.background,
         headerTitleAlign: "center",
-        headerBackTitleVisible: false, // ✅ يخفي كلمة Back واسم الشاشة السابقة
+        headerBackTitleVisible: false,
+        headerTitleStyle: {
+          fontFamily: typography.fontFamily,
+          fontSize: typography.headingSm,
+        },
       }}
     >
       <Stack.Screen

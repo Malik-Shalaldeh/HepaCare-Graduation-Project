@@ -14,6 +14,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function MedPatientsScreen({ navigation }) {
   const [doctorId, setDoctorId] = useState(null);
@@ -78,10 +79,11 @@ export default function MedPatientsScreen({ navigation }) {
     <TouchableOpacity
       style={styles.patientItem}
       onPress={() => openPatient(item)}
+      activeOpacity={0.9}
     >
       <View style={styles.patientRight}>
         <View style={styles.iconCircle}>
-          <Ionicons name="person-outline" size={20} color="#00b29c" />
+          <Ionicons name="person-outline" size={20} color={colors.primary} />
         </View>
       </View>
       <View style={styles.patientMiddle}>
@@ -90,7 +92,7 @@ export default function MedPatientsScreen({ navigation }) {
           رقم المريض: {item.code || item.patient_code || item.id}
         </Text>
       </View>
-      <Ionicons name="chevron-back" size={20} color="#999" />
+      <Ionicons name="chevron-back" size={20} color={colors.textMuted} />
     </TouchableOpacity>
   );
 
@@ -101,15 +103,16 @@ export default function MedPatientsScreen({ navigation }) {
           <Ionicons
             name="search"
             size={24}
-            color="#888"
+            color={colors.textMuted}
             style={styles.searchIcon}
           />
           <TextInput
             style={[styles.input, styles.rtlText]}
             placeholder={loading ? "جاري البحث..." : "ابحث عن مريض"}
-            placeholderTextColor="#888"
+            placeholderTextColor={colors.textMuted}
             value={search}
             onChangeText={handleSearch}
+            textAlign="right"
           />
         </View>
 
@@ -119,14 +122,15 @@ export default function MedPatientsScreen({ navigation }) {
             item.id ? String(item.id) : String(index)
           }
           renderItem={renderPatient}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
+          contentContainerStyle={{ paddingBottom: spacing.lg }}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
               {loading ? "جاري التحميل..." : "لا يوجد مرضى"}
             </Text>
           }
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </SafeAreaView>
@@ -134,60 +138,84 @@ export default function MedPatientsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
+  safeArea: { flex: 1, backgroundColor: colors.backgroundLight },
+
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingHorizontal: 16,
-    paddingTop: 12, // بدل StatusBar.currentHeight
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg, // ≈16
+    paddingTop: spacing.sm + 4,
   },
-  rtlText: { writingDirection: "rtl", textAlign: "right" },
-  searchSection: { position: "relative", marginBottom: 12 },
+
+  rtlText: {
+    writingDirection: "rtl",
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
+  searchSection: { position: "relative", marginBottom: spacing.sm + 2 },
+
   searchIcon: {
     position: "absolute",
-    top: Platform.select({ ios: 12, android: 14 }),
-    left: 10,
+    top: Platform.select({ ios: spacing.md, android: spacing.md + 2 }),
+    left: spacing.sm + 2,
     zIndex: 1,
   },
+
   input: {
     borderWidth: 1,
-    borderColor: "#DDD",
-    padding: Platform.select({ ios: 12, android: 10 }),
-    paddingLeft: 36,
-    borderRadius: 12,
-    backgroundColor: "#FFF",
-    fontSize: 16,
-    color: "#333",
+    borderColor: colors.border,
+    padding: Platform.select({ ios: spacing.md, android: spacing.md - 2 }),
+    paddingLeft: spacing.xl + 4, // ≈36
+    borderRadius: radii.md,
+    backgroundColor: colors.background,
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    ...shadows.light,
   },
+
   patientItem: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 1,
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md - 2,
+    paddingHorizontal: spacing.md - 2,
+    ...shadows.light,
   },
-  patientRight: { marginLeft: 12 },
+
+  patientRight: { marginLeft: spacing.sm + 4 },
+
   iconCircle: {
     width: 40,
     height: 40,
     borderRadius: 999,
-    backgroundColor: "rgba(0,178,156,0.12)",
+    backgroundColor: "rgba(11,79,108,0.12)",
     justifyContent: "center",
     alignItems: "center",
   },
+
   patientMiddle: { flex: 1 },
-  patientName: { fontSize: 16, fontWeight: "700", color: "#333" },
-  patientSub: { fontSize: 12, color: "#777", marginTop: 2 },
+
+  patientName: {
+    fontSize: typography.bodyLg,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
+  },
+
+  patientSub: {
+    fontSize: typography.bodySm,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+    fontFamily: typography.fontFamily,
+  },
+
   emptyText: {
     textAlign: "center",
-    marginTop: 20,
-    color: "#888",
-    fontSize: 14,
+    marginTop: spacing.lg,
+    color: colors.textMuted,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
 });

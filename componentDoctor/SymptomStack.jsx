@@ -4,17 +4,23 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SymptomPatientSearchScreen from "../screensDoctor/SymptomPatientSearchScreen";
 import SymptomRecordsScreen from "../screensDoctor/SymptomRecordsScreen";
 import SymptomAddScreen from "../screensDoctor/SymptomAddScreen";
+import { colors, typography } from "../style/theme";
 
 const Stack = createStackNavigator();
-const primary = "#00b29c";
 
 export default function SymptomStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: primary },
-        headerTintColor: "#fff",
+        headerStyle: { backgroundColor: colors.primary },
+        headerTintColor: colors.background,
         headerTitleAlign: "center",
+        headerBackTitleVisible: false,
+        headerTitleStyle: {
+          fontFamily: typography.fontFamily,
+          fontSize: typography.headingSm,
+          fontWeight: "bold",
+        },
       }}
     >
       <Stack.Screen

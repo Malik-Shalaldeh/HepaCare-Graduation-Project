@@ -1,5 +1,5 @@
 // LabsStack.jsx
-import React from 'react';
+import React from "react";
 import {
   SafeAreaView,
   View,
@@ -8,25 +8,26 @@ import {
   StyleSheet,
   StatusBar,
   Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const primary = '#00b29c';
-const dark = '#2C3E50';
+const primary = colors.primary;
+const dark = colors.secondary;
 
 export default function LabsStack({ navigation }) {
   return (
     <ScreenWithDrawer>
       <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
         <View style={styles.container}>
           <Text style={styles.title}>المختبرات</Text>
 
           {/* إضافة مختبر */}
           <TouchableOpacity
             style={[styles.btn, styles.btnPrimary]}
-            onPress={() => navigation.navigate('LabAdd')}
+            onPress={() => navigation.navigate("LabAdd")}
             activeOpacity={0.9}
           >
             <View style={styles.btnContent}>
@@ -38,7 +39,7 @@ export default function LabsStack({ navigation }) {
           {/* حذف مختبر */}
           <TouchableOpacity
             style={[styles.btn, styles.btnDark]}
-            onPress={() => navigation.navigate('LabDelete')}
+            onPress={() => navigation.navigate("LabDelete")}
             activeOpacity={0.9}
           >
             <View style={styles.btnContent}>
@@ -50,7 +51,7 @@ export default function LabsStack({ navigation }) {
           {/* عرض المختبرات */}
           <TouchableOpacity
             style={[styles.btn, styles.btnOutline]}
-            onPress={() => navigation.navigate('LabsList')}
+            onPress={() => navigation.navigate("LabsList")}
             activeOpacity={0.9}
           >
             <View style={styles.btnContent}>
@@ -69,31 +70,28 @@ export default function LabsStack({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    backgroundColor: colors.background,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
-    padding: 20,
-    gap: 14,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   title: {
     color: dark,
-    fontSize: 27,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 8,
-    marginTop: 30,
+    fontSize: typography.headingLg,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: spacing.sm,
+    marginTop: spacing.xl,
   },
   btn: {
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    ...shadows.light,
   },
   btnPrimary: {
     backgroundColor: primary,
@@ -102,19 +100,20 @@ const styles = StyleSheet.create({
     backgroundColor: dark,
   },
   btnOutline: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     borderWidth: 1.5,
     borderColor: primary,
   },
   btnContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
   },
   btnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    color: "#fff",
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
   },
 });

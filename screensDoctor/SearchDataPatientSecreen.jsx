@@ -14,7 +14,8 @@ import {
   Platform,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AbedEndPoint from "../AbedEndPoint"; // ✔ استدعاء ملف الاندبوينت
+import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function DataPatientsListScreen() {
   const navigation = useNavigation();
@@ -28,7 +29,6 @@ export default function DataPatientsListScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  // جلب بيانات مريض محدد (بدون زيارات)
   const loadPatientDetails = async (pid, fallbackName) => {
     try {
       const [detail, labs] = await Promise.all([
@@ -71,14 +71,12 @@ export default function DataPatientsListScreen() {
     }
   };
 
-  // لو جاي من PatientListScreen نحمل بيانات المريض مباشرة
   useEffect(() => {
     if (fromList && preselectedId) {
       loadPatientDetails(Number(preselectedId), preselectedName);
     }
   }, [fromList, preselectedId]);
 
-  // البحث اليدوي (لو مش fromList)
   const handleSearchChange = async (text) => {
     setSearchTerm(text);
     setSelectedPatient(null);
@@ -107,7 +105,6 @@ export default function DataPatientsListScreen() {
     }
   };
 
-  // عنصر مريض في قائمة البحث
   const renderPatientItem = ({ item }) => (
     <TouchableOpacity
       style={styles.patientItem}
@@ -119,38 +116,37 @@ export default function DataPatientsListScreen() {
     >
       <View style={styles.patientRow}>
         <View style={styles.patientLeft}>
-          <Ionicons name="person-circle-outline" size={28} color={primary} />
-          <View style={{ marginRight: 8 }}>
+          <Ionicons
+            name="person-circle-outline"
+            size={28}
+            color={colors.primary}
+          />
+          <View style={{ marginRight: spacing.sm }}>
             <Text style={styles.patientName}>{item.name}</Text>
             <Text style={styles.patientHint}>اضغط لعرض بيانات المريض</Text>
           </View>
         </View>
-        {/* لون السهم واضح على الخلفية البيضاء */}
-        <Ionicons name="chevron-back" size={20} color="#9ca3af" />
+        <Ionicons name="chevron-back" size={20} color={colors.textMuted} />
       </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.root}>
-      {/* شريط الحالة */}
       <StatusBar
-        backgroundColor={primary}
+        backgroundColor={colors.primary}
         barStyle="light-content"
         translucent={false}
       />
 
-      {/* Safe Area أعلى للشق (iOS/Android) */}
       <SafeAreaView style={styles.safeTop} />
 
-      {/* الهيدر */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          {/* جعل السهم أبيض ليبان على الخلفية الخضراء */}
           <Ionicons name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
 
@@ -166,21 +162,19 @@ export default function DataPatientsListScreen() {
         </View>
       </View>
 
-      {/* المحتوى */}
       <View style={styles.container}>
-        {/* البحث - يظهر فقط إذا مش جاي من قائمة المرضى */}
         {!fromList && (
           <View style={styles.searchSection}>
             <Ionicons
               name="search"
               size={20}
-              color="#9ca3af"
+              color={colors.textMuted}
               style={styles.searchIcon}
             />
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="ابحث عن مريض بالاسم"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.textMuted}
               value={searchTerm}
               onChangeText={handleSearchChange}
               autoCorrect={false}
@@ -189,7 +183,6 @@ export default function DataPatientsListScreen() {
           </View>
         )}
 
-        {/* قائمة نتائج البحث */}
         {!fromList && searchTerm.trim() !== "" && (
           <FlatList
             data={patients}
@@ -204,34 +197,31 @@ export default function DataPatientsListScreen() {
           />
         )}
 
-        {/* تفاصيل المريض */}
         {selectedPatient && (
           <ScrollView
             style={styles.detailsContainer}
             showsVerticalScrollIndicator={false}
           >
-            {/* كارد اسم المريض */}
             <View style={styles.mainCard}>
               <View style={styles.mainCardRow}>
                 <Ionicons
                   name="person-circle-outline"
                   size={40}
-                  color={primary}
+                  color={colors.primary}
                 />
-                <View style={{ marginRight: 10 }}>
+                <View style={{ marginRight: spacing.sm + 2 }}>
                   <Text style={styles.mainName}>{selectedPatient.name}</Text>
                   <Text style={styles.mainLabel}>معلومات المريض</Text>
                 </View>
               </View>
             </View>
 
-            {/* الأعراض */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
                 <Ionicons
                   name="alert-circle-outline"
                   size={18}
-                  color={primary}
+                  color={colors.primary}
                 />
                 <Text style={styles.blockTitle}>الأعراض الحالية</Text>
               </View>
@@ -240,10 +230,13 @@ export default function DataPatientsListScreen() {
               </Text>
             </View>
 
-            {/* الفحوصات */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
-                <Ionicons name="flask-outline" size={18} color={primary} />
+                <Ionicons
+                  name="flask-outline"
+                  size={18}
+                  color={colors.primary}
+                />
                 <Text style={styles.blockTitle}>أهم الفحوصات</Text>
               </View>
               <Text style={styles.blockText}>
@@ -251,10 +244,13 @@ export default function DataPatientsListScreen() {
               </Text>
             </View>
 
-            {/* الأدوية */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
-                <Ionicons name="medkit-outline" size={18} color={primary} />
+                <Ionicons
+                  name="medkit-outline"
+                  size={18}
+                  color={colors.primary}
+                />
                 <Text style={styles.blockTitle}>الأدوية الموصوفة</Text>
               </View>
               {selectedPatient.medications.length === 0 ? (
@@ -265,8 +261,8 @@ export default function DataPatientsListScreen() {
                     <Ionicons
                       name="ellipse-outline"
                       size={8}
-                      color={primary}
-                      style={{ marginLeft: 6 }}
+                      color={colors.accent}
+                      style={{ marginLeft: spacing.xs + 2 }}
                     />
                     <Text style={styles.medText}>
                       {med.name} - {med.dosage} - {med.frequency}
@@ -276,7 +272,6 @@ export default function DataPatientsListScreen() {
               )}
             </View>
 
-            {/* زر إغلاق في وضع البحث فقط */}
             {!fromList && (
               <TouchableOpacity
                 style={styles.closeBtn}
@@ -287,7 +282,7 @@ export default function DataPatientsListScreen() {
                   name="close-circle-outline"
                   size={18}
                   color="#fff"
-                  style={{ marginLeft: 6 }}
+                  style={{ marginLeft: spacing.xs + 2 }}
                 />
                 <Text style={styles.closeText}>إخفاء تفاصيل المريض</Text>
               </TouchableOpacity>
@@ -295,7 +290,6 @@ export default function DataPatientsListScreen() {
           </ScrollView>
         )}
 
-        {/* رسائل مساعدة */}
         {!fromList && !selectedPatient && searchTerm.trim() === "" && (
           <Text style={styles.helperText}>
             ابدأ بالبحث عن مريض لعرض بياناته.
@@ -307,35 +301,30 @@ export default function DataPatientsListScreen() {
         )}
       </View>
 
-      {/* Safe Area أسفل لعدم التصادم مع شريط الهوم في الآيفون */}
       <SafeAreaView style={styles.safeBottom} />
     </View>
   );
 }
 
-const primary = "#00b29c";
-const bg = "#f5fafb";
-const cardBg = "#ffffff";
-const textMain = "#023047";
-const textSoft = "#6b7280";
-const borderSoft = "#e5e7eb";
-
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: bg },
+  root: { flex: 1, backgroundColor: colors.backgroundLight },
+
   safeTop: {
-    backgroundColor: primary,
+    backgroundColor: colors.primary,
     ...Platform.select({
       ios: {},
       android: { height: StatusBar.currentHeight || 0 },
     }),
   },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: primary,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm + 2,
   },
+
   backButton: {
     width: 32,
     height: 32,
@@ -346,146 +335,214 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.12)",
   },
-  headerCenter: { flex: 1, marginHorizontal: 10 },
+
+  headerCenter: { flex: 1, marginHorizontal: spacing.sm + 2 },
+
   headerTitle: {
-    fontSize: 18,
+    fontSize: typography.headingSm,
     fontWeight: "700",
     color: "#fff",
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
+
   headerSubtitle: {
-    fontSize: 12,
+    fontSize: typography.bodySm,
     color: "rgba(255,255,255,0.85)",
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
+
   headerIconCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
     justifyContent: "center",
   },
+
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 6,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm + 2,
+    paddingBottom: spacing.xs + 2,
+    backgroundColor: colors.backgroundLight,
   },
-  rtlText: { textAlign: "right", writingDirection: "rtl" },
 
-  // البحث
+  rtlText: {
+    textAlign: "right",
+    writingDirection: "rtl",
+    fontFamily: typography.fontFamily,
+  },
+
   searchSection: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: cardBg,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
     borderWidth: 1,
-    borderColor: borderSoft,
-    marginBottom: 10,
+    borderColor: colors.border,
+    marginBottom: spacing.sm + 2,
+    ...shadows.light,
   },
-  searchIcon: { marginLeft: 6 },
-  input: { flex: 1, fontSize: 14, color: textMain },
 
-  // قائمة المرضى
-  patientsList: { maxHeight: 180, marginBottom: 8 },
-  patientItem: {
-    backgroundColor: cardBg,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: borderSoft,
+  searchIcon: { marginLeft: spacing.xs + 2 },
+
+  input: {
+    flex: 1,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    fontFamily: typography.fontFamily,
   },
+
+  patientsList: { maxHeight: 180, marginBottom: spacing.sm },
+
+  patientItem: {
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.xs + 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.light,
+  },
+
   patientRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
   },
+
   patientLeft: { flexDirection: "row-reverse", alignItems: "center" },
-  patientName: { fontSize: 15, fontWeight: "600", color: textMain },
-  patientHint: { fontSize: 11, color: textSoft },
+
+  patientName: {
+    fontSize: typography.bodyLg,
+    fontWeight: "600",
+    color: colors.textPrimary,
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
+  patientHint: {
+    fontSize: typography.bodySm,
+    color: colors.textMuted,
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
   emptyText: {
     textAlign: "center",
-    color: textSoft,
-    marginTop: 6,
-    fontSize: 13,
+    color: colors.textMuted,
+    marginTop: spacing.xs + 2,
+    fontSize: typography.bodySm,
+    fontFamily: typography.fontFamily,
   },
+
   helperText: {
     textAlign: "center",
-    color: textSoft,
-    marginTop: 16,
-    fontSize: 14,
+    color: colors.textMuted,
+    marginTop: spacing.lg,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
 
-  // تفاصيل المريض
-  detailsContainer: { flex: 1, marginTop: 8 },
+  detailsContainer: { flex: 1, marginTop: spacing.sm },
+
   mainCard: {
-    backgroundColor: cardBg,
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: borderSoft,
-    marginBottom: 10,
+    borderColor: colors.border,
+    marginBottom: spacing.sm + 2,
+    ...shadows.light,
   },
+
   mainCardRow: { flexDirection: "row-reverse", alignItems: "center" },
+
   mainName: {
-    fontSize: 18,
+    fontSize: typography.headingSm,
     fontWeight: "700",
-    color: textMain,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
-  mainLabel: { fontSize: 12, color: primary, textAlign: "right" },
+
+  mainLabel: {
+    fontSize: typography.bodySm,
+    color: colors.accent,
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
 
   block: {
-    backgroundColor: cardBg,
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: borderSoft,
-    marginBottom: 8,
+    borderColor: colors.border,
+    marginBottom: spacing.sm,
+    ...shadows.light,
   },
+
   blockHeader: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
+
   blockTitle: {
-    fontSize: 14,
+    fontSize: typography.bodyMd,
     fontWeight: "600",
-    color: textMain,
-    marginRight: 6,
+    color: colors.textPrimary,
+    marginRight: spacing.xs + 2,
+    fontFamily: typography.fontFamily,
   },
+
   blockText: {
-    fontSize: 13,
-    color: textSoft,
+    fontSize: typography.bodySm,
+    color: colors.textSecondary,
     lineHeight: 20,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
 
   medItem: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
-  medText: { fontSize: 13, color: textMain, textAlign: "right" },
 
-  // (شيلنا كل ستايلات الزيارات السابقة)
+  medText: {
+    fontSize: typography.bodySm,
+    color: colors.textPrimary,
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
   closeBtn: {
-    marginTop: 10,
-    marginBottom: 8,
+    marginTop: spacing.sm + 2,
+    marginBottom: spacing.sm,
     alignSelf: "center",
     flexDirection: "row-reverse",
     alignItems: "center",
-    backgroundColor: primary,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.xs + 4,
+    borderRadius: 999,
+    ...shadows.medium,
   },
-  closeText: { color: "#fff", fontSize: 13, fontWeight: "600" },
 
-  safeBottom: { backgroundColor: bg },
+  closeText: {
+    color: "#fff",
+    fontSize: typography.bodySm,
+    fontWeight: "600",
+    fontFamily: typography.fontFamily,
+  },
+
+  safeBottom: { backgroundColor: colors.backgroundLight },
 });

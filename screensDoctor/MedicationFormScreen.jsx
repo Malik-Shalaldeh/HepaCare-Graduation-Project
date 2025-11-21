@@ -16,6 +16,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function MedicationFormScreen({ route, navigation }) {
   const { mode, patientId, patientName, medication } = route.params;
@@ -206,7 +207,7 @@ export default function MedicationFormScreen({ route, navigation }) {
       <ScrollView
         ref={scrollRef}
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 60 }}
+        contentContainerStyle={{ paddingBottom: spacing.xxl + 28 }}
         keyboardShouldPersistTaps="handled"
       >
         <Text style={[styles.modalTitle, styles.rtlText]}>
@@ -227,7 +228,7 @@ export default function MedicationFormScreen({ route, navigation }) {
           ref={medicationNameRef}
           style={[styles.input, styles.rtlText]}
           placeholder="أدخل اسم الدواء"
-          placeholderTextColor="#888"
+          placeholderTextColor={colors.textMuted}
           value={form.name}
           onChangeText={handleMedicationNameChange}
           onFocus={onFocusInput}
@@ -240,8 +241,9 @@ export default function MedicationFormScreen({ route, navigation }) {
                 key={item.id}
                 style={styles.medNameItem}
                 onPress={() => selectMedicationName(item)}
+                activeOpacity={0.9}
               >
-                <Text style={[styles.rtlText, { color: "#333" }]}>
+                <Text style={[styles.rtlText, { color: colors.textPrimary }]}>
                   {item.label || item.name}
                 </Text>
               </TouchableOpacity>
@@ -255,7 +257,7 @@ export default function MedicationFormScreen({ route, navigation }) {
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="أدخل الجرعة"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textMuted}
               value={form.dosage}
               onChangeText={(text) => setForm({ ...form, dosage: text })}
               onFocus={onFocusInput}
@@ -265,7 +267,7 @@ export default function MedicationFormScreen({ route, navigation }) {
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="أدخل التكرار"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textMuted}
               value={form.frequency}
               onChangeText={(text) => setForm({ ...form, frequency: text })}
               onFocus={onFocusInput}
@@ -275,7 +277,7 @@ export default function MedicationFormScreen({ route, navigation }) {
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="أدخل وقت الجرعة (مثلاً: صباحاً، مساءً)"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textMuted}
               value={form.doseTime}
               onChangeText={(text) => setForm({ ...form, doseTime: text })}
               onFocus={onFocusInput}
@@ -305,16 +307,21 @@ export default function MedicationFormScreen({ route, navigation }) {
                 styles.rtlText,
                 timeFocused && styles.timePickerButtonFocused,
               ]}
+              activeOpacity={0.9}
             >
               <Text
                 style={[
                   styles.rtlText,
-                  { color: form.timeToTake ? "#000" : "#888" },
+                  {
+                    color: form.timeToTake
+                      ? colors.textPrimary
+                      : colors.textMuted,
+                  },
                 ]}
               >
                 {form.timeToTake || "اختر الساعة"}
               </Text>
-              <Ionicons name="alarm" size={20} color="#555" />
+              <Ionicons name="alarm" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
 
             {showTimePicker && (
@@ -337,12 +344,14 @@ export default function MedicationFormScreen({ route, navigation }) {
                         setIsPickingTime(false);
                         setTimeFocused(false);
                       }}
+                      activeOpacity={0.9}
                     >
                       <Text style={styles.iosBtnText}>إلغاء</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.iosBtn}
                       onPress={saveTempTimeAndClosePicker}
+                      activeOpacity={0.9}
                     >
                       <Text style={styles.iosBtnText}>تم</Text>
                     </TouchableOpacity>
@@ -355,7 +364,7 @@ export default function MedicationFormScreen({ route, navigation }) {
             <TextInput
               style={[styles.input, styles.rtlText]}
               placeholder="أدخل أي تعليمات إضافية"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.textMuted}
               value={form.additionalInstructions}
               onChangeText={(text) =>
                 setForm({ ...form, additionalInstructions: text })
@@ -374,6 +383,7 @@ export default function MedicationFormScreen({ route, navigation }) {
           <TouchableOpacity
             style={[styles.modalButton, styles.saveButton]}
             onPress={handleSave}
+            activeOpacity={0.9}
           >
             <Ionicons
               name={
@@ -382,21 +392,23 @@ export default function MedicationFormScreen({ route, navigation }) {
                   : "add-circle-outline"
               }
               size={20}
-              color="#fff"
+              color={colors.buttonSuccessText}
               style={{ marginRight: 6 }}
             />
             <Text style={styles.btnText}>
               {route?.params?.mode === "edit" ? "حفظ التعديلات" : "إضافة"}
             </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.modalButton, styles.cancelButton]}
             onPress={() => navigation.goBack()}
+            activeOpacity={0.9}
           >
             <Ionicons
               name="close-circle"
               size={20}
-              color="#fff"
+              color={colors.buttonDangerText}
               style={{ marginRight: 6 }}
             />
             <Text style={styles.btnText}>إلغاء</Text>
@@ -408,88 +420,141 @@ export default function MedicationFormScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#F5F5F5" },
+  safeArea: { flex: 1, backgroundColor: colors.backgroundLight },
+
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm + 4,
   },
-  rtlText: { writingDirection: "rtl", textAlign: "right" },
+
+  rtlText: {
+    writingDirection: "rtl",
+    textAlign: "right",
+    fontFamily: typography.fontFamily,
+  },
+
   modalTitle: {
-    fontSize: 20,
+    fontSize: typography.headingMd,
     fontWeight: "bold",
-    color: "#333",
+    color: colors.textPrimary,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: spacing.xl,
+    fontFamily: typography.fontFamily,
   },
-  label: { fontSize: 14, color: "#555", marginBottom: 4 },
+
+  label: {
+    fontSize: typography.bodyMd,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+    fontFamily: typography.fontFamily,
+  },
+
   input: {
     borderWidth: 1,
-    borderColor: "#CCC",
-    padding: Platform.select({ ios: 12, android: 10 }),
-    borderRadius: 8,
-    backgroundColor: "#FFF",
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 10,
+    borderColor: colors.border,
+    padding: Platform.select({ ios: spacing.md, android: spacing.md - 2 }),
+    borderRadius: radii.sm,
+    backgroundColor: colors.background,
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm + 2,
+    fontFamily: typography.fontFamily,
+    ...shadows.light,
   },
-  disabledInput: { backgroundColor: "#F0F0F0", color: "#777" },
+
+  disabledInput: {
+    backgroundColor: colors.buttonMuted,
+    color: colors.textMuted,
+  },
+
   medNamesList: {
     maxHeight: 140,
-    backgroundColor: "#FFF",
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 8,
-    marginBottom: 10,
+    borderColor: colors.border,
+    borderRadius: radii.sm,
+    marginBottom: spacing.sm + 2,
+    overflow: "hidden",
   },
+
   medNameItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#EEE",
+    borderBottomColor: colors.border,
   },
+
   timePickerButton: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#FFF",
-    borderColor: "#CCC",
+    backgroundColor: colors.background,
+    borderColor: colors.border,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 10,
+    borderRadius: radii.sm,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm + 2,
   },
-  timePickerButtonFocused: { borderColor: "#4CAF50" },
+
+  timePickerButtonFocused: {
+    borderColor: colors.success,
+  },
+
   iosTimeActions: {
     flexDirection: "row-reverse",
     justifyContent: "flex-start",
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
+
   iosBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: "#4CAF50",
-    borderRadius: 6,
-    marginLeft: 8,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.buttonSuccess,
+    borderRadius: radii.sm - 2,
+    marginLeft: spacing.sm,
   },
-  iosBtnText: { color: "#fff", fontSize: 14 },
+
+  iosBtnText: {
+    color: colors.buttonSuccessText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    fontWeight: "700",
+  },
+
   buttonContainer: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: spacing.xl,
+    marginBottom: spacing.xxl,
   },
+
   modalButton: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: spacing.md,
+    borderRadius: radii.sm,
     justifyContent: "center",
+    ...shadows.medium,
   },
-  saveButton: { backgroundColor: "#4CAF50", marginRight: 8 },
-  cancelButton: { backgroundColor: "#F44336", marginLeft: 8 },
-  btnText: { color: "#FFF", fontSize: 16, fontWeight: "bold" },
+
+  saveButton: {
+    backgroundColor: colors.buttonSuccess,
+    marginRight: spacing.sm,
+  },
+
+  cancelButton: {
+    backgroundColor: colors.buttonDanger,
+    marginLeft: spacing.sm,
+  },
+
+  btnText: {
+    color: colors.background,
+    fontSize: typography.bodyLg,
+    fontWeight: "bold",
+    fontFamily: typography.fontFamily,
+  },
 });

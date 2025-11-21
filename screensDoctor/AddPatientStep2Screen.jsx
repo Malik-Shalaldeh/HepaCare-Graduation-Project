@@ -1,3 +1,4 @@
+// AddPatientStep2Screen
 import React, { useState } from "react";
 import {
   View,
@@ -10,15 +11,7 @@ import {
   Switch,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-
-const COLORS = {
-  primary: "#00b29c",
-  bg: "#f5f7f8",
-  card: "#ffffff",
-  text: "#1f2937",
-  mutetxt: "#6b7280",
-  border: "#e5e7eb",
-};
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const commonDiseases = [
   "Diabetes",
@@ -97,8 +90,10 @@ export default function AddPatientStep2Screen() {
         <TextInput
           style={styles.input}
           placeholder="ابحث عن مرض..."
+          placeholderTextColor={colors.textMuted}
           value={searchDisease}
           onChangeText={setSearchDisease}
+          textAlign="right"
         />
 
         {filteredDiseases.map((disease) => (
@@ -107,6 +102,13 @@ export default function AddPatientStep2Screen() {
             <Switch
               value={(newPatient.diseases || []).includes(disease)}
               onValueChange={() => toggleDisease(disease)}
+              trackColor={{
+                false: colors.border,
+                true: colors.accent,
+              }}
+              thumbColor={
+                Platform.OS === "android" ? colors.primary : undefined
+              }
             />
           </View>
         ))}
@@ -116,14 +118,19 @@ export default function AddPatientStep2Screen() {
             key={index}
             style={styles.input}
             placeholder={`مرض آخر ${index + 1}`}
+            placeholderTextColor={colors.textMuted}
             value={d}
             onChangeText={(t) => updateCustomDisease(index, t)}
+            textAlign="right"
           />
         ))}
 
-        {/* ✅ زر واحد (التالي) – الرجوع من سهم الهيدر */}
         <View style={styles.singleBtnWrapper}>
-          <TouchableOpacity style={styles.nextButton} onPress={goNext}>
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={goNext}
+            activeOpacity={0.9}
+          >
             <Text style={styles.nextButtonText}>التالي</Text>
           </TouchableOpacity>
         </View>
@@ -135,54 +142,61 @@ export default function AddPatientStep2Screen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.backgroundLight,
   },
   container: {
-    padding: 16,
-    paddingBottom: Platform.OS === "android" ? 24 : 16,
+    padding: spacing.lg,
+    paddingBottom: Platform.OS === "android" ? spacing.xl : spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: typography.headingSm,
     fontWeight: "700",
-    color: COLORS.text,
-    marginBottom: 10,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm + 2,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: COLORS.card,
-    fontSize: 14,
+    borderColor: colors.border,
+    padding: spacing.md - 2,
+    borderRadius: radii.sm,
+    marginBottom: spacing.sm + 2,
+    backgroundColor: colors.background,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
+    ...shadows.light,
   },
   switchRow: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 6,
+    paddingVertical: spacing.xs + 2,
   },
   switchLabel: {
-    fontSize: 14,
-    color: COLORS.text,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
     flex: 1,
     textAlign: "right",
-    marginLeft: 10,
+    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily,
   },
   singleBtnWrapper: {
-    marginTop: 16,
+    marginTop: spacing.lg,
   },
   nextButton: {
-    backgroundColor: "#2196F3",
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: colors.buttonInfo,
+    padding: spacing.md,
+    borderRadius: radii.sm,
+    ...shadows.medium,
   },
   nextButtonText: {
-    color: "#FFF",
-    fontSize: 16,
+    color: colors.buttonInfoText,
+    fontSize: typography.bodyLg,
     textAlign: "center",
     fontWeight: "600",
+    fontFamily: typography.fontFamily,
   },
 });

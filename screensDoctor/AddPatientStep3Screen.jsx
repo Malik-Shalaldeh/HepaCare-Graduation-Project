@@ -1,3 +1,4 @@
+// AddPatientStep3Screen
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -14,15 +15,7 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AbedEndPoint from "../AbedEndPoint";
-
-const COLORS = {
-  primary: "#00b29c",
-  bg: "#f5f7f8",
-  card: "#ffffff",
-  text: "#1f2937",
-  mutetxt: "#6b7280",
-  border: "#e5e7eb",
-};
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const commonMedications = [
   "Insulin",
@@ -186,8 +179,10 @@ export default function AddPatientStep3Screen() {
         <TextInput
           style={styles.input}
           placeholder="ابحث عن دواء..."
+          placeholderTextColor={colors.textMuted}
           value={searchMedication}
           onChangeText={setSearchMedication}
+          textAlign="right"
         />
 
         {filteredMedications.map((med) => (
@@ -196,6 +191,13 @@ export default function AddPatientStep3Screen() {
             <Switch
               value={(newPatient.medications || []).includes(med)}
               onValueChange={() => toggleMedication(med)}
+              trackColor={{
+                false: colors.border,
+                true: colors.accent,
+              }}
+              thumbColor={
+                Platform.OS === "android" ? colors.primary : undefined
+              }
             />
           </View>
         ))}
@@ -205,20 +207,22 @@ export default function AddPatientStep3Screen() {
             key={index}
             style={styles.input}
             placeholder={`دواء آخر ${index + 1}`}
+            placeholderTextColor={colors.textMuted}
             value={m}
             onChangeText={(t) => updateCustomMed(index, t)}
+            textAlign="right"
           />
         ))}
 
-        {/* ✅ زر واحد للحفظ – الرجوع من سهم الهيدر فقط */}
         <View style={styles.singleBtnWrapper}>
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSave}
             disabled={saving}
+            activeOpacity={0.9}
           >
             {saving ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={colors.buttonSuccessText} />
             ) : (
               <Text style={styles.saveButtonText}>حفظ المريض</Text>
             )}
@@ -232,50 +236,61 @@ export default function AddPatientStep3Screen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.backgroundLight,
   },
   container: {
-    padding: 16,
-    paddingBottom: Platform.OS === "android" ? 24 : 16,
+    padding: spacing.lg,
+    paddingBottom: Platform.OS === "android" ? spacing.xl : spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: typography.headingSm,
     fontWeight: "700",
-    color: COLORS.text,
-    marginBottom: 10,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm + 2,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: COLORS.card,
-    fontSize: 14,
+    borderColor: colors.border,
+    padding: spacing.md - 2,
+    borderRadius: radii.sm,
+    marginBottom: spacing.sm + 2,
+    backgroundColor: colors.background,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
     textAlign: "right",
+    fontFamily: typography.fontFamily,
+    ...shadows.light,
   },
   switchRow: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 6,
+    paddingVertical: spacing.xs + 2,
   },
   switchLabel: {
-    fontSize: 14,
-    color: COLORS.text,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
     flex: 1,
     textAlign: "right",
-    marginLeft: 10,
+    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily,
   },
   singleBtnWrapper: {
-    marginTop: 16,
+    marginTop: spacing.lg,
   },
   saveButton: {
-    backgroundColor: "#4CAF50",
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: colors.buttonSuccess,
+    padding: spacing.md,
+    borderRadius: radii.sm,
     alignItems: "center",
+    ...shadows.medium,
   },
-  saveButtonText: { color: "#FFF", fontSize: 16, fontWeight: "600" },
+  saveButtonText: {
+    color: colors.buttonSuccessText,
+    fontSize: typography.bodyLg,
+    fontWeight: "600",
+    fontFamily: typography.fontFamily,
+  },
 });

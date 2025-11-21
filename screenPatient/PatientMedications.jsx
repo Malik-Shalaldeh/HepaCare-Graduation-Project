@@ -1,24 +1,20 @@
 // screensPatient/PatientMedications.jsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-
-import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-import theme from '../style/theme';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
+import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import theme from "../style/theme";
 
 const PatientMedications = () => {
   const navigation = useNavigation();
 
   return (
     <ScreenWithDrawer title="الأدوية">
-      <View
-        style={styles.container}
-      >
-        {/* ✅ زر "الأدوية التي أتناولها" */}
+      <View style={styles.container}>
         <TouchableOpacity
           style={[styles.button, styles.currentMedsButton]}
-          onPress={() => navigation.navigate('الأدوية التي أتناولها')}
+          onPress={() => navigation.navigate("MyMedications")}
           activeOpacity={0.9}
         >
           <View style={styles.buttonContent}>
@@ -28,18 +24,13 @@ const PatientMedications = () => {
               color={theme.colors.buttonPrimaryText}
               style={styles.icon}
             />
-            <Text
-              style={styles.buttonText}
-            >
-              الأدوية التي أتناولها
-            </Text>
+            <Text style={styles.buttonText}>الأدوية التي أتناولها</Text>
           </View>
         </TouchableOpacity>
 
-        {/* ✅ زر "الأدوية المتوفرة في وزارة الصحة" */}
         <TouchableOpacity
           style={[styles.button, styles.mohMedsButton]}
-          onPress={() => navigation.navigate('الأدوية المتوفرة في الصحة')}
+          onPress={() => navigation.navigate("AvailableMedications")}
           activeOpacity={0.9}
         >
           <View style={styles.buttonContent}>
@@ -49,11 +40,7 @@ const PatientMedications = () => {
               color={theme.colors.buttonPrimaryText}
               style={styles.icon}
             />
-            <Text
-              style={styles.buttonText}
-            >
-              الأدوية المتوفرة في الصحة
-            </Text>
+            <Text style={styles.buttonText}>الأدوية المتوفرة في الصحة</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -75,28 +62,22 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.xs,
     ...theme.shadows.light,
   },
-  currentMedsButton: {
-    backgroundColor: theme.colors.buttonPrimary, // زر أساسي
-  },
-  mohMedsButton: {
-    backgroundColor: theme.colors.buttonInfo, // أزرق واضح
-  },
+  currentMedsButton: { backgroundColor: theme.colors.buttonPrimary },
+  mohMedsButton: { backgroundColor: theme.colors.buttonInfo },
   buttonContent: {
-    flexDirection: 'row-reverse', // عربي
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   buttonText: {
     color: theme.colors.buttonPrimaryText,
     fontSize: theme.typography.headingSm,
-    fontWeight: 'bold',
-    textAlign: 'right',
+    fontWeight: "bold",
+    textAlign: "right",
     flex: 1,
     fontFamily: theme.typography.fontFamily,
   },
-  icon: {
-    marginLeft: theme.spacing.sm,
-  },
+  icon: { marginLeft: theme.spacing.sm },
 });
 
 export default PatientMedications;

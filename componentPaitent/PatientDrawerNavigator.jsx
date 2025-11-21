@@ -14,21 +14,19 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import TestResultsScreen from "../screenPatient/TestResultsScreen";
 import LabsScreen from "../screenPatient/LabsScreen";
 import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
-import PatientMedications from "../screenPatient/PatientMedications";
 import PatientDashboard from "../screenPatient/PatientDashboard";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
-import AvailableMedicationsScreen from "../screenPatient/AvailableMedicationsScreen";
-import MyMedicationsScreen from "../screenPatient/MyMedicationsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 
-// 🎨 الثيم الموحد
-import theme from "../style/theme";
+// ✅ ستاك الأدوية
+import MedicationsStack from "./MedStack";
 
+import theme from "../style/theme";
 const primary = theme.colors.primary;
 
-// ✅ محتوى الـ Drawer مع زر تسجيل الخروج
+// محتوى الدرور
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
@@ -62,7 +60,7 @@ function CustomDrawerContent(props) {
   );
 }
 
-// ✅ التابات السفلية (MainTabs)
+// التابات
 const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
@@ -70,9 +68,7 @@ function MainTabs() {
       initialRouteName="لوحة التحكم"
       screenOptions={({ route }) => ({
         headerShown: true,
-        headerStyle: {
-          backgroundColor: theme.colors.primary,
-        },
+        headerStyle: { backgroundColor: theme.colors.primary },
         headerTintColor: theme.colors.buttonPrimaryText,
         headerTitleAlign: "center",
         headerTitleStyle: {
@@ -100,15 +96,24 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
-      <Tab.Screen name="الأدوية" component={PatientMedications} />
+
+      {/* ✅ التاب يفتح شاشة PatientMedications داخل الستاك */}
+      <Tab.Screen
+        name="الأدوية"
+        component={MedicationsStack}
+        options={{
+          headerShown: false, // ✅ يمنع هيدر التاب (حتى ما يصير نفيقيتور فوق نفيقيتور)
+        }}
+      />
+
       <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
     </Tab.Navigator>
   );
 }
 
-// ✅ Drawer Navigator
+// الدرور
 const Drawer = createDrawerNavigator();
-function NavigatorPatient() {
+export default function NavigatorPatient() {
   return (
     <>
       <StatusBar
@@ -122,9 +127,7 @@ function NavigatorPatient() {
         initialRouteName="MainTabs"
         screenOptions={{
           headerShown: true,
-          headerStyle: {
-            backgroundColor: theme.colors.primary,
-          },
+          headerStyle: { backgroundColor: theme.colors.primary },
           headerTintColor: theme.colors.buttonPrimaryText,
           headerTitleAlign: "center",
           headerTitleStyle: {
@@ -133,11 +136,13 @@ function NavigatorPatient() {
             fontWeight: "700",
           },
           drawerActiveTintColor: primary,
-          drawerLabelStyle: { fontSize: 16, fontFamily: theme.typography.fontFamily },
+          drawerLabelStyle: {
+            fontSize: 16,
+            fontFamily: theme.typography.fontFamily,
+          },
           drawerStyle: { backgroundColor: "#fff" },
         }}
       >
-        {/* إخفاء MainTabs من الـ Drawer */}
         <Drawer.Screen
           name="MainTabs"
           component={MainTabs}
@@ -169,30 +174,13 @@ function NavigatorPatient() {
           }}
         />
 
-        <Drawer.Screen
-          name="الأدوية التي أتناولها"
-          component={MyMedicationsScreen}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerShown: false,
-          }}
-        />
-
-        <Drawer.Screen
-          name="الأدوية المتوفرة في الصحة"
-          component={AvailableMedicationsScreen}
-          options={{
-            drawerItemStyle: { height: 0 },
-            headerShown: false,
-          }}
-        />
+        {/* ❌ شاشات الأدوية مش موجودة بالدرور */}
 
         <Drawer.Screen
           name="مواعيدي"
           component={PatientAppointmentsScreen}
           options={{
             headerTitle: "مواعيدي القادمة",
-            headerTitleAlign: "center",
             drawerIcon: ({ size, color }) => (
               <Ionicons name="calendar-outline" size={size} color={color} />
             ),
@@ -204,7 +192,6 @@ function NavigatorPatient() {
           component={LabsScreen}
           options={{
             headerTitle: "المختبرات المعتمدة من وزارة الصحة",
-            headerTitleAlign: "center",
             drawerIcon: ({ size, color }) => (
               <Ionicons name="flask-outline" size={size} color={color} />
             ),
@@ -216,11 +203,7 @@ function NavigatorPatient() {
           component={PrivacyPolicyScreen}
           options={{
             drawerIcon: ({ size, color }) => (
-              <Ionicons
-                name="document-text-outline"
-                size={size}
-                color={color}
-              />
+              <Ionicons name="document-text-outline" size={size} color={color} />
             ),
           }}
         />
@@ -238,5 +221,3 @@ function NavigatorPatient() {
     </>
   );
 }
-
-export default NavigatorPatient;

@@ -14,73 +14,92 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import AbedEndPoint from "../AbedEndPoint";
-
-const COLORS = {
-  primary: "#00b29c",
-  bg: "#f5f7f8",
-  card: "#ffffff",
-  text: "#1f2937",
-  mutetxt: "#6b7280",
-  border: "#e5e7eb",
-};
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 export default function SymptomPatientSearchScreen() {
   const navigation = useNavigation();
 
   const [doctorId, setDoctorId] = useState(null);
-  const [patients, setPatients] = useState([]);
+  const [patients, setPatients] = useState([]); // normalized [{patientId,name,nationalId}]
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    let mounted = true;
+
     const init = async () => {
       try {
         const id = await AsyncStorage.getItem("doctor_id");
-        if (id) setDoctorId(parseInt(id, 10));
+        if (mounted) setDoctorId(id ? parseInt(id, 10) : null);
       } catch (e) {
-        console.log("Error loading doctor_id", e);
+        if (mounted) setDoctorId(null);
       }
     };
+
     init();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const fetchPatients = async (query = "") => {
     if (!doctorId) return;
+
     try {
       setLoading(true);
       const url =
-        `${AbedEndPoint.symptomPatients}?doctor_id=${doctorId}` +
-        (query ? `&query=${encodeURIComponent(query)}` : "");
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.log("Failed to load patients", res.status);
-        return;
-      }
+        `${AbedEndPoint.symptomPatients}?doctor_id=${encodeURIComponent(
+          doctorId
+        )}` + (query ? `&query=${encodeURIComponent(query)}` : "");
+
+      const res = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
-      setPatients(data || []);
+
+      const safe = Array.isArray(data)
+        ? data
+            .filter((x) => x)
+            .map((x) => ({
+              patientId: x.patientId ?? x.patient_id ?? x.id,
+              name:
+                x.name ??
+                x.fullName ??
+                x.full_name ??
+                x.patient_name ??
+                "المريض",
+              nationalId:
+                x.nationalId ?? x.national_id ?? x.nationalID ?? "",
+            }))
+            .filter((p) => p.patientId !== undefined && p.patientId !== null)
+        : [];
+
+      setPatients(safe);
     } catch (err) {
       console.log("Error loading patients", err);
+      setPatients([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (doctorId) {
-      fetchPatients("");
-    }
+    if (doctorId) fetchPatients("");
   }, [doctorId]);
 
   const handleSearchChange = (text) => {
     setSearch(text);
-    const q = text.trim();
-    fetchPatients(q);
+    fetchPatients(text.trim());
   };
 
   const renderPatient = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate("SymptomRecords", { patient: item })}
+      activeOpacity={0.9}
     >
       <View style={styles.cardRow}>
         <View style={{ flex: 1 }}>
@@ -91,7 +110,7 @@ export default function SymptomPatientSearchScreen() {
             </Text>
           ) : null}
         </View>
-        <Ionicons name="chevron-back" size={22} color={COLORS.primary} />
+        <Ionicons name="chevron-back" size={22} color={colors.accent} />
       </View>
     </TouchableOpacity>
   );
@@ -103,12 +122,13 @@ export default function SymptomPatientSearchScreen() {
           <Ionicons
             name="search"
             size={20}
-            color={COLORS.mutetxt}
+            color={colors.textMuted}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
             placeholder="ابحث باسم المريض"
+            placeholderTextColor={colors.textMuted}
             value={search}
             onChangeText={handleSearchChange}
           />
@@ -116,7 +136,7 @@ export default function SymptomPatientSearchScreen() {
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.mutetxt}>جارٍ تحميل المرضى...</Text>
           </View>
         ) : patients.length === 0 ? (
@@ -128,9 +148,12 @@ export default function SymptomPatientSearchScreen() {
         ) : (
           <FlatList
             data={patients}
-            keyExtractor={(item) => item.patientId.toString()}
+            keyExtractor={(item, idx) =>
+              item.patientId ? String(item.patientId) : String(idx)
+            }
             renderItem={renderPatient}
-            contentContainerStyle={{ paddingVertical: 8 }}
+            contentContainerStyle={{ paddingVertical: spacing.sm }}
+            keyboardShouldPersistTaps="handled"
           />
         )}
       </View>
@@ -141,53 +164,58 @@ export default function SymptomPatientSearchScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.backgroundLight,
   },
   container: {
     flex: 1,
-    padding: 16,
+    padding: spacing.lg,
   },
   searchWrapper: {
     position: "relative",
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   searchIcon: {
     position: "absolute",
-    right: 12,
+    right: spacing.md,
     top: 11,
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    backgroundColor: COLORS.card,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: colors.background,
     paddingVertical: 9,
     paddingHorizontal: 40,
-    fontSize: 16,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
+    color: colors.textPrimary,
     textAlign: "right",
   },
   card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
+    ...shadows.light,
   },
   cardRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
   },
   patientName: {
-    fontSize: 16,
+    fontSize: typography.bodyLg,
+    fontFamily: typography.fontFamily,
     fontWeight: "600",
-    color: COLORS.text,
+    color: colors.textPrimary,
     textAlign: "right",
   },
   patientSub: {
     fontSize: 13,
-    color: COLORS.mutetxt,
-    marginTop: 2,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
     textAlign: "right",
   },
   center: {
@@ -196,7 +224,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   mutetxt: {
-    color: COLORS.mutetxt,
-    marginTop: 8,
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    fontFamily: typography.fontFamily,
+    fontSize: typography.bodyMd,
   },
 });
