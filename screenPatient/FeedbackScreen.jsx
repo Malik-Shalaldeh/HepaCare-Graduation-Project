@@ -1,3 +1,4 @@
+// sami
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -7,6 +8,7 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,9 +18,16 @@ import {
   getCurrentPatientClinicId,
   MOCK_CLINICS,
 } from "../utils/ratings";
+import {
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+} from "../style/theme";
 
-const primary = "#00b29c";
-const API = "http://192.168.1.128:8000";
+const API = "http://192.168.1.122:8000";
+const primary = colors.primary;
 
 const FeedbackScreen = () => {
   const navigation = useNavigation();
@@ -26,19 +35,18 @@ const FeedbackScreen = () => {
   const [comment, setComment] = useState("");
   const [patientId, setPatientId] = useState(null);
   const [patientName, setPatientName] = useState("مريض");
+
   const clinicId = getCurrentPatientClinicId();
   const clinicName =
     MOCK_CLINICS.find((c) => c.id === clinicId)?.name || "عيادة الصحة";
 
-  // جلب بيانات المريض من AsyncStorage
   useEffect(() => {
     const loadPatientData = async () => {
       try {
         const id = await AsyncStorage.getItem("patientId");
         if (id) {
-          setPatientId(parseInt(id));
-          
-          // جلب اسم المريض من API
+          setPatientId(parseInt(id, 10));
+
           const response = await fetch(`${API}/patient/dashboard/${id}`);
           if (response.ok) {
             const data = await response.json();
@@ -49,7 +57,7 @@ const FeedbackScreen = () => {
         console.error("Error loading patient data:", error);
       }
     };
-    
+
     loadPatientData();
   }, []);
 
@@ -58,12 +66,12 @@ const FeedbackScreen = () => {
       Alert.alert("تنبيه", "الرجاء اختيار تقييم للتطبيق");
       return;
     }
-    
+
     if (!patientId) {
       Alert.alert("خطأ", "لم يتم العثور على معرف المريض");
       return;
     }
-    
+
     try {
       const result = await submitRating({
         patientId,
@@ -74,12 +82,15 @@ const FeedbackScreen = () => {
         clinicRating: 0,
         comment,
       });
-      
+
       if (result.success) {
         Alert.alert("تم", result.message || "تم إرسال تقييمك بنجاح");
         navigation.goBack();
       } else {
-        Alert.alert("تنبيه", result.message || "لا يمكن إرسال تقييم جديد الآن");
+        Alert.alert(
+          "تنبيه",
+          result.message || "لا يمكن إرسال تقييم جديد الآن"
+        );
       }
     } catch (e) {
       Alert.alert("خطأ", "تعذر إرسال التقييم");
@@ -88,84 +99,103 @@ const FeedbackScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* شريط علوي بسيط */}
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <Text style={styles.title}>تقييم جودة الخدمات</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      {/* تقييم التطبيق بالنجوم */}
-      <View style={styles.panel}>
-        <Text style={[styles.label, { marginBottom: 8 }]}>تقييم التطبيق</Text>
-        <View style={styles.starsRow}>
-          <RatingStars value={appValue} onChange={setAppValue} size={28} />
-          {appValue ? (
-            <Text style={styles.valueText}>{appValue} / 5</Text>
-          ) : null}
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}
+          >
+            <Ionicons name="arrow-back" size={24} color={primary} />
+          </TouchableOpacity>
+          <Text style={styles.title}>تقييم جودة الخدمات</Text>
+          <View style={styles.topBarSpacer} />
         </View>
-      </View>
 
-      {/* خانة الملاحظات */}
-      <View style={styles.panel}>
-        <Text style={styles.label}>ملاحظاتك</Text>
-        <TextInput
-          value={comment}
-          onChangeText={setComment}
-          placeholder="اكتب ملاحظتك هنا (اختياري)"
-          style={styles.input}
-          multiline
-          numberOfLines={4}
-          textAlign="right"
-        />
-      </View>
+        <View style={styles.panel}>
+          <Text style={styles.label}>تقييم التطبيق</Text>
+          <View style={styles.starsRow}>
+            <RatingStars value={appValue} onChange={setAppValue} size={28} />
+            {appValue ? (
+              <Text style={styles.valueText}>{appValue} / 5</Text>
+            ) : null}
+          </View>
+        </View>
 
-      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-        <Ionicons
-          name="send"
-          size={18}
-          color="#fff"
-          style={{ marginLeft: 6 }}
-        />
-        <Text style={styles.submitText}>إرسال التقييم</Text>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.panel}>
+          <Text style={styles.label}>ملاحظاتك</Text>
+          <TextInput
+            value={comment}
+            onChangeText={setComment}
+            placeholder="اكتب ملاحظتك هنا (اختياري)"
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            textAlign="right"
+            placeholderTextColor={colors.textSecondary}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+          <Ionicons
+            name="send"
+            size={18}
+            color={colors.buttonPrimaryText}
+            style={styles.submitIcon}
+          />
+          <Text style={styles.submitText}>إرسال التقييم</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default FeedbackScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6FAF9" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.backgroundLight,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: colors.backgroundLight,
+  },
   topBar: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 8,
-    backgroundColor: "#fff",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: "#E2E8F0",
-    flexDirection: "row-reverse",
+    borderBottomColor: colors.border,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    ...shadows.small,
   },
-  backBtn: { padding: 4 },
-  title: { color: primary, fontSize: 16, fontWeight: "700" },
+  backBtn: {
+    padding: spacing.xs,
+  },
+  title: {
+    color: primary,
+    fontSize: typography.bodyMd,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  topBarSpacer: {
+    width: 24,
+  },
   panel: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    ...shadows.small,
   },
   label: {
-    fontSize: 14,
-    color: "#374151",
-    marginBottom: 8,
+    fontSize: typography.bodySm,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
     textAlign: "right",
   },
   starsRow: {
@@ -173,24 +203,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  valueText: { color: "#111827", fontWeight: "700" },
+  valueText: {
+    color: colors.textPrimary,
+    fontWeight: "700",
+    fontSize: typography.bodyMd,
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.md,
     minHeight: 110,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    textAlignVertical: "top",
+    writingDirection: "rtl",
   },
   submitBtn: {
-    marginTop: 16,
-    backgroundColor: primary,
-    borderRadius: 12,
-    paddingVertical: 12,
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.buttonPrimary ?? primary,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.md,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row-reverse",
-    marginHorizontal: 16,
+    ...shadows.medium,
   },
-  submitText: { color: "#fff", fontWeight: "700" },
+  submitIcon: {
+    marginLeft: spacing.xs,
+  },
+  submitText: {
+    color: colors.buttonPrimaryText,
+    fontWeight: "700",
+    fontSize: typography.bodyMd,
+  },
 });

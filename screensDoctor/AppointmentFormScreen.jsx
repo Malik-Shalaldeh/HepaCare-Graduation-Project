@@ -1,5 +1,5 @@
-//sami
-import React, { useState, useContext, useEffect } from 'react';
+// sami - Appointment form with unified theme
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,32 +9,45 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
-import ScreenWithDrawer from './ScreenWithDrawer';
-import { AppointmentsContext } from '../contexts/AppointmentsContext';
+} from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 
-const primary = '#00b29c';
+import ScreenWithDrawer from "./ScreenWithDrawer";
+import { AppointmentsContext } from "../contexts/AppointmentsContext";
+import {
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+} from "../style/theme";
+
+const primary = colors.buttonPrimary || colors.primary;
 
 const formatDate = (value) => value.toLocaleDateString();
-const formatTime = (value) => value.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-const toSqlDateTime = (value) => value.toISOString().slice(0, 19).replace('T', ' ');
+const formatTime = (value) =>
+  value.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const toSqlDateTime = (value) =>
+  value.toISOString().slice(0, 19).replace("T", " ");
 
 const AppointmentFormScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { saveAppointment, patientOptions, loading } = useContext(AppointmentsContext);
+  const { saveAppointment, patientOptions, loading } =
+    useContext(AppointmentsContext);
 
   const editingAppointment = route.params?.appointment;
   const isEditing = Boolean(editingAppointment);
 
   const [open, setOpen] = useState(false);
-  const [patient, setPatient] = useState(editingAppointment?.patientId ?? null);
+  const [patient, setPatient] = useState(
+    editingAppointment?.patientId ?? null
+  );
   const [patientsItems, setPatientsItems] = useState(patientOptions);
-  const [notes, setNotes] = useState(editingAppointment?.notes ?? '');
+  const [notes, setNotes] = useState(editingAppointment?.notes ?? "");
   const [date, setDate] = useState(
     editingAppointment ? new Date(editingAppointment.startAt) : new Date()
   );
@@ -45,7 +58,7 @@ const AppointmentFormScreen = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const screenTitle = isEditing ? 'تعديل موعد' : 'موعد جديد';
+  const screenTitle = isEditing ? "تعديل موعد" : "موعد جديد";
 
   useEffect(() => {
     setPatientsItems(patientOptions);
@@ -59,24 +72,25 @@ const AppointmentFormScreen = () => {
 
   const handleSubmit = async () => {
     if (!patient) {
-      Alert.alert('تنبيه', 'يرجى اختيار المريض قبل حفظ الموعد');
+      Alert.alert("تنبيه", "يرجى اختيار المريض قبل حفظ الموعد");
       return;
     }
 
     try {
       setSaving(true);
       const startDate = combineDateAndTime(date, time);
-      const cleanedNotes = notes.trim();
       const sqlDate = toSqlDateTime(startDate);
+
       await saveAppointment({
         id: editingAppointment?.id,
         patientId: patient,
         startAt: sqlDate,
-        notes: cleanedNotes,
+        notes: notes.trim(),
       });
+
       navigation.goBack();
     } catch (err) {
-      Alert.alert('خطأ', err.message || 'تعذر حفظ الموعد');
+      Alert.alert("خطأ", err.message || "تعذر حفظ الموعد");
     } finally {
       setSaving(false);
     }
@@ -97,15 +111,18 @@ const AppointmentFormScreen = () => {
   };
 
   return (
-    <ScreenWithDrawer title="" showDrawerIcon={false}>
+    <ScreenWithDrawer title={screenTitle} showDrawerIcon={false}>
       <View style={styles.container}>
-        <Text style={styles.screenTitle}>{screenTitle}</Text>
         {loading && !patientsItems.length ? (
-          <ActivityIndicator color={primary} style={{ marginVertical: 12 }} />
+          <ActivityIndicator color={primary} style={styles.loader} />
         ) : null}
+
         {!loading && patientsItems.length === 0 ? (
-          <Text style={styles.info}>لا يوجد مرضى حاليًا لعرضهم. يرجى إضافة مرضى أولاً.</Text>
+          <Text style={styles.info}>
+            لا يوجد مرضى حاليًا لعرضهم. يرجى إضافة مرضى أولاً.
+          </Text>
         ) : null}
+
         <Text style={styles.label}>اسم المريض</Text>
         <DropDownPicker
           open={open}
@@ -116,7 +133,7 @@ const AppointmentFormScreen = () => {
           setItems={setPatientsItems}
           placeholder="اختر اسم المريض"
           disabled={!patientsItems.length}
-          searchable={true}
+          searchable
           searchPlaceholder="ابحث عن مريض"
           zIndex={3000}
           zIndexInverse={1000}
@@ -125,40 +142,55 @@ const AppointmentFormScreen = () => {
         />
 
         <Text style={styles.label}>التاريخ</Text>
-        <TouchableOpacity style={styles.picker} onPress={() => setShowDatePicker(true)}>
+        <TouchableOpacity
+          style={styles.picker}
+          onPress={() => setShowDatePicker(true)}
+          activeOpacity={0.8}
+        >
           <Ionicons name="calendar" size={20} color={primary} />
           <Text style={styles.pickerText}>{formatDate(date)}</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>الوقت</Text>
-        <TouchableOpacity style={styles.picker} onPress={() => setShowTimePicker(true)}>
+        <TouchableOpacity
+          style={styles.picker}
+          onPress={() => setShowTimePicker(true)}
+          activeOpacity={0.8}
+        >
           <Ionicons name="time" size={20} color={primary} />
           <Text style={styles.pickerText}>{formatTime(time)}</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>ملاحظات</Text>
         <TextInput
-          style={[styles.input, { height: 80 }]}
+          style={[styles.input, styles.notesInput]}
           placeholder="أي ملاحظات إضافية"
           value={notes}
           onChangeText={setNotes}
           multiline
+          placeholderTextColor={colors.textMuted}
         />
 
         <TouchableOpacity
-          style={[styles.saveBtn, { marginTop: 12, backgroundColor: '#00796b' }]}
+          style={styles.saveBtn}
           onPress={handleSubmit}
           activeOpacity={0.8}
           disabled={saving || loading}
         >
           {saving ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.buttonPrimaryText} />
           ) : (
-            <Text style={styles.saveText}>{isEditing ? 'حفظ التعديلات' : 'حفظ الموعد'}</Text>
+            <Text style={styles.saveText}>
+              {isEditing ? "حفظ التعديلات" : "حفظ الموعد"}
+            </Text>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
+        >
           <Text style={styles.backText}>العودة إلى القائمة</Text>
         </TouchableOpacity>
       </View>
@@ -167,7 +199,7 @@ const AppointmentFormScreen = () => {
         <DateTimePicker
           value={date}
           mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleDateChange}
         />
       )}
@@ -177,7 +209,7 @@ const AppointmentFormScreen = () => {
           value={time}
           mode="time"
           is24Hour={false}
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleTimeChange}
         />
       )}
@@ -187,86 +219,96 @@ const AppointmentFormScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: spacing.lg,
   },
   label: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 4,
+    fontSize: typography.bodySm,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.background,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+  notesInput: {
+    minHeight: 80,
+    textAlignVertical: "top",
   },
   picker: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.background,
   },
   pickerText: {
-    marginStart: 8,
-    fontSize: 16,
-    color: '#333',
+    marginStart: spacing.sm,
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
   },
   saveBtn: {
     backgroundColor: primary,
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    alignItems: "center",
+    marginTop: spacing.sm,
+    ...shadows.medium,
   },
   saveText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colors.buttonPrimaryText,
+    fontSize: typography.bodyMd,
+    fontWeight: "bold",
+    fontFamily: typography.fontFamily,
   },
   backBtn: {
-    backgroundColor: '#ccc',
-    padding: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
+    backgroundColor: colors.surface || "#ccc",
+    padding: spacing.md,
+    borderRadius: radii.lg,
+    alignItems: "center",
+    marginTop: spacing.sm,
   },
   dropdown: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 16,
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    marginBottom: spacing.md,
+    backgroundColor: colors.background,
   },
   dropdownContainer: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    marginBottom: 16,
-    marginTop:20
-  },
-  screenTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 16,
+    borderColor: colors.border,
+    borderRadius: radii.md,
+    backgroundColor: colors.background,
+    marginBottom: spacing.md,
+    marginTop: spacing.sm,
   },
   backText: {
-    color: '#333',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colors.textPrimary,
+    fontSize: typography.bodyMd,
+    fontWeight: "bold",
+    fontFamily: typography.fontFamily,
   },
   info: {
-    color: '#666',
-    marginBottom: 8,
-    textAlign: 'center',
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    textAlign: "center",
+    fontSize: typography.bodySm,
+  },
+  loader: {
+    marginVertical: spacing.sm,
   },
 });
 

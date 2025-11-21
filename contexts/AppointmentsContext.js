@@ -25,7 +25,10 @@ const formatAppointment = (row, lookup) => {
     patientName,
     startAt: rawStart,
     dateText: start.toLocaleDateString(),
-    timeText: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    timeText: start.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
     notes: row.notes || '',
   };
 };
@@ -43,12 +46,41 @@ export const AppointmentsProvider = ({ children }) => {
   const [doctorId, setDoctorId] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [patientOptions, setPatientOptions] = useState([]);
-  const [patientLookup, setPatientLookup] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // دالة رئيسية تجيب المرضى + المواعيد
+  const loadAllData = async (id) => {
+    // 1) جلب المرضى
+    const patientsData = await fetchJson(
+      `${ENDPOINTS.patientsList}?doctor_id=${id}`
+    );
+
+    const lookup = {};
+    const options = patientsData.map((patient) => {
+      const label =
+        patient.name ??
+        patient.full_name ??
+        `مريض رقم ${patient.id || patient.patient_id}`;
+      const value = patient.id ?? patient.patient_id;
+
+      lookup[value] = label;
+      return { label, value };
+    });
+
+    setPatientOptions(options);
+
+    // 2) جلب المواعيد
+    const apptsData = await fetchJson(ENDPOINTS.doctorAppointments(id));
+    const rows = apptsData.appointments || [];
+
+    const formatted = rows.map((row) => formatAppointment(row, lookup));
+    setAppointments(formatted);
+  };
+
+  // عند فتح التطبيق: قراءة doctor_id + تحميل البيانات
   useEffect(() => {
-    const loadDoctorId = async () => {
+    const init = async () => {
       try {
         setLoading(true);
         const stored = await AsyncStorage.getItem('doctor_id');
@@ -56,52 +88,25 @@ export const AppointmentsProvider = ({ children }) => {
           throw new Error('لا يوجد رقم طبيب محفوظ');
         }
         setDoctorId(stored);
+        setError('');
+        await loadAllData(stored);
       } catch (err) {
-        setError(err.message || 'تعذر قراءة بيانات الطبيب');
+        setError(err.message || 'تعذر تحميل المواعيد');
       } finally {
         setLoading(false);
       }
     };
-    loadDoctorId();
+
+    init();
   }, []);
 
-  useEffect(() => {
-    if (doctorId) {
-      refresh();
-    }
-  }, [doctorId]);
-
-  const loadPatients = async (id) => {
-    const data = await fetchJson(`${ENDPOINTS.patientsList}?doctor_id=${id}`);
-    const options = data.map((patient) => ({
-      label: patient.name ?? patient.full_name ?? `مريض رقم ${patient.id}`,
-      value: patient.id,
-    }));
-    const lookup = {};
-    options.forEach((item) => {
-      lookup[item.value] = item.label;
-    });
-    setPatientOptions(options);
-    setPatientLookup(lookup);
-    return lookup;
-  };
-
-  const loadAppointments = async (id, lookup) => {
-    const data = await fetchJson(ENDPOINTS.doctorAppointments(id));
-    const rows = Array.isArray(data) ? data : data.appointments || [];
-    const formatted = rows.map((row) => formatAppointment(row, lookup));
-    setAppointments(formatted);
-  };
-
+  // إعادة تحميل المواعيد والمرضى يدويًا (pull to refresh)
   const refresh = async () => {
-    if (!doctorId) {
-      return;
-    }
+    if (!doctorId) return;
     try {
       setLoading(true);
       setError('');
-      const lookup = await loadPatients(doctorId);
-      await loadAppointments(doctorId, lookup);
+      await loadAllData(doctorId);
     } catch (err) {
       setError(err.message || 'تعذر تحميل المواعيد');
     } finally {
@@ -121,7 +126,9 @@ export const AppointmentsProvider = ({ children }) => {
       notes: notes || '',
     };
 
-    const url = id ? ENDPOINTS.doctorAppointmentUpdate(id) : ENDPOINTS.doctorAppointmentCreate;
+    const url = id
+      ? ENDPOINTS.doctorAppointmentUpdate(id)
+      : ENDPOINTS.doctorAppointmentCreate;
     const method = id ? 'PUT' : 'POST';
 
     await fetchJson(url, {
@@ -134,7 +141,9 @@ export const AppointmentsProvider = ({ children }) => {
   };
 
   const deleteAppointment = async (appointmentId) => {
-    await fetchJson(ENDPOINTS.doctorAppointmentDelete(appointmentId), { method: 'DELETE' });
+    await fetchJson(ENDPOINTS.doctorAppointmentDelete(appointmentId), {
+      method: 'DELETE',
+    });
     await refresh();
   };
 
@@ -150,6 +159,8 @@ export const AppointmentsProvider = ({ children }) => {
   };
 
   return (
-    <AppointmentsContext.Provider value={value}>{children}</AppointmentsContext.Provider>
+    <AppointmentsContext.Provider value={value}>
+      {children}
+    </AppointmentsContext.Provider>
   );
 };

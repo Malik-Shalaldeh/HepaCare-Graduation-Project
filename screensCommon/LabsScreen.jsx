@@ -98,7 +98,7 @@ const LabsScreen = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="ابحث باسم المدينة..."
+          placeholder="ابحث باسم المدينة"
           value={search}
           onChangeText={setSearch}
         />
@@ -167,6 +167,9 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyMd,
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    textAlign:"right",
+    writingDirection:"rtl",
+    fontWeight:"700"
   },
   listContent: {
     paddingBottom: spacing.xl,
