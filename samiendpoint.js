@@ -7,8 +7,8 @@
  import { Platform } from 'react-native';
 const BASE_URL =
   Platform.OS === 'android'
-    ? 'http://192.168.1.122:8000'
-    : 'http://192.168.1.122:8000';
+    ? 'http://192.168.1.7:8000'
+    : 'http://192.168.1.7:8000';
 const ENDPOINTS = {
   // الاتصال الأساسي
   BASE_URL,

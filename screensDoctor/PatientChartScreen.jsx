@@ -54,12 +54,19 @@ export default function PatientChartScreen() {
         setRecords(response.data);
       } 
       catch (error) {
+        console.log({
+          message: error.message,
+          url: `${ENDPOINTS.PATIENT_CHART.GET}?patient_id=${patientId}`,
+        });
         Alert.alert(
           'خطأ',
-          'تأكد من اتصالك بالإنترنت',
-          [{ text: 'إلغاء', style: 'cancel' }]
+          error.response
+            ? 'حدث خطأ من السيرفر أثناء جلب البيانات'
+            : 'تأكد من اتصالك بالإنترنت',
+          [{ text: 'إغلاق', style: 'cancel' }]
         );
       }
+
     }
 
     loadData();

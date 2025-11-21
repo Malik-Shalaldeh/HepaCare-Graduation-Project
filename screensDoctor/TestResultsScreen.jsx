@@ -1,4 +1,6 @@
-import { useState, useLayoutEffect } from 'react';
+// TestResultsScreen.jsx
+
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +12,6 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ENDPOINTS from '../malikEndPoint';
@@ -34,17 +35,17 @@ export default function TestResultsScreen() {
       });
 
       setFilteredResults(res.data);
-    } 
-    catch (error) {
+    } catch (error) {
       console.error('Error fetching results:', error);
-      Alert.alert('خطأ', 'فشل في جلب البيانات. تأكد من الاتصال أو من صلاحية الدخول.');
+      Alert.alert(
+        'خطأ',
+        'فشل في جلب البيانات. تأكد من الاتصال أو من صلاحية الدخول.'
+      );
     }
   };
 
   const renderItem = ({ item }) => (
-    <View
-      style={styles.card}
-    >
+    <View style={styles.card}>
       <Text style={styles.name}>
         👤 {item.name} (رقم: {item.patientId})
       </Text>
@@ -57,30 +58,27 @@ export default function TestResultsScreen() {
 
       <TouchableOpacity
         style={[styles.searchButton, styles.fileButton]}
-        onPress={() =>
-          item.filePath
-            ? Linking.openURL(`${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${item.filePath}`)
-            : Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }])
-        }
+        onPress={() => {
+          if (item.filePath) {
+            const normalizedPath = item.filePath.replace(/\\/g, '/');
+            const url = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${normalizedPath}`;
+            Linking.openURL(url);
+          } else {
+            Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }]);
+          }
+        }}
         activeOpacity={0.8}
       >
         <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
+
     </View>
   );
 
   return (
-    <View
-      style={styles.container}
-    >
-
-
+    <View style={styles.container}>
       {/* العنوان */}
-      <Text
-        style={styles.header}
-      >
-       ابحث عن فحوصات المريض
-      </Text>
+      <Text style={styles.header}>ابحث عن فحوصات المريض</Text>
 
       {/* حقل البحث */}
       <TextInput
@@ -110,18 +108,13 @@ export default function TestResultsScreen() {
       <FlatList
         data={filteredResults}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={
           filteredResults.length === 0 && searchInput.trim() !== '' ? (
-            <Text
-              style={styles.emptyText}
-            >
-              لا يوجد نتائج
-            </Text>
+            <Text style={styles.emptyText}>لا يوجد نتائج</Text>
           ) : null
         }
       />
-
     </View>
   );
 }
@@ -132,17 +125,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.backgroundLight,
     paddingHorizontal: theme.spacing.lg,
     paddingTop: theme.spacing.xl,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  backText: {
-    marginLeft: theme.spacing.sm,
-    fontSize: theme.typography.bodyLg,
-    color: theme.colors.textPrimary,
-    fontFamily: theme.typography.fontFamily,
   },
   header: {
     fontSize: theme.typography.headingMd,
