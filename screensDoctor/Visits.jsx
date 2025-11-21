@@ -1,3 +1,5 @@
+// sami - Visits screen (باستخدام fetch بدل axios)
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -14,7 +16,6 @@ import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
@@ -22,20 +23,24 @@ const primary = colors.buttonPrimary;
 
 const Visits = () => {
   const navigation = useNavigation();
+
   const [searchText, setSearchText] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [doctorId, setDoctorId] = useState(null);
 
+  // جلب doctor_id مرة واحدة عند فتح الشاشة
   useEffect(() => {
     const fetchDoctorId = async () => {
       try {
-        const doctorId = await AsyncStorage.getItem("doctor_id");
-        if (!doctorId) {
+        const storedId = await AsyncStorage.getItem("doctor_id");
+        if (!storedId) {
           Alert.alert("خطأ", "يرجى تسجيل الدخول مرة أخرى");
           return;
         }
-        await searchPatients(doctorId);
+        setDoctorId(storedId);
+        await searchPatients(storedId, ""); // جلب قائمة أولية (اختياري)
       } catch (error) {
         console.error("خطأ في جلب معرف الطبيب:", error);
         Alert.alert("خطأ", "تعذر جلب بيانات الطبيب");
@@ -45,17 +50,23 @@ const Visits = () => {
     fetchDoctorId();
   }, []);
 
-  const searchPatients = async (doctorId, query = "") => {
+  const searchPatients = async (docId, query = "") => {
+    if (!docId) return;
+
     setLoading(true);
     try {
-      const response = await axios.get(ENDPOINTS.searchPatients, {
-        params: {
-          query: query,
-          doctor_id: doctorId,
-        },
-      });
+      const url = `${ENDPOINTS.searchPatients}?doctor_id=${encodeURIComponent(
+        docId
+      )}&query=${encodeURIComponent(query)}`;
 
-      setPatients(response.data || []);
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("فشل في جلب قائمة المرضى");
+      }
+
+      const data = await response.json();
+      setPatients(data || []);
     } catch (error) {
       console.error("خطأ في البحث عن المرضى:", error);
       Alert.alert("خطأ", "تعذر جلب قائمة المرضى");
@@ -66,17 +77,17 @@ const Visits = () => {
 
   const filteredPatients = patients.filter(
     (p) =>
-      p.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      (p.name || "")
+        .toLowerCase()
+        .includes(searchText.toLowerCase()) ||
       String(p.id).includes(searchText)
   );
 
-  useEffect(() => {
-    setSelectedPatient(null);
-  }, []);
-
   return (
     <ScreenWithDrawer title="الزيارات">
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundLight }}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.backgroundLight }}
+      >
         {!selectedPatient ? (
           <>
             <View style={styles.searchContainer}>
@@ -84,12 +95,9 @@ const Visits = () => {
                 style={styles.searchInput}
                 placeholder="ابحث عن المريض..."
                 value={searchText}
-                onChangeText={async (text) => {
+                onChangeText={(text) => {
                   setSearchText(text);
-                  const doctorId = await AsyncStorage.getItem("doctor_id");
-                  if (doctorId) {
-                    searchPatients(doctorId, text);
-                  }
+                  searchPatients(doctorId, text);
                 }}
                 placeholderTextColor={colors.textMuted}
               />
@@ -109,7 +117,7 @@ const Visits = () => {
               searchText.trim().length > 0 && (
                 <FlatList
                   data={filteredPatients}
-                  keyExtractor={(item) => item.id}
+                  keyExtractor={(item) => String(item.id)}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.resultItem}

@@ -1,142 +1,135 @@
 // سامي - واجهة المختبرات المعتمدة
-// هذه الشاشة تعرض قائمة المختبرات المعتمدة وتسمح بالبحث حسب المدينة
 
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  StyleSheet, 
+import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
   TextInput,
-  TouchableOpacity, 
-  ActivityIndicator 
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import ENDPOINTS from '../samiendpoint';
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import {
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+} from "../style/theme";
+import ENDPOINTS from "../samiendpoint";
 
-// المكون الرئيسي لشاشة المختبرات
-const LabsScreen = ({ route }) => {
-  // إعداد الـ navigation للعودة للصفحة السابقة
+const LabsScreen = () => {
   const navigation = useNavigation();
-  
-  // المتغيرات (State) المستخدمة في الشاشة
-  const [search, setSearch] = useState(''); // نص البحث
-  const [labs, setLabs] = useState([]); // قائمة المختبرات
-  const [loading, setLoading] = useState(true); // حالة التحميل
-  const [error, setError] = useState(null); // رسالة الخطأ
 
-  // جلب المختبرات عند فتح الشاشة
+  const [search, setSearch] = useState("");
+  const [labs, setLabs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     fetchLabs();
   }, []);
 
-  // دالة جلب المختبرات من قاعدة البيانات
   const fetchLabs = async () => {
     try {
-      // نبدأ التحميل
       setLoading(true);
       setError(null);
-      
-      // نرسل طلب للخادم لجلب المختبرات
+
       const response = await fetch(ENDPOINTS.labsList);
-      
-      // نتحقق من نجاح الطلب
+
       if (!response.ok) {
-        throw new Error('فشل في جلب البيانات');
+        throw new Error("فشل في جلب البيانات");
       }
-      
-      // نحول الرد إلى JSON ونحفظ المختبرات
+
       const data = await response.json();
-      setLabs(data);
-      
+      setLabs(data || []);
     } catch (err) {
-      // في حالة حدوث خطأ
-      console.error('خطأ في جلب المختبرات:', err);
-      setError('حدث خطأ في جلب المختبرات');
+      console.error("خطأ في جلب المختبرات:", err);
+      setError("حدث خطأ في جلب المختبرات");
     } finally {
-      // ننهي حالة التحميل
       setLoading(false);
     }
   };
 
-  // فلترة المختبرات حسب المدينة المدخلة
   const filteredLabs = search.trim()
-    ? labs.filter(lab => 
-        lab.city && 
-        lab.city.toLowerCase().includes(search.toLowerCase())
+    ? labs.filter(
+        (lab) =>
+          lab.city &&
+          lab.city.toLowerCase().includes(search.toLowerCase())
       )
     : labs;
 
-  // مكون عرض بطاقة المختبر الواحد
   const renderLabCard = ({ item }) => (
     <View style={styles.card}>
-      {/* اسم المختبر */}
-      <Text style={styles.labName}>{item.name || 'غير محدد'}</Text>
-      
-      {/* معلومات المختبر */}
+      <Text style={styles.labName}>{item.name || "غير محدد"}</Text>
       <Text style={styles.labInfo}>
-        الموقع: {item.location || 'غير محدد'}
+        الموقع: {item.location || "غير محدد"}
       </Text>
-      
       <Text style={styles.labInfo}>
-        رقم التواصل: {item.phone || 'غير محدد'}
+        رقم التواصل: {item.phone || "غير محدد"}
       </Text>
-      
-      {/* المدينة */}
-      <Text style={styles.labCity}>({item.city || 'غير محدد'})</Text>
+      <Text style={styles.labCity}>({item.city || "غير محدد"})</Text>
     </View>
   );
-  // العناصر المعروضة على الشاشة
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <View style={styles.container}>
-        {/* زر الرجوع */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
-            navigation.goBack(); // الرجوع للشاشة الرئيسية
+            navigation.goBack();
             setTimeout(() => {
-              navigation.openDrawer(); // ثم فتح الـ Sidebar
+              navigation.openDrawer?.();
             }, 300);
-          }} 
+          }}
           style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={25} color={'#00b29c'} />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={colors.primary}
+          />
         </TouchableOpacity>
-        {/* حقل البحث */}
+
         <TextInput
           style={styles.input}
           placeholder="ابحث باسم المدينة..."
           value={search}
           onChangeText={setSearch}
         />
-        
-        {/* عرض محتوى الشاشة حسب الحالة */}
+
         {loading ? (
-          // شاشة التحميل
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#00b29c" />
-            <Text style={styles.loadingText}>جاري تحميل المختبرات...</Text>
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>
+              جاري تحميل المختبرات...
+            </Text>
           </View>
         ) : error ? (
-          // شاشة الخطأ
-          <View style={styles.errorContainer}>
+          <View style={styles.centerContainer}>
             <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity onPress={fetchLabs} style={styles.retryButton}>
+            <TouchableOpacity
+              onPress={fetchLabs}
+              style={styles.retryButton}
+            >
               <Text style={styles.retryText}>إعادة المحاولة</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          // قائمة المختبرات
           <FlatList
             data={filteredLabs}
-            keyExtractor={item => item.id?.toString()}
+            keyExtractor={(item) => item.id?.toString()}
             renderItem={renderLabCard}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>لا يوجد مختبرات مطابقة</Text>
+              <Text style={styles.emptyText}>
+                لا يوجد مختبرات مطابقة
+              </Text>
             }
           />
         )}
@@ -145,135 +138,97 @@ const LabsScreen = ({ route }) => {
   );
 };
 
-// تنسيقات الشاشة (CSS للـ React Native)
 const styles = StyleSheet.create({
-  // تنسيق المنطقة الآمنة
   safeArea: {
     flex: 1,
-    backgroundColor: '#f6f8fa',
+    backgroundColor: colors.backgroundLight,
   },
-  
-  // تنسيق الحاوية الرئيسية
   container: {
     flex: 1,
-    padding: 16,
+    padding: spacing.lg,
   },
-  
-  // تنسيق حقل البحث
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginTop: 50, // مسافة من الأعلى لتجنب تداخل مع زر الرجوع
-    marginBottom: 14,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  
-  // تنسيق زر الرجوع
   backButton: {
-    position: 'absolute',
-    top: 10,
-    left: 16, // على الشمال
-    padding: 8,
+    position: "absolute",
+    top: spacing.md,
+    left: spacing.lg,
+    padding: spacing.sm,
     borderRadius: 25,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.background,
     zIndex: 1,
-    elevation: 3, // ظل للأندرويد
-    shadowColor: '#000', // ظل لـ iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    ...shadows.small,
   },
-  // تنسيق محتوى القائمة
+  input: {
+    backgroundColor: colors.background,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.xxl * 2,
+    marginBottom: spacing.md,
+    fontSize: typography.bodyMd,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: spacing.xl,
   },
-  
-  // تنسيق بطاقة المختبر
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2, // للظل في Android
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadows.small,
   },
-  
-  // تنسيق اسم المختبر
   labName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#00b29c',
+    textAlign:"right",
+    writingDirection:"rtl",
+    fontSize: typography.bodyLg,
+    fontWeight: "700",
+    color: colors.primary,
     marginBottom: 4,
   },
-  
-  // تنسيق معلومات المختبر
   labInfo: {
-    fontSize: 15,
-    color: '#222',
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
     marginBottom: 2,
   },
-  
-  // تنسيق المدينة
   labCity: {
-    fontSize: 14,
-    color: '#00b29c',
-    alignSelf: 'flex-end',
+    fontSize: typography.bodySm,
+    color: colors.primary,
+    alignSelf: "flex-end",
   },
-  // رسالة عند عدم وجود نتائج
   emptyText: {
-    textAlign: 'center',
-    color: '#aaa',
-    marginTop: 30,
-    fontSize: 16,
+    textAlign: "center",
+    color: colors.textSecondary,
+    marginTop: spacing.xl,
+    fontSize: typography.bodyMd,
   },
-  
-  // تنسيق شاشة التحميل
-  loadingContainer: {
+  centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.lg,
   },
-  
   loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
+    marginTop: spacing.sm,
+    fontSize: typography.bodyMd,
+    color: colors.textSecondary,
   },
-  
-  // تنسيق شاشة الخطأ
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  
   errorText: {
-    fontSize: 16,
-    color: '#d32f2f',
-    textAlign: 'center',
-    marginBottom: 20,
+    fontSize: typography.bodyMd,
+    color: "#d32f2f",
+    textAlign: "center",
+    marginBottom: spacing.lg,
   },
-  
-  // زر إعادة المحاولة
   retryButton: {
-    backgroundColor: '#00b29c',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
   },
-  
   retryText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#fff",
+    fontSize: typography.bodyMd,
+    fontWeight: "700",
   },
 });
 

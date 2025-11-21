@@ -1,126 +1,165 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
-
-const primary = '#00b29c';
+//sami
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import {
+  colors,
+  spacing,
+  radii,
+  typography,
+  shadows,
+} from "../style/theme";
 
 const LIBRARY_CONTENT = [
   {
     id: 1,
-    type: 'مقال',
-    title: 'ما هو التهاب الكبد الوبائي B؟',
-    content: 'التهاب الكبد الوبائي B هو عدوى فيروسية تصيب الكبد، يسببها فيروس التهاب الكبد (HBV) B. يمكن أن تكون العدوى حادة (قصيرة الأمد) أو مزمنة (طويلة الأمد)، وقد تؤدي إلى مضاعفات خطيرة مثل تليف الكبد وسرطان الكبد.',
+    type: "مقال",
+    title: "ما هو التهاب الكبد الوبائي B؟",
+    content:
+      "التهاب الكبد الوبائي B هو عدوى فيروسية تصيب الكبد، يسببها فيروس التهاب الكبد (HBV) B. يمكن أن تكون العدوى حادة (قصيرة الأمد) أو مزمنة (طويلة الأمد)، وقد تؤدي إلى مضاعفات خطيرة مثل تليف الكبد وسرطان الكبد.",
   },
   {
     id: 2,
-    type: 'مقال',
-    title: 'كيف ينتقل فيروس التهاب الكبد B؟',
-    content: 'ينتقل الفيروس عبر ملامسة سوائل الجسم المصابة، ويشمل ذلك:\n\n• من الأم إلى الطفل عند الولادة: تُعتبر هذه الطريقة الأكثر شيوعاً لانتقال العدوى عالمياً.\n\n• التعرض للدم الملوث: مثل مشاركة الإبر أو الأدوات الحادة الملوثة.\n\n• الاتصال الجنسي غير المحمي: مع شخص مصاب.\n\n• مشاركة الأدوات الشخصية: مثل شفرات الحلاقة أو فرش الأسنان مع شخص مصاب.',
+    type: "مقال",
+    title: "كيف ينتقل فيروس التهاب الكبد B؟",
+    content:
+      "ينتقل الفيروس عبر ملامسة سوائل الجسم المصابة، ويشمل ذلك:\n\n• من الأم إلى الطفل عند الولادة: تُعتبر هذه الطريقة الأكثر شيوعاً لانتقال العدوى عالمياً.\n\n• التعرض للدم الملوث: مثل مشاركة الإبر أو الأدوات الحادة الملوثة.\n\n• الاتصال الجنسي غير المحمي: مع شخص مصاب.\n\n• مشاركة الأدوات الشخصية: مثل شفرات الحلاقة أو فرش الأسنان مع شخص مصاب.",
   },
   {
     id: 3,
-    type: 'مقال',
-    title: 'ما هي أعراض التهاب الكبد الوبائي B؟',
-    content: 'قد لا تظهر أي أعراض على المصابين، خاصة في المراحل المبكرة. عندما تظهر الأعراض، قد تشمل:\n\n• التعب الشديد\n\n• آلام في البطن\n\n• فقدان الشهية\n\n• غثيان وقيء\n\n• اصفرار الجلد والعينين (اليرقان)\n\n• بول داكن اللون\n\n• براز فاتح اللون\n\nتظهر الأعراض عادة بعد نحو 1-6 أشهر من الإصابة بالعدوى.',
+    type: "مقال",
+    title: "ما هي أعراض التهاب الكبد الوبائي B؟",
+    content:
+      "قد لا تظهر أي أعراض على المصابين، خاصة في المراحل المبكرة. عندما تظهر الأعراض، قد تشمل:\n\n• التعب الشديد\n\n• آلام في البطن\n\n• فقدان الشهية\n\n• غثيان وقيء\n\n• اصفرار الجلد والعينين (اليرقان)\n\n• بول داكن اللون\n\n• براز فاتح اللون\n\nتظهر الأعراض عادة بعد نحو 1-6 أشهر من الإصابة بالعدوى.",
   },
   {
     id: 4,
-    type: 'مقال',
-    title: 'كيف يتم تشخيص التهاب الكبد الوبائي B؟',
-    content: 'يتم التشخيص من خلال:\n\n• فحوصات الدم: لتحديد وجود الفيروس أو الأجسام المضادة له.\n\n• اختبارات وظائف الكبد: لقياس مدى تأثير الفيروس على الكبد.\n\n• خزعة الكبد: في بعض الحالات، قد يتم أخذ عينة من نسيج الكبد لفحصها.',
+    type: "مقال",
+    title: "كيف يتم تشخيص التهاب الكبد الوبائي B؟",
+    content:
+      "يتم التشخيص من خلال:\n\n• فحوصات الدم: لتحديد وجود الفيروس أو الأجسام المضادة له.\n\n• اختبارات وظائف الكبد: لقياس مدى تأثير الفيروس على الكبد.\n\n• خزعة الكبد: في بعض الحالات، قد يتم أخذ عينة من نسيج الكبد لفحصها.",
   },
   {
     id: 5,
-    type: 'مقال',
-    title: 'ما هو علاج التهاب الكبد الوبائي B؟',
-    content: 'يعتمد العلاج على نوع العدوى:\n\n• العدوى الحادة: يُنصح بالراحة والتغذية السليمة. غالباً ما يتعافى المريض تلقائياً دون علاج خاص.\n\n• العدوى المزمنة: قد يتطلب العلاج بأدوية مضادة للفيروسات للحد من تكاثر الفيروس وتقليل تلف الكبد.\n\n• حالات متقدمة: في حالة تليف الكبد أو فشل الكبد، قد تكون زراعة الكبد ضرورية.',
+    type: "مقال",
+    title: "ما هو علاج التهاب الكبد الوبائي B؟",
+    content:
+      "يعتمد العلاج على نوع العدوى:\n\n• العدوى الحادة: يُنصح بالراحة والتغذية السليمة. غالباً ما يتعافى المريض تلقائياً دون علاج خاص.\n\n• العدوى المزمنة: قد يتطلب العلاج بأدوية مضادة للفيروسات للحد من تكاثر الفيروس وتقليل تلف الكبد.\n\n• حالات متقدمة: في حالة تليف الكبد أو فشل الكبد، قد تكون زراعة الكبد ضرورية.",
   },
   {
     id: 6,
-    type: 'مقال',
-    title: 'كيف يمكن الوقاية من التهاب الكبد الوبائي B؟',
-    content: 'تشمل التدابير الوقائية:\n\n• التطعيم: يُعتبر اللقاح آمناً وفعالاً ويوفر حماية طويلة الأمد.\n\n• ممارسات جنسية آمنة: استخدام الواقيات الذكرية يقلل من خطر الانتقال الجنسي.\n\n• تجنب مشاركة الأدوات الشخصية: مثل شفرات الحلاقة وفرش الأسنان.\n\n• ممارسات طبية آمنة: التأكد من استخدام إبر وأدوات معقمة في الإجراءات الطبية والتجميلية.\n\n• فحص النساء الحوامل: لمنع انتقال الفيروس إلى المولود.',
+    type: "مقال",
+    title: "كيف يمكن الوقاية من التهاب الكبد الوبائي B؟",
+    content:
+      "تشمل التدابير الوقائية:\n\n• التطعيم: يُعتبر اللقاح آمناً وفعالاً ويوفر حماية طويلة الأمد.\n\n• ممارسات جنسية آمنة: استخدام الواقيات الذكرية يقلل من خطر الانتقال الجنسي.\n\n• تجنب مشاركة الأدوات الشخصية: مثل شفرات الحلاقة وفرش الأسنان.\n\n• ممارسات طبية آمنة: التأكد من استخدام إبر وأدوات معقمة في الإجراءات الطبية والتجميلية.\n\n• فحص النساء الحوامل: لمنع انتقال الفيروس إلى المولود.",
   },
   {
     id: 7,
-    type: 'مقال',
-    title: 'ما هو وضع التهاب الكبد الوبائي B في فلسطين؟',
-    content: 'أعلنت وزارة الصحة الفلسطينية أنه لم تُسجل أي إصابة بالتهاب الكبد الوبائي B بين المواليد منذ عام 1992، مما يشير إلى فعالية برامج التطعيم الوطنية.',
+    type: "مقال",
+    title: "ما هو وضع التهاب الكبد الوبائي B في فلسطين؟",
+    content:
+      "أعلنت وزارة الصحة الفلسطينية أنه لم تُسجل أي إصابة بالتهاب الكبد الوبائي B بين المواليد منذ عام 1992، مما يشير إلى فعالية برامج التطعيم الوطنية.",
   },
   {
     id: 8,
-    type: 'مقال',
-    title: 'ما هي إحصاءات الإصابة بالتهاب الكبد الوبائي B في فلسطين؟',
-    content: 'وفقاً للجهاز المركزي للإحصاء الفلسطيني، بلغ عدد الإصابات بالتهاب الكبد الوبائي B لكل 100,000 شخص في فلسطين 0.280 في عام 2022.',
+    type: "مقال",
+    title: "ما هي إحصاءات الإصابة بالتهاب الكبد الوبائي B في فلسطين؟",
+    content:
+      "وفقاً للجهاز المركزي للإحصاء الفلسطيني، بلغ عدد الإصابات بالتهاب الكبد الوبائي B لكل 100,000 شخص في فلسطين 0.280 في عام 2022.",
   },
 ];
 
 const FAQ_CONTENT = [
   {
     id: 1,
-    question: 'هل يمكن الشفاء التام من التهاب الكبد الوبائي B؟',
-    answer: 'يمكن للبالغين الأصحاء التخلص من الفيروس بشكل كامل في حالات العدوى الحادة. ومع ذلك، قد تصبح العدوى مزمنة لدى بعض الأشخاص، مما يتطلب متابعة طبية مستمرة.',
+    question: "هل يمكن الشفاء التام من التهاب الكبد الوبائي B؟",
+    answer:
+      "يمكن للبالغين الأصحاء التخلص من الفيروس بشكل كامل في حالات العدوى الحادة. ومع ذلك، قد تصبح العدوى مزمنة لدى بعض الأشخاص، مما يتطلب متابعة طبية مستمرة.",
   },
   {
     id: 2,
-    question: 'هل يمكن أن أعيش حياة طبيعية مع التهاب الكبد الوبائي B؟',
-    answer: 'نعم، مع الالتزام بالعلاج والمتابعة الطبية، يمكن للمصابين العيش بشكل طبيعي وتجنب المضاعفات.',
+    question: "هل يمكن أن أعيش حياة طبيعية مع التهاب الكبد الوبائي B؟",
+    answer:
+      "نعم، مع الالتزام بالعلاج والمتابعة الطبية، يمكن للمصابين العيش بشكل طبيعي وتجنب المضاعفات.",
   },
   {
     id: 3,
-    question: 'هل يمكن أن أنقل العدوى لأفراد عائلتي؟',
-    answer: 'يمكن ذلك إذا لم يحصلوا على اللقاح أو لم يتخذوا تدابير الوقاية. لا ينتقل الفيروس عبر المصافحة أو مشاركة الطعام.',
+    question: "هل يمكن أن أنقل العدوى لأفراد عائلتي؟",
+    answer:
+      "يمكن ذلك إذا لم يحصلوا على اللقاح أو لم يتخذوا تدابير الوقاية. لا ينتقل الفيروس عبر المصافحة أو مشاركة الطعام.",
   },
   {
     id: 4,
-    question: 'هل يؤثر المرض على الحمل؟',
-    answer: 'يمكن أن ينتقل الفيروس من الأم إلى الطفل أثناء الولادة. ومع ذلك، يمكن منع ذلك بإعطاء الطفل اللقاح والمناعة الفورية بعد الولادة.',
+    question: "هل يؤثر المرض على الحمل؟",
+    answer:
+      "يمكن أن ينتقل الفيروس من الأم إلى الطفل أثناء الولادة. ومع ذلك، يمكن منع ذلك بإعطاء الطفل اللقاح والمناعة الفورية بعد الولادة.",
   },
   {
     id: 5,
-    question: 'ما هي نصائح الحفاظ على صحة الكبد؟',
-    answer: '• تجنب التدخين\n\n• اتباع نظام غذائي صحي\n\n• ممارسة الرياضة\n\n• إجراء فحوصات دورية',
+    question: "ما هي نصائح الحفاظ على صحة الكبد؟",
+    answer:
+      "• تجنب التدخين\n\n• اتباع نظام غذائي صحي\n\n• ممارسة الرياضة\n\n• إجراء فحوصات دورية",
   },
 ];
 
 const getTypeIcon = (type) => {
   switch (type) {
-    case 'مقال':
-      return 'document-text';
-    case 'فيديو':
-      return 'play-circle';
-    case 'صورة':
-      return 'image';
+    case "مقال":
+      return "document-text";
+    case "فيديو":
+      return "play-circle";
+    case "صورة":
+      return "image";
     default:
-      return 'document-text';
+      return "document-text";
   }
 };
 
 const EducationalContentScreen = () => {
   const navigation = useNavigation();
+
   return (
     <ScreenWithDrawer>
-      
-    <SafeAreaView style={styles.safeArea} edges={["top","bottom"]}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* زر رجوع بنفس أسلوب شاشة المختبرات */}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
 
-     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={28} color={primary} />
-              </TouchableOpacity>
-      <View style={styles.container}>
-
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <View style={styles.section}>
             <View style={styles.sectionHeaderContainer}>
-              <Ionicons name="library" size={24} color={primary} />
-              <Text style={styles.sectionHeader}>معلومات عن التهاب الكبد الوبائي B</Text>
+              <Ionicons name="library" size={22} color={colors.primary} />
+              <Text style={styles.sectionHeader}>
+                معلومات عن التهاب الكبد الوبائي B
+              </Text>
             </View>
+
             {LIBRARY_CONTENT.map((item) => (
               <View key={item.id} style={styles.card}>
                 <View style={styles.cardHeader}>
                   <View style={styles.iconContainer}>
-                    <Ionicons name={getTypeIcon(item.type)} size={20} color={primary} />
+                    <Ionicons
+                      name={getTypeIcon(item.type)}
+                      size={18}
+                      color={colors.primary}
+                    />
                   </View>
                   <Text style={styles.cardTitle}>{item.title}</Text>
                 </View>
@@ -128,15 +167,22 @@ const EducationalContentScreen = () => {
               </View>
             ))}
           </View>
+
           <View style={styles.section}>
             <View style={styles.sectionHeaderContainer}>
-              <Ionicons name="help-circle" size={24} color={primary} />
+              <Ionicons name="help-circle" size={22} color={colors.primary} />
               <Text style={styles.sectionHeader}>الأسئلة الشائعة</Text>
             </View>
+
             {FAQ_CONTENT.map((item) => (
-              <View key={item.id} style={styles.faqCard}>
+              <View key={item.id} style={styles.card}>
                 <View style={styles.questionContainer}>
-                  <Ionicons name="chatbubble-ellipses" size={18} color={primary} style={styles.questionIcon} />
+                  <Ionicons
+                    name="chatbubble-ellipses"
+                    size={18}
+                    color={colors.primary}
+                    style={styles.questionIcon}
+                  />
                   <Text style={styles.question}>{item.question}</Text>
                 </View>
                 <Text style={styles.answer}>{item.answer}</Text>
@@ -144,138 +190,111 @@ const EducationalContentScreen = () => {
             ))}
           </View>
         </ScrollView>
-      </View>
-    </SafeAreaView>
-  </ScreenWithDrawer>
+      </SafeAreaView>
+    </ScreenWithDrawer>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.backgroundLight,
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#00b29c',
-    marginBottom: 16,
-    textAlign: 'center',
-    alignSelf: 'center',
-    flex: 1,
+  // 🔹 نفس فكرة زر الرجوع في واجهة المختبرات:
+  backButton: {
+    position: "absolute",
+    top: spacing.md,
+    left: spacing.lg,            // على الشمال
+    padding: spacing.sm,
+    borderRadius: 25,
+    backgroundColor: colors.background,
+    zIndex: 1,
+    ...shadows.small,
   },
   section: {
-    marginBottom: 24,
+    marginTop: spacing.xxl * 2,  // عشان ما يتغطى العنوان بالزر
+    marginBottom: spacing.xl,
   },
   sectionHeaderContainer: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginVertical: 16,
-    paddingBottom: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: primary,
-  },
-    backButton: {
-    marginRight: 5,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    marginBottom: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1.5,
+    borderBottomColor: colors.primary,
   },
   sectionHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
-    marginRight: 5,
+    fontSize: typography.headingSm,
+    fontWeight: "700",
+    color: colors.primary,
+    marginRight: spacing.sm,
   },
   card: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 16,
-    marginVertical: 6,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: colors.background,
+    marginVertical: spacing.sm,
+    borderRadius: radii.lg,
+    padding: spacing.xl,
     borderLeftWidth: 4,
-    borderLeftColor: primary,
+    borderLeftColor: colors.primary,
+    ...shadows.medium,
   },
   cardHeader: {
-    flexDirection: 'row-reverse',
-    alignItems: 'flex-start',
-    marginBottom: 12,
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    marginBottom: spacing.sm,
   },
   iconContainer: {
-    backgroundColor: `${primary}15`,
-    padding: 8,
-    borderRadius: 10,
-    marginRight: 5,
-    marginLeft: 8,
+    backgroundColor: `${colors.primary}15`,
+    padding: spacing.sm,
+    borderRadius: radii.md,
+    marginLeft: spacing.sm,
+    marginRight: spacing.xs,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
+    fontSize: typography.bodyLg,
+    fontWeight: "600",
+    color: colors.primary,
     flex: 1,
-    lineHeight: 22,
-    textAlign: 'right',
-    writingDirection: 'rtl',
+    lineHeight: typography.lineHeightNormal,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   cardContent: {
-    fontSize: 14,
-    color: '#222', // أسود واضح
-    lineHeight: 22,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  faqCard: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 16,
-    marginVertical: 6,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderLeftWidth: 4,
-    borderLeftColor: '#3498db',
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    lineHeight: typography.lineHeightNormal,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   questionContainer: {
-    flexDirection: 'row-reverse',
-    alignItems: 'flex-start',
-    marginBottom: 12,
+    flexDirection: "row-reverse",
+    alignItems: "flex-start",
+    marginBottom: spacing.sm,
   },
   questionIcon: {
-    marginRight: 8,
+    marginRight: spacing.sm,
     marginTop: 2,
   },
   question: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#00b29c', // توحيد الأزرق مع باقي الشاشات
+    fontSize: typography.bodyLg,
+    fontWeight: "600",
+    color: colors.primary,
     flex: 1,
-    lineHeight: 22,
-    textAlign: 'right',
-    writingDirection: 'rtl',
+    lineHeight: typography.lineHeightNormal,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   answer: {
-    fontSize: 14,
-    color: '#222', // أسود واضح
-    lineHeight: 22,
-    writingDirection: 'rtl',
-    textAlign: 'right',
-    paddingRight: 28,
+    fontSize: typography.bodyMd,
+    color: colors.textSecondary,
+    lineHeight: typography.lineHeightNormal,
+    textAlign: "right",
+    writingDirection: "rtl",
+    paddingRight: spacing.xl,
   },
 });
 
