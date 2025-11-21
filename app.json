@@ -23,6 +23,10 @@
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.firstCopy"
     },
+    "runtimeVersion": "1",
+    "updates": {
+    "url": "https://u.expo.dev/de9a1790-6c60-49ad-b68b-7281ec18cc62"
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },

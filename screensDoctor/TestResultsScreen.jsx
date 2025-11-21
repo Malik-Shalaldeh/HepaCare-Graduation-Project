@@ -9,8 +9,8 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  Linking,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,7 @@ import theme from '../style/theme';
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const navigation = useNavigation();
 
   const handleSearch = async () => {
     const query = searchInput.trim();
@@ -45,6 +46,7 @@ export default function TestResultsScreen() {
   };
 
   const renderItem = ({ item }) => (
+    
     <View style={styles.card}>
       <Text style={styles.name}>
         👤 {item.name} (رقم: {item.patientId})
@@ -62,7 +64,7 @@ export default function TestResultsScreen() {
           if (item.filePath) {
             const normalizedPath = item.filePath.replace(/\\/g, '/');
             const url = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${normalizedPath}`;
-            Linking.openURL(url);
+            navigation.navigate('FileViewer', { fileUrl: url });
           } else {
             Alert.alert('تنبيه', 'لا يوجد ملف مرفق لهذا الفحص', [{ text: 'موافق' }]);
           }
@@ -71,6 +73,7 @@ export default function TestResultsScreen() {
       >
         <Text style={styles.btn}>فتح ملف الفحص</Text>
       </TouchableOpacity>
+
 
     </View>
   );

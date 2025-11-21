@@ -6,12 +6,14 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "preview"
     },
     "production": {
       "android": {
         "buildType": "app-bundle"
       }
     }
+
   }
 }

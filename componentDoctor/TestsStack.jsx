@@ -5,6 +5,7 @@ import TestResultsScreen from '../screensDoctor/TestResultsScreen';
 import MedicalIndicatorsScreen from '../screensDoctor/MedicalIndicatorsScreen';
 import InputTestResultScreen from '../screensDoctor/InputTestResultScreen';
 import theme from '../style/theme';
+import FileViewerScreen from '../screensDoctor/FileViewerScreen';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,12 @@ const TestsStack = () => {
         component={TestResultsScreen}
         options={{ title: 'نتائج الفحوصات' }}
       />
+      <Stack.Screen
+        name="FileViewer"
+        component={FileViewerScreen}
+        options={{ title: 'عرض الملف' }}
+      />
+
 
       <Stack.Screen
         name="MedicalIndicatorsScreen"
