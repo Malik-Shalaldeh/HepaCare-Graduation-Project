@@ -1,45 +1,66 @@
 // شاشة مبسطة لعرض تقييمات التطبيق فقط
+// sami
 
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Platform } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { getAllRatings, getAggregates } from "../utils/ratings";
+import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const primary = "#00b29c";
+const primary = colors.primary;
 
 export default function HealthRatingsScreen() {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
-  const [aggregates, setAggregates] = useState({ appAverage: 0, count: 0 });
+  const [aggregates, setAggregates] = useState({
+    appAverage: 0,
+    count: 0,
+  });
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([getAllRatings(), getAggregates()])
-      .then(([list, aggs]) => {
-        setItems(list);
-        setAggregates({ appAverage: aggs.appAverage, count: aggs.count });
-      })
-      .finally(() => setLoading(false));
+    const loadRatings = async () => {
+      try {
+        setLoading(true);
+
+        const [list, aggs] = await Promise.all([
+          getAllRatings(),
+          getAggregates(),
+        ]);
+
+        setItems(list || []);
+        setAggregates({
+          appAverage: aggs?.appAverage || 0,
+          count: aggs?.count || 0,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRatings();
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* ملخص بسيط */}
+      {/* ✅ بس ملخص فوق بدون عنوان إضافي */}
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>متوسط تقييم التطبيق</Text>
-          <Text style={styles.summaryValue}>{aggregates.appAverage} / 5</Text>
+          <Text style={styles.summaryValue}>
+            {aggregates.appAverage} / 5
+          </Text>
         </View>
+
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>عدد التقييمات</Text>
           <Text style={styles.summaryValue}>{aggregates.count}</Text>
         </View>
       </View>
 
-      {/* القائمة */}
+      {/* قائمة التقييمات */}
       <FlatList
         data={items}
-        keyExtractor={(it) => it.id}
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        keyExtractor={(it) => String(it.id)}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshing={loading}
         renderItem={({ item }) => (
@@ -50,76 +71,125 @@ export default function HealthRatingsScreen() {
                 التقييم: {item.appRating} / 5
               </Text>
             </View>
+
             {item.comment ? (
               <View style={styles.commentBox}>
                 <Text style={styles.commentText}>{item.comment}</Text>
               </View>
             ) : null}
+
             <Text style={styles.dateText}>
               {new Date(item.createdAt).toLocaleString("ar-EG")}
             </Text>
           </View>
         )}
-        ListEmptyComponent={() => (
-          <Text
-            style={{ textAlign: "center", color: "#64748B", marginTop: 24 }}
-          >
-            لا توجد تقييمات
-          </Text>
-        )}
+        ListEmptyComponent={
+          !loading && (
+            <Text style={styles.emptyText}>لا توجد تقييمات</Text>
+          )
+        }
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F6FAF9" },
+  container: {
+    flex: 1,
+    backgroundColor: colors.backgroundLight,
+  },
+
   summaryRow: {
     flexDirection: "row-reverse",
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
   },
+
   summaryCard: {
     flex: 1,
-    backgroundColor: "#fff",
-    marginHorizontal: 6,
-    marginBottom: 10,
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: colors.background,
+    marginHorizontal: spacing.xs,
+    marginBottom: spacing.sm,
+    borderRadius: radii.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.border,
+    ...shadows.small,
   },
+
   summaryTitle: {
-    fontSize: 12,
-    color: "#475569",
-    marginBottom: 6,
+    fontSize: typography.bodySm,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
     textAlign: "right",
   },
-  summaryValue: { fontSize: 16, color: "#0F172A", fontWeight: "700" },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    marginBottom: 12,
+
+  summaryValue: {
+    fontSize: typography.bodyLg,
+    color: colors.textPrimary,
+    fontWeight: "700",
   },
+
+  listContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
+  },
+
+  card: {
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+  },
+
   cardHeader: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
-  patientName: { fontSize: 16, color: "#0F172A", fontWeight: "700" },
-  smallLabel: { fontSize: 12, color: "#475569" },
+
+  patientName: {
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    fontWeight: "700",
+    textAlign: "right",
+  },
+
+  smallLabel: {
+    fontSize: typography.bodySm,
+    color: colors.textSecondary,
+  },
+
   commentBox: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: colors.backgroundLight,
+    borderRadius: radii.md,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    marginTop: 10,
+    borderColor: colors.border,
+    marginTop: spacing.sm,
   },
-  commentText: { fontSize: 14, color: "#1F2937", textAlign: "right" },
-  dateText: { marginTop: 8, color: "#64748B", fontSize: 12, textAlign: "left" },
+
+  commentText: {
+    fontSize: typography.bodyMd,
+    color: colors.textPrimary,
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+
+  dateText: {
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
+    fontSize: typography.bodySm,
+    textAlign: "left",
+  },
+
+  emptyText: {
+    textAlign: "center",
+    color: colors.textSecondary,
+    marginTop: spacing.xl,
+    fontSize: typography.bodyMd,
+  },
 });

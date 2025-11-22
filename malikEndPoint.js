@@ -1,7 +1,12 @@
 // malikEndPoint.js
 
-
-const BASE_URL = "https://luminous-possibility-production.up.railway.app";
+import { Platform } from "react-native";
+// مالك يا طبل ما تحذف الى بيشغل  local خليه  commint  وقيم الكومنت عن الى بيربط في السيرفر تضلش تجنني .
+//const BASE_URL = "https://luminous-possibility-production.up.railway.app";
+const BASE_URL =
+  Platform.OS === 'android'
+    ? 'http://192.168.1.122:8000'
+    : 'http://192.168.1.122:8000';
 
 const ENDPOINTS = {
   BASE_URL,

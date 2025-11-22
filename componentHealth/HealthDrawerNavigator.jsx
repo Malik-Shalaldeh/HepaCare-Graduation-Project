@@ -20,11 +20,16 @@ import CommonLabsScreen from "../screensCommon/LabsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 
-const primary = "#2196f3";
+// استدعاء قيم التصميم الموحد
+import { colors, spacing, typography } from "../style/theme";
+
+// اللون الأساسي من ملف الـ theme
+const primary = colors.primary;
 
 // محتوى مخصص للقائمة الجانبية مع زر تسجيل الخروج
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
+
   const handleLogout = () => {
     Alert.alert(
       "تسجيل الخروج",
@@ -40,6 +45,7 @@ function CustomDrawerContent(props) {
       { cancelable: true }
     );
   };
+
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
@@ -56,12 +62,18 @@ function CustomDrawerContent(props) {
 
 // تبويبات سفلية بسيطة: لوحة التحكم + التقييمات
 const Tab = createBottomTabNavigator();
+
 function MainTabs() {
   return (
     <Tab.Navigator
       initialRouteName="لوحة التحكم"
       screenOptions={({ route }) => ({
         headerShown: true,
+        headerTitleAlign: "center",
+        headerTintColor: colors.textOnPrimary || "#fff",
+        headerStyle: {
+          backgroundColor: primary,
+        },
         tabBarIcon: ({ color, size }) => {
           const icons = {
             "لوحة التحكم": "home-outline",
@@ -72,10 +84,16 @@ function MainTabs() {
           );
         },
         tabBarActiveTintColor: primary,
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          height: 90,
-          marginBottom: Platform.OS === "android" ? 5 : 0,
+          height: 80,
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          paddingBottom: Platform.OS === "ios" ? spacing.sm : 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: typography.bodySm,
         },
         tabBarHideOnKeyboard: true,
       })}
@@ -92,33 +110,35 @@ const Drawer = createDrawerNavigator();
 export default function HealthDrawerNavigator() {
   return (
     <>
+      {/* شريط الحالة بلون التطبيق الموحد */}
       <StatusBar backgroundColor={primary} barStyle="light-content" />
+
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
-        initialRouteName="MainTabs"
+        initialRouteName="الرئيسية"   // ✅ صارت البداية على شاشة "الرئيسية"
         screenOptions={{
           headerShown: true,
+          headerTitleAlign: "center",
+          headerTintColor: colors.textOnPrimary || "#fff",
+          headerStyle: {
+            backgroundColor: primary,
+          },
           drawerActiveTintColor: primary,
-          drawerLabelStyle: { fontSize: 16 },
-          drawerStyle: { backgroundColor: "#fff" },
+          drawerInactiveTintColor: colors.textSecondary,
+          drawerLabelStyle: {
+            fontSize: typography.bodyMd,
+          },
+          drawerStyle: {
+            backgroundColor: colors.background,
+          },
         }}
       >
-        {/* إخفاء MainTabs من القائمة وإبقاؤه كوجهة رئيسية */}
-        <Drawer.Screen
-          name="MainTabs"
-          component={MainTabs}
-          options={{
-            drawerLabel: () => null,
-            title: null,
-            headerShown: false,
-            drawerIcon: () => null,
-          }}
-        />
-
+        {/* ✅ شاشة واحدة فقط تستخدم MainTabs، وبدون هيدر من الـ Drawer */}
         <Drawer.Screen
           name="الرئيسية"
           component={MainTabs}
           options={{
+            headerShown: false, // مهم: عشان ما يطلع هيدر ثاني فوق التابات
             drawerIcon: ({ size, color }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
