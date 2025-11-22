@@ -1,21 +1,16 @@
 // malikEndPoint.js
 
-import { Platform } from 'react-native';
 
-const BASE_URL =
-  Platform.OS === 'android'
-    ? 'http://192.168.1.7:8000'
-    : 'http://192.168.1.7:8000';
+const BASE_URL = "https://luminous-possibility-production.up.railway.app";
 
 const ENDPOINTS = {
   BASE_URL,
   TEST_RESULTS: {
     SEARCH: `${BASE_URL}/test-results/`,
-    // مهم: FILE_BASE هو نفس BASE_URL
     FILE_BASE: BASE_URL,
   },
   PATIENT_CHART: {
-    GET: `${BASE_URL}/patient-chart`,
+    GET: `${BASE_URL}/patient-chart/`,
   },
   DOCTOR_DASHBOARD: {
     GET: `${BASE_URL}/doctor/dashboard`,
