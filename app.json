@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.firstCopy"
+      "package": "com.malikzeyad.hepacare"
     },
     "runtimeVersion": "1",
     "web": {
@@ -29,8 +29,11 @@
     },
     "extra": {
       "eas": {
-        "projectId": "de9a1790-6c60-49ad-b68b-7281ec18cc62"
+        "projectId": "59e9531a-038a-4d0d-8af2-4780b3de7383"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/59e9531a-038a-4d0d-8af2-4780b3de7383"
     }
   }
 }

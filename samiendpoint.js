@@ -3,12 +3,7 @@
 // This makes maintaining URL changes easy and avoids hard-coding strings.
 
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
-import { Platform } from "react-native";
-const BASE_URL =
-  Platform.OS === 'android'
-    ? 'http://192.168.1.122:8000'
-    : 'http://192.168.1.122:8000';
-
+const BASE_URL = "https://luminous-possibility-production.up.railway.app";
 const ENDPOINTS = {
   // الاتصال الأساسي
   BASE_URL,

@@ -23,6 +23,7 @@
     "expo": "^54.0.6",
     "expo-document-picker": "~13.1.6",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~29.0.13",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
