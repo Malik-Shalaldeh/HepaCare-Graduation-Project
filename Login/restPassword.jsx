@@ -1,5 +1,5 @@
 // ChangePasswordScreen.js
-import { useState, useLayoutEffect } from 'react';
+import { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -66,7 +66,7 @@ const ChangePasswordScreen = () => {
         setShowConfirm(false);
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.detail) {
+      if(error.response && error.response.data && error.response.data.detail) {
         Alert.alert('⚠️ خطأ', error.response.data.detail);
       } else {
         Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم، تحقق من الشبكة.');
@@ -79,13 +79,12 @@ const ChangePasswordScreen = () => {
       style={styles.container}
     >
       <StatusBar
-        barStyle="dark-content"
-        backgroundColor={theme.colors.backgroundLight}
+        barStyle="light-content"
+        backgroundColor={theme.colors.primary}
       />
 
       {/* زر الرجوع */}
       <TouchableOpacity
-        style={styles.backBtn}
         onPress={() => navigation.goBack()}
         activeOpacity={0.8}
       >
@@ -213,11 +212,6 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.lg,
-  },
-  backBtn: {
-    marginBottom: theme.spacing.lg,
-    marginTop: theme.spacing.lg,
-    marginLeft: theme.spacing.sm,
   },
   title: {
     fontSize: theme.typography.headingMd,

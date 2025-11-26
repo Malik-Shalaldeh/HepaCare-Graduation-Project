@@ -39,22 +39,27 @@ export default function LoginScreen({ navigation }) {
       if (data.role === 'DOCTOR') {
         await AsyncStorage.setItem('doctor_id', String(data.id));
         await AsyncStorage.setItem('patientId', '');
-      } else if (data.role === 'PATIENT') {
+      } 
+      else if (data.role === 'PATIENT') {
         await AsyncStorage.removeItem('doctor_id');
         await AsyncStorage.setItem('patientId', String(data.id));
       }
 
       navigation.replace(data.route);
-    } catch (e) {
+    } 
+    catch (e) {
       if (e.response) {
         if (e.response.status === 403) {
           Alert.alert('الحساب معطل', 'هذا الحساب معطل، تواصل مع الإدارة.');
-        } else if (e.response.status === 401) {
+        } 
+        else if (e.response.status === 401) {
           Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-        } else {
+        } 
+        else {
           Alert.alert('خطأ', 'حدث خطأ في تسجيل الدخول');
         }
-      } else {
+      } 
+      else {
         Alert.alert('خطأ', 'تعذر الاتصال بالخادم');
       }
       setPassword('');

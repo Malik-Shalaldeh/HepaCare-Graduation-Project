@@ -4,7 +4,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
@@ -34,26 +33,16 @@ export default function PatientDashboard() {
   const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
 
   return (
-    <ScreenWithDrawer title="لوحة التحكم" showDrawerIcon>
-      <View
-        style={styles.screen}
-      >
+    <ScreenWithDrawer title="لوحة التحكم" >
+      <View style={styles.screen}>
         {/* الهيدر */}
-        <View
-          style={styles.header}
-        >
-          <Text
-            style={styles.headerText}
-          >
-            HepaCare
-          </Text>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>HepaCare</Text>
         </View>
 
         <View style={styles.container}>
           {/* بطاقة الترحيب */}
-          <View
-            style={styles.card}
-          >
+          <View style={styles.card}>
             <Ionicons
               name="happy-outline"
               size={40}
@@ -61,32 +50,20 @@ export default function PatientDashboard() {
               style={styles.icon}
             />
             <View>
-              <Text
-                style={styles.title}
-              >
-                {name || 'مستخدم'}
-              </Text>
-              <Text
-                style={styles.subtitle}
-              >
-                {formattedDate}
-              </Text>
+              <Text style={styles.title}> {name || 'مستخدم'}</Text>
+              <Text style={styles.subtitle}>{formattedDate}</Text>
             </View>
           </View>
 
           {/* صندوق التشجيع */}
-          <View
-            style={styles.motivationBox}
-          >
+          <View style={styles.motivationBox}>
             <Ionicons
               name="heart-circle-outline"
               size={50}
               color={theme.colors.danger}
               style={{ marginBottom: theme.spacing.sm }}
             />
-            <Text
-              style={styles.motivationText}
-            >
+            <Text style={styles.motivationText}>
               صحتك أمانة... تابع أدويتك وفحوصاتك بانتظام لتحمي كبدك ونحافظ على عافيتك
             </Text>
           </View>

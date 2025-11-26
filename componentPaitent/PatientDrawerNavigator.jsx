@@ -1,4 +1,3 @@
-import React from "react";
 import { StatusBar, Alert, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -19,11 +18,10 @@ import EducationalContentScreen from "../screensCommon/EducationalContentScreen"
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
-
-// ✅ ستاك الأدوية
 import MedicationsStack from "./MedStack";
-
 import theme from "../style/theme";
+
+
 const primary = theme.colors.primary;
 
 // محتوى الدرور

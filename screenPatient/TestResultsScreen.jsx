@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
@@ -39,11 +38,7 @@ export default function TestResultsScreen() {
         🧪 {item.test_name}
       </Text>
 
-      <Text
-        style={styles.rowText}
-      >
-        📊 النتيجة: {item.result_value} {item.unit || ''}
-      </Text>
+      <Text style={styles.rowText}> 📊 النتيجة: {item.result_value} {item.unit || ''}</Text>
 
       <Text
         style={[
@@ -54,17 +49,9 @@ export default function TestResultsScreen() {
         📈 التقييم: {item.is_normal ? 'طبيعي' : 'غير طبيعي'}
       </Text>
 
-      <Text
-        style={styles.rowText}
-      >
-        💬 ملاحظة: {item.comments || '—'}
-      </Text>
+      <Text style={styles.rowText}> 💬 ملاحظة: {item.comments || '—'} </Text>
 
-      <Text
-        style={styles.rowText}
-      >
-        📅 التاريخ: {item.test_date}
-      </Text>
+      <Text style={styles.rowText}> 📅 التاريخ: {item.test_date}</Text>
     </View>
   );
 
@@ -79,7 +66,7 @@ export default function TestResultsScreen() {
 
         <FlatList
           data={data}
-          keyExtractor={(_, i) => i.toString()}
+          keyExtractor={(item, i) => i.toString()}
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
           ListEmptyComponent={
