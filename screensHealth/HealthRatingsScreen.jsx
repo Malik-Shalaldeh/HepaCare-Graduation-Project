@@ -1,43 +1,64 @@
-// شاشة مبسطة لعرض تقييمات التطبيق فقط
 // sami
-
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import { getAllRatings, getAggregates } from "../utils/ratings";
+import { useIsFocused } from "@react-navigation/native";
+import axios from "axios";
+import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const primary = colors.primary;
 
 export default function HealthRatingsScreen() {
+  // state
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
+  const [error, setError] = useState(null);
   const [aggregates, setAggregates] = useState({
     appAverage: 0,
     count: 0,
   });
 
+  const isFocused = useIsFocused();
+
+  // load data on focus
   useEffect(() => {
-    const loadRatings = async () => {
-      try {
-        setLoading(true);
+    if (isFocused) {
+      loadRatings();
+    }
+  }, [isFocused]);
 
-        const [list, aggs] = await Promise.all([
-          getAllRatings(),
-          getAggregates(),
-        ]);
+  // API calls
+  const getAllRatings = async () => {
+    const response = await axios.get(ENDPOINTS.ratingsAll);
+    return response.data;
+  };
 
-        setItems(list || []);
-        setAggregates({
-          appAverage: aggs?.appAverage || 0,
-          count: aggs?.count || 0,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  const getAggregates = async () => {
+    const response = await axios.get(ENDPOINTS.ratingsAggregates);
+    return response.data;
+  };
 
-    loadRatings();
-  }, []);
+  const loadRatings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [list, aggs] = await Promise.all([
+        getAllRatings(),
+        getAggregates(),
+      ]);
+
+      setItems(list || []);
+      setAggregates({
+        appAverage: aggs?.appAverage || 0,
+        count: aggs?.count || 0,
+      });
+    } catch (err) {
+      setError("فشل تحميل التقييمات");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -63,6 +84,7 @@ export default function HealthRatingsScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshing={loading}
+        onRefresh={loadRatings}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.cardHeader}>

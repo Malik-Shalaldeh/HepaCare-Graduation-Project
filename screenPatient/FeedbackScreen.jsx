@@ -11,13 +11,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import RatingStars from "../componentsHealth/RatingStars";
-import {
-  submitRating,
-  getCurrentPatientClinicId,
-  MOCK_CLINICS,
-} from "../utils/ratings";
+import ENDPOINTS from "../samiendpoint";
 import {
   colors,
   spacing,
@@ -26,41 +24,66 @@ import {
   shadows,
 } from "../style/theme";
 
-const API = "http://192.168.1.122:8000";
 const primary = colors.primary;
+
+// clinic data
+const MOCK_CLINICS = [
+  { id: 1, name: "Main Clinic" },
+  { id: 2, name: "سعير" },
+  { id: 3, name: "عيادة السلام" },
+];
 
 const FeedbackScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+  // form state
   const [appValue, setAppValue] = useState(0);
   const [comment, setComment] = useState("");
   const [patientId, setPatientId] = useState(null);
   const [patientName, setPatientName] = useState("مريض");
 
-  const clinicId = getCurrentPatientClinicId();
-  const clinicName =
-    MOCK_CLINICS.find((c) => c.id === clinicId)?.name || "عيادة الصحة";
+  // clinic info
+  const clinicId = 1;
+  const clinicName = MOCK_CLINICS.find((c) => c.id === clinicId)?.name || "عيادة الصحة";
 
+  // reset form and load patient data on focus
   useEffect(() => {
-    const loadPatientData = async () => {
-      try {
-        const id = await AsyncStorage.getItem("patientId");
-        if (id) {
-          setPatientId(parseInt(id, 10));
+    if (isFocused) {
+      setAppValue(0);
+      setComment("");
+      loadPatientData();
+    }
+  }, [isFocused]);
 
-          const response = await fetch(`${API}/patient/dashboard/${id}`);
-          if (response.ok) {
-            const data = await response.json();
-            setPatientName(data.full_name || "مريض");
-          }
-        }
-      } catch (error) {
-        console.error("Error loading patient data:", error);
+  const loadPatientData = async () => {
+    try {
+      const id = await AsyncStorage.getItem("patientId");
+      if (id) {
+        setPatientId(parseInt(id, 10));
+        const response = await axios.get(`${ENDPOINTS.BASE_URL}/patient/dashboard/${id}`);
+        setPatientName(response.data.full_name || "مريض");
       }
-    };
+    } catch (error) {
+      console.error("Error loading patient data:", error);
+    }
+  };
 
-    loadPatientData();
-  }, []);
+  // API call
+  const submitRating = async ({ patientId, patientName, clinicId, clinicName, appRating, comment }) => {
+    const response = await axios.post(ENDPOINTS.ratingsSubmit, {
+      patient_id: patientId,
+      patient_name: patientName || "مستخدم",
+      clinic_id: clinicId || 1,
+      clinic_name: clinicName || "عيادة الصحة",
+      app_rating: Number(appRating) || 0,
+      clinic_rating: 0,
+      comment: comment || "",
+    });
+    return response.data;
+  };
 
+  // submit form
   const handleSubmit = async () => {
     if (!appValue) {
       Alert.alert("تنبيه", "الرجاء اختيار تقييم للتطبيق");

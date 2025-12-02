@@ -1,17 +1,11 @@
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+// sami - Visits Summary Screen (Malik-style: simple, axios, focus refresh)
+
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import axios from "axios";
-
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
@@ -21,45 +15,36 @@ const AI_MODEL = "Hepa_care_version_17:latest";
 
 const VisitsSummaryScreen = ({ route }) => {
   const { patientId, patientName } = route.params || {};
-
-  const [status, setStatus] = useState("idle");
-  const [summary, setSummary] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
 
-  const buildPrompt = (visitsPayload) => {
-    const dataForAi = {
-      patient: { id: patientId, name: patientName || "غير معروف" },
-      visits: visitsPayload,
-    };
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState("");
+  const [error, setError] = useState(null);
 
-    return [
-      "البيانات التالية:",
-      JSON.stringify(dataForAi, null, 2),
-      "قدّم ملخصاً طبياً بالعربية وفق التعليمات المسبقة.",
-    ].join("\n\n");
-  };
+  useEffect(() => {
+    if (isFocused) {
+      loadSummary();
+    }
+  }, [isFocused]);
 
-  const loadSummary = useCallback(async () => {
+  const loadSummary = async () => {
     if (!patientId) {
-      setErrorMessage("لا يوجد معرف للمريض.");
-      setStatus("error");
+      setError("لا يوجد معرف للمريض.");
       return;
     }
 
-    setStatus("loading");
-    setSummary("");
-    setErrorMessage("");
-
     try {
+      setLoading(true);
+      setSummary("");
+      setError(null);
+
       const visitsResponse = await axios.get(ENDPOINTS.visitsHistory, {
         params: { patient_id: patientId },
       });
 
-      const visits = Array.isArray(visitsResponse.data)
-        ? visitsResponse.data
-        : [];
+      const visits = Array.isArray(visitsResponse.data) ? visitsResponse.data : [];
 
       const visitsPayload = visits.map((visit) => ({
         id: visit.id,
@@ -73,89 +58,73 @@ const VisitsSummaryScreen = ({ route }) => {
         summary: visit.summary || "",
       }));
 
-      const prompt = buildPrompt(visitsPayload);
+      const dataForAi = {
+        patient: { id: patientId, name: patientName || "غير معروف" },
+        visits: visitsPayload,
+      };
 
-      const aiResponse = await fetch(AI_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: AI_MODEL,
-          prompt,
-          stream: false,
-        }),
+      const prompt = [
+        "البيانات التالية:",
+        JSON.stringify(dataForAi, null, 2),
+        "قدّم ملخصاً طبياً بالعربية وفق التعليمات المسبقة.",
+      ].join("\n\n");
+
+      const aiResponse = await axios.post(AI_URL, {
+        model: AI_MODEL,
+        prompt,
+        stream: false,
       });
 
-      if (!aiResponse.ok) {
-        throw new Error("تعذر الحصول على الملخص من الخادم الذكي.");
-      }
-
-      const aiJson = await aiResponse.json();
-      const text = aiJson?.response?.trim();
+      const text = aiResponse.data?.response?.trim();
 
       if (!text) {
         throw new Error("الرد من الخادم فارغ.");
       }
 
       setSummary(text);
-      setStatus("done");
-    } catch (error) {
-      console.error("خطأ في إنشاء ملخص الزيارات:", error);
-      setErrorMessage(
-        error?.message ?? "حدث خطأ أثناء توليد الملخص، حاول مرة أخرى."
-      );
-      setStatus("error");
+    } catch (err) {
+      console.error("خطأ في إنشاء ملخص الزيارات:", err);
+      setError(err?.message ?? "حدث خطأ أثناء توليد الملخص، حاول مرة أخرى.");
+    } finally {
+      setLoading(false);
     }
-  }, [patientId, patientName]);
-
-  useEffect(() => {
-    loadSummary();
-  }, [loadSummary]);
+  };
 
   return (
     <ScreenWithDrawer title="ملخص الزيارات">
-      <View
-        style={[styles.container, { paddingTop: insets.top + spacing.sm }]}
-      >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={22} color={colors.primary} />
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <View style={styles.contentWrapper}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={22} color={colors.primary} />
+          </TouchableOpacity>
 
-        <View style={styles.patientBox}>
-          <Text style={styles.patientLabel}>المريض:</Text>
-          <Text style={styles.patientName}>{patientName || "غير معروف"}</Text>
+          <View style={styles.patientBox}>
+            <Text style={styles.patientLabel}>المريض:</Text>
+            <Text style={styles.patientName}>{patientName || "غير معروف"}</Text>
+          </View>
+
+          {loading && (
+            <View style={styles.centerBox}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.infoText}>جاري تحليل الزيارات...</Text>
+            </View>
+          )}
+
+          {error && (
+            <View style={styles.centerBox}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={loadSummary}>
+                <Text style={styles.retryText}>إعادة المحاولة</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {!loading && !error && summary && (
+            <ScrollView nestedScrollEnabled={true} style={styles.scrollArea} contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + spacing.lg }]}>
+              <Text style={styles.summaryText}>{summary}</Text>
+            </ScrollView>
+          )}
         </View>
-
-        {status === "loading" && (
-          <View style={styles.centerBox}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.infoText}>جاري تحليل الزيارات...</Text>
-          </View>
-        )}
-
-        {status === "error" && (
-          <View style={styles.centerBox}>
-            <Text style={styles.errorText}>{errorMessage}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={loadSummary}>
-              <Text style={styles.retryText}>إعادة المحاولة</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {status === "done" && (
-          <ScrollView
-            nestedScrollEnabled={true}
-            style={styles.scrollArea}
-            contentContainerStyle={[
-              styles.scrollContent,
-              { paddingBottom: insets.bottom + spacing.lg },
-            ]}
-          >
-            <Text style={styles.summaryText}>{summary}</Text>
-          </ScrollView>
-        )}
       </View>
     </ScreenWithDrawer>
   );
@@ -164,9 +133,11 @@ const VisitsSummaryScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: 'transparent',
+  },
+  contentWrapper: {
+    flex: 1,
   },
   backButton: {
     alignSelf: "flex-start",

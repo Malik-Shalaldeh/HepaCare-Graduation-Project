@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+// sami - History Visits Screen (Malik-style: simple, axios, focus refresh)
+
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,14 +11,13 @@ import {
   Modal,
   Pressable,
   TextInput,
-  Alert,
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ScreenWithDrawer from "./ScreenWithDrawer";
 import axios from "axios";
+import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
@@ -25,59 +26,54 @@ const primary = colors.primary;
 const HistoryVisits = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const { patientId = null, patientName = "" } = route.params || {};
 
+  // state
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
-  const [serverVisits, setServerVisits] = useState([]);
+  const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  // load visits on focus
   useEffect(() => {
-    const loadVisitsHistory = async () => {
-      if (!patientId) return;
+    if (isFocused && patientId) {
+      loadVisitsHistory();
+    }
+  }, [isFocused, patientId]);
 
+  const loadVisitsHistory = async () => {
+    try {
       setLoading(true);
-      try {
-        const response = await axios.get(ENDPOINTS.visitsHistory, {
-          params: { patient_id: patientId },
-        });
+      setError(null);
 
-        const visitsData = response.data || [];
-        setServerVisits(visitsData);
-      } catch (error) {
-        console.error("خطأ في جلب سجل الزيارات:", error);
-        Alert.alert("خطأ", "تعذر جلب سجل الزيارات");
-      } finally {
-        setLoading(false);
-      }
-    };
+      const response = await axios.get(ENDPOINTS.visitsHistory, {
+        params: { patient_id: patientId },
+      });
 
-    loadVisitsHistory();
-  }, [patientId]);
-
-  const handleBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate("الرئيسية");
+      setVisits(response.data || []);
+    } catch (err) {
+      console.error("خطأ في جلب سجل الزيارات:", err);
+      setError("تعذر جلب سجل الزيارات");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredVisitsData = useMemo(() => {
-    if (!searchQuery.trim()) return serverVisits;
+  const filteredVisits = visits.filter((visit) => {
+    if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
-    return serverVisits.filter(
-      (visit) =>
-        (visit.patientName &&
-          visit.patientName.toLowerCase().includes(query)) ||
-        visit.date.includes(query) ||
-        (visit.summary && visit.summary.toLowerCase().includes(query)) ||
-        (visit.condition && visit.condition.toLowerCase().includes(query))
+    return (
+      (visit.patientName && visit.patientName.toLowerCase().includes(query)) ||
+      visit.date.includes(query) ||
+      (visit.summary && visit.summary.toLowerCase().includes(query)) ||
+      (visit.condition && visit.condition.toLowerCase().includes(query))
     );
-  }, [serverVisits, searchQuery]);
+  });
 
   const openVisit = (item) => {
     setSelectedVisit(item);
@@ -86,13 +82,8 @@ const HistoryVisits = () => {
 
   return (
     <ScreenWithDrawer title="سجل الزيارات">
-      <SafeAreaView
-        style={[
-          styles.container,
-          { paddingTop: insets.top + spacing.sm }, // ⬅ توحيد البعد عن الأعلى
-        ]}
-      >
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top + spacing.sm }]}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={22} color={primary} />
         </TouchableOpacity>
 
@@ -108,59 +99,44 @@ const HistoryVisits = () => {
             onChangeText={setSearchQuery}
             placeholderTextColor={colors.textMuted}
           />
-          <Ionicons
-            name="search"
-            size={20}
-            color={colors.textMuted}
-            style={styles.searchIcon}
-          />
+          <Ionicons name="search" size={20} color={colors.textMuted} style={styles.searchIcon} />
         </View>
 
         {loading ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>جار التحميل...</Text>
           </View>
+        ) : error ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={loadVisitsHistory}>
+              <Text style={styles.retryButtonText}>إعادة المحاولة</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <FlatList
-            data={filteredVisitsData}
+            data={filteredVisits}
             keyExtractor={(item) => String(item.id)}
             contentContainerStyle={{ paddingBottom: spacing.lg }}
             ListEmptyComponent={
               searchQuery.trim() !== "" ? (
-                <Text style={styles.noResults}>
-                  لا توجد نتائج مطابقة للبحث
-                </Text>
+                <Text style={styles.noResults}>لا توجد نتائج مطابقة للبحث</Text>
               ) : (
                 <Text style={styles.noResults}>لا توجد زيارات سابقة</Text>
               )
             }
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() => openVisit(item)}
-              >
+              <TouchableOpacity style={styles.card} onPress={() => openVisit(item)}>
                 {!patientName && item.patientName && (
-                  <Text
-                    style={styles.patientNameInVisit}
-                  >{`المريض: ${item.patientName}`}</Text>
+                  <Text style={styles.patientNameInVisit}>{`المريض: ${item.patientName}`}</Text>
                 )}
 
                 <View style={styles.cardRow}>
-                  <Text
-                    style={styles.date}
-                  >{`${item.date} | ${item.time}`}</Text>
-                  <Ionicons
-                    name="chevron-back"
-                    size={22}
-                    color={colors.textPrimary}
-                  />
+                  <Text style={styles.date}>{`${item.date} | ${item.time}`}</Text>
+                  <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
                 </View>
 
-                <Text
-                  style={styles.summary}
-                  numberOfLines={3}
-                  ellipsizeMode="tail"
-                >
+                <Text style={styles.summary} numberOfLines={3} ellipsizeMode="tail">
                   {item.summary}
                 </Text>
               </TouchableOpacity>
@@ -168,67 +144,36 @@ const HistoryVisits = () => {
           />
         )}
 
-        <Modal
-          animationType="slide"
-          transparent
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
+        <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Pressable
-                style={styles.closeBtn}
-                onPress={() => setModalVisible(false)}
-              >
-                <Ionicons
-                  name="close"
-                  size={24}
-                  color={colors.textPrimary}
-                />
+              <Pressable style={styles.closeBtn} onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.textPrimary} />
               </Pressable>
 
               <ScrollView contentContainerStyle={styles.modalScrollContent}>
                 {selectedVisit && (
                   <>
-                    <Text
-                      style={styles.modalTitle}
-                    >{`زيارة ${selectedVisit.date} في ${selectedVisit.time}`}</Text>
+                    <Text style={styles.modalTitle}>{`زيارة ${selectedVisit.date} في ${selectedVisit.time}`}</Text>
 
                     <Text style={styles.sectionHeader}>الحالة العامة</Text>
-                    <Text style={styles.multiLine}>
-                      {selectedVisit.condition || "غير محدد"}
-                    </Text>
+                    <Text style={styles.multiLine}>{selectedVisit.condition || "غير محدد"}</Text>
 
                     <Text style={styles.sectionHeader}>الالتزام بالعلاج</Text>
-                    <Text style={styles.multiLine}>
-                      {selectedVisit.adherence || "غير محدد"}
-                    </Text>
+                    <Text style={styles.multiLine}>{selectedVisit.adherence || "غير محدد"}</Text>
 
-                    <Text style={styles.sectionHeader}>
-                      الملاحظات التفصيلية
-                    </Text>
-                    <Text style={styles.multiLine}>
-                      {selectedVisit.notes || "لا توجد ملاحظات"}
-                    </Text>
+                    <Text style={styles.sectionHeader}>الملاحظات التفصيلية</Text>
+                    <Text style={styles.multiLine}>{selectedVisit.notes || "لا توجد ملاحظات"}</Text>
 
-                    <Text style={styles.sectionHeader}>
-                      الجوانب النفسية والاجتماعية
-                    </Text>
-                    <Text style={styles.multiLine}>
-                      {selectedVisit.psychosocial || "لا توجد معلومات"}
-                    </Text>
+                    <Text style={styles.sectionHeader}>الجوانب النفسية والاجتماعية</Text>
+                    <Text style={styles.multiLine}>{selectedVisit.psychosocial || "لا توجد معلومات"}</Text>
 
                     <Text style={styles.sectionHeader}>الطبيب المعالج</Text>
-                    <Text style={styles.multiLine}>
-                      {selectedVisit.doctorName || "غير محدد"}
-                    </Text>
+                    <Text style={styles.multiLine}>{selectedVisit.doctorName || "غير محدد"}</Text>
                   </>
                 )}
 
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setModalVisible(false)}
-                >
+                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                   <Text style={styles.closeButtonText}>إغلاق</Text>
                 </TouchableOpacity>
               </ScrollView>
@@ -362,31 +307,9 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyMd,
     fontFamily: typography.fontFamily,
   },
-  actionBtn: {
-    backgroundColor: colors.buttonSuccess,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
-    alignItems: "center",
+  closeBtn: {
+    alignSelf: "flex-start",
   },
-  actionBtnText: {
-    color: colors.buttonSuccessText,
-    fontWeight: "bold",
-    fontSize: typography.bodyMd,
-    fontFamily: typography.fontFamily,
-  },
-  fab: {
-    position: "absolute",
-    width: 56,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    right: spacing.xl,
-    bottom: spacing.xl,
-    backgroundColor: colors.buttonPrimary,
-    borderRadius: 28,
-    ...shadows.medium,
-  },
-  closeBtn: { alignSelf: "flex-start" },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -396,6 +319,25 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyMd,
     fontFamily: typography.fontFamily,
     color: colors.textSecondary,
+  },
+  errorText: {
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.danger,
+    textAlign: "center",
+    marginBottom: spacing.md,
+  },
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.buttonPrimary,
+    borderRadius: radii.md,
+    ...shadows.light,
+  },
+  retryButtonText: {
+    color: colors.buttonPrimaryText,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
   noResults: {
     fontSize: typography.bodyMd,

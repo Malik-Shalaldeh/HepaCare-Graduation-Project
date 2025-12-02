@@ -1,7 +1,7 @@
-// سامي - واجهة المختبرات المعتمدة
+// سامي - واجهة المختبرات المعتمدة - Refactored to Malik-style
 
 import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import axios from "axios";
 import {
   colors,
   spacing,
@@ -24,29 +25,28 @@ import ENDPOINTS from "../samiendpoint";
 
 const LabsScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
+  // state
   const [search, setSearch] = useState("");
   const [labs, setLabs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // load data on focus
   useEffect(() => {
-    fetchLabs();
-  }, []);
+    if (isFocused) {
+      fetchLabs();
+    }
+  }, [isFocused]);
 
   const fetchLabs = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(ENDPOINTS.labsList);
-
-      if (!response.ok) {
-        throw new Error("فشل في جلب البيانات");
-      }
-
-      const data = await response.json();
-      setLabs(data || []);
+      const response = await axios.get(ENDPOINTS.labsList);
+      setLabs(response.data || []);
     } catch (err) {
       console.error("خطأ في جلب المختبرات:", err);
       setError("حدث خطأ في جلب المختبرات");
@@ -57,10 +57,10 @@ const LabsScreen = () => {
 
   const filteredLabs = search.trim()
     ? labs.filter(
-        (lab) =>
-          lab.city &&
-          lab.city.toLowerCase().includes(search.toLowerCase())
-      )
+      (lab) =>
+        lab.city &&
+        lab.city.toLowerCase().includes(search.toLowerCase())
+    )
     : labs;
 
   const renderLabCard = ({ item }) => (
@@ -167,9 +167,9 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyMd,
     borderWidth: 1,
     borderColor: "#e0e0e0",
-    textAlign:"right",
-    writingDirection:"rtl",
-    fontWeight:"700"
+    textAlign: "right",
+    writingDirection: "rtl",
+    fontWeight: "700"
   },
   listContent: {
     paddingBottom: spacing.xl,
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
     ...shadows.small,
   },
   labName: {
-    textAlign:"right",
-    writingDirection:"rtl",
+    textAlign: "right",
+    writingDirection: "rtl",
     fontSize: typography.bodyLg,
     fontWeight: "700",
     color: colors.primary,

@@ -1,5 +1,5 @@
-// sami
-import React, { useState, useEffect, useCallback } from "react";
+// sami - Refactored to Malik-style
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
@@ -21,21 +22,25 @@ const primary = colors.primary;
 
 const PatientAppointmentsScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
+  // state
   const [appointments, setAppointments] = useState([]);
   const [clinicName, setClinicName] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const getStoredPatientId = useCallback(async () => {
+  // get patient ID from storage
+  const getStoredPatientId = async () => {
     const keys = ["patient_id", "patientId", "user_id", "userId", "id"];
     for (const key of keys) {
       const value = await AsyncStorage.getItem(key);
       if (value) return value;
     }
     return null;
-  }, []);
+  };
 
+  // normalize appointment data
   const normalizeAppointment = (row) => {
     const rawStart = row.start_at || "";
     const startDate = rawStart ? new Date(rawStart.replace(" ", "T")) : null;
@@ -47,9 +52,9 @@ const PatientAppointmentsScreen = () => {
         : "غير محدد",
       time: startDate
         ? startDate.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
+          hour: "2-digit",
+          minute: "2-digit",
+        })
         : "",
       doctor: row.doctor_name || `دكتور رقم ${row.doctor_id}`,
       clinic: row.clinic_name || "",
@@ -57,10 +62,12 @@ const PatientAppointmentsScreen = () => {
     };
   };
 
-  const loadAppointments = useCallback(async () => {
-    setRefreshing(true);
+  // load appointments data
+  const loadAppointments = async () => {
     try {
+      setIsLoading(true);
       setError("");
+
       const patientId = await getStoredPatientId();
 
       if (!patientId) {
@@ -70,16 +77,12 @@ const PatientAppointmentsScreen = () => {
         return;
       }
 
-      const response = await fetch(
+      const response = await axios.get(
         ENDPOINTS.patientAppointmentsByPatient(patientId),
         { headers: { Accept: "application/json" } }
       );
 
-      if (!response.ok) {
-        throw new Error("تعذر جلب المواعيد");
-      }
-
-      const data = await response.json();
+      const data = response.data;
       const rows = Array.isArray(data) ? data : data.appointments || [];
       const normalized = rows.map(normalizeAppointment);
 
@@ -90,13 +93,16 @@ const PatientAppointmentsScreen = () => {
       setAppointments([]);
       setClinicName("");
     } finally {
-      setRefreshing(false);
+      setIsLoading(false);
     }
-  }, [getStoredPatientId]);
+  };
 
+  // load data on focus
   useEffect(() => {
-    loadAppointments();
-  }, [loadAppointments]);
+    if (isFocused) {
+      loadAppointments();
+    }
+  }, [isFocused]);
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -118,7 +124,7 @@ const PatientAppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      {/* زر الرجوع على الشمال (نفس ستايل الشاشات الثانية) */}
+      {/* back button */}
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={styles.backButton}
@@ -134,7 +140,7 @@ const PatientAppointmentsScreen = () => {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        {refreshing && !appointments.length ? (
+        {isLoading && !appointments.length ? (
           <ActivityIndicator
             color={primary}
             style={styles.loader}
@@ -156,7 +162,7 @@ const PatientAppointmentsScreen = () => {
             }
             refreshControl={
               <RefreshControl
-                refreshing={refreshing}
+                refreshing={isLoading}
                 onRefresh={loadAppointments}
                 tintColor={primary}
               />
@@ -186,7 +192,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
-    paddingTop: spacing.xxl * 2, // عشان ما يتغطى العنوان بزر الرجوع
+    paddingTop: spacing.xxl * 2,
   },
   clinicName: {
     fontSize: typography.bodyLg,

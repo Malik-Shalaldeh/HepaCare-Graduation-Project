@@ -1,5 +1,5 @@
-// Developed by Sami
-import React, { useContext } from "react";
+// sami - Refactored to Malik-style
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,12 @@ import {
   RefreshControl,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-import { AppointmentsContext } from "../contexts/AppointmentsContext";
+import ENDPOINTS from "../samiendpoint";
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import {
   colors,
@@ -27,22 +29,103 @@ const primary = colors.primary;
 
 const AppointmentListScreen = () => {
   const navigation = useNavigation();
-  const { appointments, deleteAppointment, loading, error, refresh } =
-    useContext(AppointmentsContext);
+  const isFocused = useIsFocused();
+
+  // state
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // format appointment data
+  const formatAppointment = (row, patientName) => {
+    const rawStart = row.start_at || "";
+    const start = rawStart ? new Date(rawStart.replace(" ", "T")) : new Date();
+
+    return {
+      id: row.id,
+      patientId: row.patient_id,
+      patientName: patientName || `مريض رقم ${row.patient_id}`,
+      startAt: rawStart,
+      dateText: start.toLocaleDateString(),
+      timeText: start.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      notes: row.notes || "",
+    };
+  };
+
+  // load appointments data
+  const loadAppointments = async () => {
+    try {
+      setIsLoading(true);
+      setError("");
+
+      const doctorId = await AsyncStorage.getItem("doctor_id");
+
+      if (!doctorId) {
+        setError("لا يوجد رقم طبيب محفوظ");
+        setAppointments([]);
+        return;
+      }
+
+      // fetch patients for name lookup
+      const patientsResponse = await axios.get(
+        `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`
+      );
+      const patientsData = patientsResponse.data;
+
+      // create patient name lookup
+      const patientLookup = {};
+      patientsData.forEach((patient) => {
+        const name = patient.name ?? patient.full_name ?? `مريض رقم ${patient.id || patient.patient_id}`;
+        const id = patient.id ?? patient.patient_id;
+        patientLookup[id] = name;
+      });
+
+      // fetch appointments
+      const apptsResponse = await axios.get(
+        ENDPOINTS.doctorAppointments(doctorId)
+      );
+      const rows = apptsResponse.data.appointments || [];
+
+      // format appointments with patient names
+      const formatted = rows.map((row) =>
+        formatAppointment(row, patientLookup[row.patient_id])
+      );
+
+      setAppointments(formatted);
+    } catch (err) {
+      setError(err.message || "تعذر تحميل المواعيد");
+      setAppointments([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // load data on focus
+  useEffect(() => {
+    if (isFocused) {
+      loadAppointments();
+    }
+  }, [isFocused]);
+
+  // delete appointment
+  const handleDelete = async (appointmentId) => {
+    try {
+      await axios.delete(ENDPOINTS.doctorAppointmentDelete(appointmentId));
+      // reload appointments after deletion
+      await loadAppointments();
+    } catch (err) {
+      Alert.alert("خطأ", err.message || "تعذر حذف الموعد");
+    }
+  };
 
   const openForm = (appointment) => {
     navigation.navigate(
       "AppointmentForm",
       appointment ? { appointment } : undefined
     );
-  };
-
-  const handleDelete = async (appointmentId) => {
-    try {
-      await deleteAppointment(appointmentId);
-    } catch (err) {
-      Alert.alert("خطأ", err.message || "تعذر حذف الموعد");
-    }
   };
 
   const renderItem = ({ item }) => (
@@ -91,7 +174,7 @@ const AppointmentListScreen = () => {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      {loading && !appointments.length ? (
+      {isLoading && !appointments.length ? (
         <ActivityIndicator color={primary} style={styles.loadingIndicator} />
       ) : null}
 
@@ -107,8 +190,8 @@ const AppointmentListScreen = () => {
         }
         refreshControl={
           <RefreshControl
-            refreshing={loading}
-            onRefresh={refresh}
+            refreshing={isLoading}
+            onRefresh={loadAppointments}
             tintColor={primary}
           />
         }

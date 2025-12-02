@@ -1,5 +1,5 @@
-// sami - Appointment form with unified theme
-import React, { useState, useContext, useEffect } from "react";
+// sami - Refactored to Malik-style
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,9 +14,11 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 import ScreenWithDrawer from "./ScreenWithDrawer";
-import { AppointmentsContext } from "../contexts/AppointmentsContext";
+import ENDPOINTS from "../samiendpoint";
 import {
   colors,
   spacing,
@@ -36,17 +38,16 @@ const toSqlDateTime = (value) =>
 const AppointmentFormScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { saveAppointment, patientOptions, loading } =
-    useContext(AppointmentsContext);
 
   const editingAppointment = route.params?.appointment;
   const isEditing = Boolean(editingAppointment);
 
+  // state
   const [open, setOpen] = useState(false);
   const [patient, setPatient] = useState(
     editingAppointment?.patientId ?? null
   );
-  const [patientsItems, setPatientsItems] = useState(patientOptions);
+  const [patientsItems, setPatientsItems] = useState([]);
   const [notes, setNotes] = useState(editingAppointment?.notes ?? "");
   const [date, setDate] = useState(
     editingAppointment ? new Date(editingAppointment.startAt) : new Date()
@@ -56,13 +57,44 @@ const AppointmentFormScreen = () => {
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [saving, setSaving] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false); // for fetching patients
+  const [saving, setSaving] = useState(false); // for submitting form
+  const [error, setError] = useState(null);
 
   const screenTitle = isEditing ? "تعديل موعد" : "موعد جديد";
 
+  // load patients on mount
   useEffect(() => {
-    setPatientsItems(patientOptions);
-  }, [patientOptions]);
+    const loadPatients = async () => {
+      try {
+        setIsLoading(true);
+        const doctorId = await AsyncStorage.getItem("doctor_id");
+
+        if (!doctorId) {
+          setError("يرجى تسجيل الدخول أولاً");
+          return;
+        }
+
+        const response = await axios.get(`${ENDPOINTS.patientsList}?doctor_id=${doctorId}`);
+        const data = response.data || [];
+
+        const options = data.map((p) => ({
+          label: p.name || p.full_name || `مريض رقم ${p.id}`,
+          value: p.id,
+        }));
+
+        setPatientsItems(options);
+      } catch (err) {
+        console.error("Error loading patients:", err);
+        Alert.alert("خطأ", "تعذر تحميل قائمة المرضى");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPatients();
+  }, []);
 
   const combineDateAndTime = (dateValue, timeValue) => {
     const combined = new Date(dateValue);
@@ -70,6 +102,7 @@ const AppointmentFormScreen = () => {
     return combined;
   };
 
+  // submit form
   const handleSubmit = async () => {
     if (!patient) {
       Alert.alert("تنبيه", "يرجى اختيار المريض قبل حفظ الموعد");
@@ -78,18 +111,32 @@ const AppointmentFormScreen = () => {
 
     try {
       setSaving(true);
+      const doctorId = await AsyncStorage.getItem("doctor_id");
+
+      if (!doctorId) {
+        Alert.alert("خطأ", "لا يوجد رقم طبيب محفوظ");
+        return;
+      }
+
       const startDate = combineDateAndTime(date, time);
       const sqlDate = toSqlDateTime(startDate);
 
-      await saveAppointment({
-        id: editingAppointment?.id,
-        patientId: patient,
-        startAt: sqlDate,
+      const payload = {
+        patient_id: patient,
+        doctor_id: Number(doctorId),
+        start_at: sqlDate,
         notes: notes.trim(),
-      });
+      };
+
+      if (isEditing) {
+        await axios.put(ENDPOINTS.doctorAppointmentUpdate(editingAppointment.id), payload);
+      } else {
+        await axios.post(ENDPOINTS.doctorAppointmentCreate, payload);
+      }
 
       navigation.goBack();
     } catch (err) {
+      console.error("Error saving appointment:", err);
       Alert.alert("خطأ", err.message || "تعذر حفظ الموعد");
     } finally {
       setSaving(false);
@@ -113,11 +160,11 @@ const AppointmentFormScreen = () => {
   return (
     <ScreenWithDrawer title={screenTitle} showDrawerIcon={false}>
       <View style={styles.container}>
-        {loading && !patientsItems.length ? (
+        {isLoading && !patientsItems.length ? (
           <ActivityIndicator color={primary} style={styles.loader} />
         ) : null}
 
-        {!loading && patientsItems.length === 0 ? (
+        {!isLoading && patientsItems.length === 0 ? (
           <Text style={styles.info}>
             لا يوجد مرضى حاليًا لعرضهم. يرجى إضافة مرضى أولاً.
           </Text>
@@ -139,6 +186,7 @@ const AppointmentFormScreen = () => {
           zIndexInverse={1000}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownContainer}
+          listMode="SCROLLVIEW"
         />
 
         <Text style={styles.label}>التاريخ</Text>
@@ -175,7 +223,7 @@ const AppointmentFormScreen = () => {
           style={styles.saveBtn}
           onPress={handleSubmit}
           activeOpacity={0.8}
-          disabled={saving || loading}
+          disabled={saving || isLoading}
         >
           {saving ? (
             <ActivityIndicator color={colors.buttonPrimaryText} />

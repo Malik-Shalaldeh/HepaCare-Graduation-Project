@@ -1,4 +1,4 @@
-// sami
+// sami - Refactored to sami-style
 
 import React, { useState, useEffect } from "react";
 import {
@@ -10,47 +10,56 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const PatientListScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
+  // state
   const [patients, setPatients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const loadPatients = async () => {
-      try {
-        const doctorId = await AsyncStorage.getItem("doctor_id");
+  // load patients data
+  const loadPatients = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        if (!doctorId) {
-          Alert.alert("خطأ", "يرجى تسجيل الدخول مرة أخرى");
-          return;
-        }
+      const doctorId = await AsyncStorage.getItem("doctor_id");
 
-        const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch patients");
-        }
-
-        const data = await response.json();
-        setPatients(data || []);
-      } catch (error) {
-        console.error("خطأ في جلب المرضى:", error);
-        Alert.alert("خطأ", "تعذر جلب قائمة المرضى");
+      if (!doctorId) {
+        setError("يرجى تسجيل الدخول مرة أخرى");
+        return;
       }
-    };
 
-    loadPatients();
-  }, []);
+      const url = `${ENDPOINTS.patientsList}?doctor_id=${doctorId}`;
+      const response = await axios.get(url);
+
+      setPatients(response.data || []);
+    } catch (err) {
+      console.error("خطأ في جلب المرضى:", err);
+      setError("تعذر جلب قائمة المرضى");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // load data on focus
+  useEffect(() => {
+    if (isFocused) {
+      loadPatients();
+    }
+  }, [isFocused]);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -147,6 +156,34 @@ const PatientListScreen = () => {
       </View>
     </View>
   );
+
+  // rendering logic
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.buttonPrimary} />
+          <Text style={styles.loadingText}>جاري تحميل المرضى...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={48} color={colors.textMuted} />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadPatients}>
+            <Text style={styles.retryButtonText}>إعادة المحاولة</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -326,6 +363,43 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyLg,
     fontFamily: typography.fontFamily,
     color: colors.textSecondary,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: spacing.md,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: spacing.xl,
+  },
+  errorText: {
+    marginTop: spacing.md,
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
+    color: colors.textSecondary,
+    textAlign: "center",
+  },
+  retryButton: {
+    marginTop: spacing.lg,
+    backgroundColor: colors.buttonPrimary,
+    borderRadius: radii.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+  },
+  retryButtonText: {
+    color: colors.buttonPrimaryText,
+    fontWeight: "700",
+    fontSize: typography.bodyMd,
+    fontFamily: typography.fontFamily,
   },
 });
 
