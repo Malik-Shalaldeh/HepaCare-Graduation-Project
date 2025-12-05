@@ -8,9 +8,9 @@ import EducationalContentScreen from "../screensCommon/EducationalContentScreen"
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
-import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
 import LabsScreen from "../screenPatient/LabsScreen";
 import theme from "../style/theme";
+
 
 const Drawer = createDrawerNavigator();
 const primary = theme.colors.primary;

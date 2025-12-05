@@ -1,8 +1,7 @@
 // FileViewerScreen.jsx
-
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
-import theme from '../style/theme';
+
 
 export default function FileViewerScreen({ route }) {
   const { fileUrl } = route.params;
@@ -16,7 +15,6 @@ export default function FileViewerScreen({ route }) {
         domStorageEnabled={true}
         startInLoadingState={true}
         allowFileAccess={true}
-        allowsInlineMediaPlayback={true}
       />
 
     </View>
