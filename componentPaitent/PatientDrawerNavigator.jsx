@@ -1,116 +1,20 @@
-import { StatusBar, Alert, Platform } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from "@react-navigation/drawer";
+// navigation/NavigatorPatient.js
+import { StatusBar } from "react-native";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-// شاشات المريض
-import TestResultsScreen from "../screenPatient/TestResultsScreen";
-import LabsScreen from "../screenPatient/LabsScreen";
-import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
-import PatientDashboard from "../screenPatient/PatientDashboard";
+import MainTabs from "./MainTabs";
+import CustomDrawerContent from "./CustomDrawerContent";
 import EducationalContentScreen from "../screensCommon/EducationalContentScreen";
 import FeedbackScreen from "../screenPatient/FeedbackScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
-import MedicationsStack from "./MedStack";
+import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
+import LabsScreen from "../screenPatient/LabsScreen";
 import theme from "../style/theme";
 
-
+const Drawer = createDrawerNavigator();
 const primary = theme.colors.primary;
 
-// محتوى الدرور
-function CustomDrawerContent(props) {
-  const navigation = useNavigation();
-
-  const handleLogout = () => {
-    Alert.alert(
-      "تسجيل الخروج",
-      "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "تسجيل خروج",
-          onPress: () => navigation.replace("Login"),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  return (
-    <DrawerContentScrollView {...props}>
-      <DrawerItemList {...props} />
-      <DrawerItem
-        label="تسجيل الخروج"
-        onPress={handleLogout}
-        icon={({ size, color }) => (
-          <Ionicons name="log-out-outline" size={size} color={color} />
-        )}
-      />
-    </DrawerContentScrollView>
-  );
-}
-
-// التابات
-const Tab = createBottomTabNavigator();
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      initialRouteName="لوحة التحكم"
-      screenOptions={({ route }) => ({
-        headerShown: true,
-        headerStyle: { backgroundColor: theme.colors.primary },
-        headerTintColor: theme.colors.buttonPrimaryText,
-        headerTitleAlign: "center",
-        headerTitleStyle: {
-          fontFamily: theme.typography.fontFamily,
-          fontSize: theme.typography.headingSm,
-          fontWeight: "700",
-        },
-        tabBarIcon: ({ color, size }) => {
-          const icons = {
-            الفحوصات: "flask-outline",
-            الأدوية: "medkit",
-            "لوحة التحكم": "home-outline",
-          };
-          return (
-            <Ionicons name={icons[route.name]} size={size} color={color} />
-          );
-        },
-        tabBarActiveTintColor: primary,
-        tabBarInactiveTintColor: "gray",
-        tabBarStyle: {
-          height: 90,
-          marginBottom: Platform.OS === "android" ? 5 : 0,
-        },
-        tabBarHideOnKeyboard: true,
-      })}
-    >
-      <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
-
-      {/* ✅ التاب يفتح شاشة PatientMedications داخل الستاك */}
-      <Tab.Screen
-        name="الأدوية"
-        component={MedicationsStack}
-        options={{
-          headerShown: false, // ✅ يمنع هيدر التاب (حتى ما يصير نفيقيتور فوق نفيقيتور)
-        }}
-      />
-
-      <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
-    </Tab.Navigator>
-  );
-}
-
-// الدرور
-const Drawer = createDrawerNavigator();
 export default function NavigatorPatient() {
   return (
     <>
@@ -145,10 +49,8 @@ export default function NavigatorPatient() {
           name="MainTabs"
           component={MainTabs}
           options={{
-            drawerLabel: () => null,
-            title: null,
+            drawerLabel: "الرئيسية",
             headerShown: false,
-            drawerIcon: () => null,
           }}
         />
 
@@ -171,8 +73,6 @@ export default function NavigatorPatient() {
             ),
           }}
         />
-
-        {/* ❌ شاشات الأدوية مش موجودة بالدرور */}
 
         <Drawer.Screen
           name="مواعيدي"

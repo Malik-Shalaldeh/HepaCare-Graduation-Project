@@ -1,6 +1,6 @@
 // screensPatient/TestResultsScreen.js
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
@@ -21,7 +21,7 @@ export default function TestResultsScreen() {
         );
         setData(response.data || []);
       } catch (error) {
-        console.error('خطأ في جلب البيانات:', error?.message || error);
+        Alert.alert('خطا' , "خطأ في جلب البيانات")
       }
     };
 
@@ -29,17 +29,9 @@ export default function TestResultsScreen() {
   }, []);
 
   const renderItem = ({ item }) => (
-    <View
-      style={styles.card}
-    >
-      <Text
-        style={styles.title}
-      >
-        🧪 {item.test_name}
-      </Text>
-
+    <View style={styles.card}>
+      <Text style={styles.title}>🧪 {item.test_name}</Text>
       <Text style={styles.rowText}> 📊 النتيجة: {item.result_value} {item.unit || ''}</Text>
-
       <Text
         style={[
           styles.rowText,
@@ -50,7 +42,6 @@ export default function TestResultsScreen() {
       </Text>
 
       <Text style={styles.rowText}> 💬 ملاحظة: {item.comments || '—'} </Text>
-
       <Text style={styles.rowText}> 📅 التاريخ: {item.test_date}</Text>
     </View>
   );
@@ -58,11 +49,7 @@ export default function TestResultsScreen() {
   return (
     <ScreenWithDrawer style={{with:'100%'}} title="نتائج الفحوصات">
 
-        <Text
-          style={styles.header}
-        >
-          🧾 فحوصاتي
-        </Text>
+        <Text style={styles.header}> 🧾 فحوصاتي</Text>
 
         <FlatList
           data={data}
@@ -70,9 +57,7 @@ export default function TestResultsScreen() {
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
           ListEmptyComponent={
-            <Text
-              style={styles.empty}
-            >
+            <Text style={styles.empty}>
               لا توجد فحوصات
             </Text>
           }

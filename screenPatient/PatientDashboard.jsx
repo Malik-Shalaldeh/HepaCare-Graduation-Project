@@ -7,6 +7,7 @@ import axios from 'axios';
 import ScreenWithDrawer from '../screensDoctor/ScreenWithDrawer';
 import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
+import { Alert } from 'react-native';
 
 export default function PatientDashboard() {
   const [name, setName] = useState('');
@@ -19,7 +20,7 @@ export default function PatientDashboard() {
         const res = await axios.get(ENDPOINTS.PATIENT_DASHBOARD.BY_ID(id));
         setName(res.data.full_name);
       } catch (error) {
-        console.log('خطأ في جلب البيانات', error?.message);
+        Alert.alert('خطا' , "خطأ في جلب البيانات");        
       }
     };
     loadName();
