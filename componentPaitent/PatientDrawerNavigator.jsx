@@ -74,16 +74,7 @@ export default function NavigatorPatient() {
           }}
         />
 
-        <Drawer.Screen
-          name="مواعيدي"
-          component={PatientAppointmentsScreen}
-          options={{
-            headerTitle: "مواعيدي القادمة",
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="calendar-outline" size={size} color={color} />
-            ),
-          }}
-        />
+   
 
         <Drawer.Screen
           name="المختبرات المعتمدة"

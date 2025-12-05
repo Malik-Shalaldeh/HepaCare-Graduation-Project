@@ -124,19 +124,8 @@ const PatientAppointmentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      {/* back button */}
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="arrow-back" size={24} color={primary} />
-      </TouchableOpacity>
 
       <View style={styles.container}>
-        <Text style={styles.clinicName}>
-          {clinicName || "مواعيدي"}
-        </Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -193,14 +182,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.lg,
     paddingTop: spacing.xxl * 2,
-  },
-  clinicName: {
-    fontSize: typography.bodyLg,
-    fontWeight: "700",
-    color: primary,
-    marginBottom: spacing.lg,
-    alignSelf: "center",
-    textAlign: "center",
   },
   card: {
     backgroundColor: colors.background,

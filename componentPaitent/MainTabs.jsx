@@ -2,11 +2,11 @@
 import { Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
 import TestResultsScreen from "../screenPatient/TestResultsScreen";
 import MedicationsStack from "./MedStack";
 import PatientDashboard from "../screenPatient/PatientDashboard";
 import theme from "../style/theme";
+import PatientAppointmentsScreen from "../screenPatient/PatientAppointmentsScreen";
 
 const Tab = createBottomTabNavigator();
 const primary = theme.colors.primary;
@@ -29,6 +29,7 @@ export default function MainTabs() {
           const icons = {
             الفحوصات: "flask-outline",
             الأدوية: "medkit",
+            "مواعيدي":"calendar-outline" ,
             "لوحة التحكم": "home-outline",
           };
           return (
@@ -43,7 +44,11 @@ export default function MainTabs() {
         },
         tabBarHideOnKeyboard: true,
       })}
-    >
+      >
+      <Tab.Screen
+        name="مواعيدي"
+        component={PatientAppointmentsScreen}
+      />
       <Tab.Screen name="الفحوصات" component={TestResultsScreen} />
 
       <Tab.Screen
@@ -51,6 +56,7 @@ export default function MainTabs() {
         component={MedicationsStack}
         options={{ headerShown: false }}
       />
+
 
       <Tab.Screen name="لوحة التحكم" component={PatientDashboard} />
     </Tab.Navigator>
