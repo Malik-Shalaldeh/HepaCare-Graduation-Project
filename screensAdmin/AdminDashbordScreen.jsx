@@ -1,5 +1,4 @@
-// screensAdmin/AdminHome.tsx
-import React from "react";
+// screensAdmin/AdminDashbordScreen
 import {
   View,
   Text,

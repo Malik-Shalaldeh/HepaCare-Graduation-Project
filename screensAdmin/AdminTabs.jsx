@@ -2,12 +2,10 @@
 import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-// الشاشات
 import AdminHome from '../screensAdmin/AdminDashbordScreen';
 import DoctorAdminStack from './DoctorAdminStack';
 import SettingAdminStack from './SettingAdminStack';
-import LapsNavigator from './LapsNavigator'; // ✅ بدل LapsStack
+import LapsNavigator from './LapsNavigator'; 
 
 
 const Tab = createBottomTabNavigator();
@@ -51,15 +49,15 @@ const primary = '#0B4F6C';
         component={LapsNavigator} 
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="flask" size={size} color={color} /> }}
       />
-<Tab.Screen
-  name="الرئيسية"
-  component={AdminHome}
-  options={{
-    tabBarIcon: ({ color, size }) => (
-      <Ionicons name="home" size={size} color={color} />
-    ),
-  }}
-/>
+      <Tab.Screen
+        name="الرئيسية"
+        component={AdminHome}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }

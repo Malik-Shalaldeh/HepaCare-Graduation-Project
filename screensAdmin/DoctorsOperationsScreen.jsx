@@ -29,7 +29,7 @@ export default function DoctorsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary} />
 
       <View style={styles.container}>
         <Text style={styles.title}>إدارة سجلات الأطباء</Text>

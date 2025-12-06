@@ -1,6 +1,6 @@
 // screensDoctor/PatientsOverviewScreen.jsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,21 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
-} from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
-import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import ScreenWithDrawer from './ScreenWithDrawer';
-import ENDPOINTS from '../malikEndPoint';
+  Alert,
+  ScrollView,
+} from "react-native";
+import { BarChart } from "react-native-chart-kit";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import ScreenWithDrawer from "./ScreenWithDrawer";
+import ENDPOINTS from "../malikEndPoint";
+import theme from "../style/theme";
+
+const { colors, spacing, radii, shadows, typography } = theme;
 
 const PatientsOverviewScreen = () => {
-  const [data, setData] = useState([]);   
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
@@ -27,7 +32,7 @@ const PatientsOverviewScreen = () => {
         const res = await axios.get(ENDPOINTS.STATS.PATIENTS_BY_CITY);
         setData(res.data || []);
       } catch (error) {
-        console.log('Error fetching stats:', error);
+        Alert.alert("خطأ", "تأكد من الاتصال بالإنترنت");
       } finally {
         setLoading(false);
       }
@@ -37,10 +42,10 @@ const PatientsOverviewScreen = () => {
   }, []);
 
   const chartData = {
-    labels: data.map(item => item.city_name),
+    labels: data.map((item) => item.city_name),
     datasets: [
       {
-        data: data.map(item => item.patients_count),
+        data: data.map((item) => item.patients_count),
       },
     ],
   };
@@ -48,44 +53,45 @@ const PatientsOverviewScreen = () => {
   return (
     <ScreenWithDrawer title="نظرة عامة على المرضى">
       <View style={styles.container}>
-
         {/* زر رجوع */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={20} color="#2C3E50" />
-          <Text style={styles.backText}>رجوع</Text>
+          <Ionicons name="arrow-back" size={28} color={colors.primary} />
         </TouchableOpacity>
 
         {loading ? (
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color={colors.primary} />
         ) : data.length === 0 ? (
-          <Text style={styles.message}>لا توجد بيانات مرضى لعرضها حالياً.</Text>
+          <Text style={styles.message}>لا توجد بيانات مرضى حالياً.</Text>
         ) : (
-          <View style={styles.chartWrapper}>
-            <Text style={styles.title}>
-              توزيع المرضى حسب المحافظات الفلسطينية
-            </Text>
+          <>
+            <Text style={styles.title}>توزيع المرضى حسب المحافظات</Text>
 
-            <BarChart
-              data={chartData}
-              width={Dimensions.get('window').width - 40}
-              height={230}
-              fromZero
-              showValuesOnTopOfBars
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(41, 128, 185, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(52, 73, 94, ${opacity})`,
-                barPercentage: 0.6,
-              }}
-              style={styles.chart}
-            />
-          </View>
+            <ScrollView
+              horizontal
+              style={styles.scrollWrapper}
+              contentContainerStyle={{ paddingHorizontal: spacing.md }}
+            >
+                <BarChart
+                  data={chartData}
+                  width={Dimensions.get("window").width - 10}
+                  height={350}
+                  fromZero
+                  showValuesOnTopOfBars
+                  chartConfig={{
+                    backgroundGradientFrom: colors.background,
+                    backgroundGradientTo: colors.background,
+                    decmalPlaces: 0,
+                    color: (opacity = 1) =>
+                      `rgba(11, 79, 108, ${opacity})`, 
+                  }}
+
+                  style={styles.chart}
+                />
+            </ScrollView>
+          </>
         )}
       </View>
     </ScreenWithDrawer>
@@ -95,41 +101,48 @@ const PatientsOverviewScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: colors.backgroundLight,
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    alignItems: "center",
   },
+
   backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: "absolute",
+    top: spacing.lg,
+    left: spacing.lg,
+    zIndex: 50,
   },
-  backText: {
-    marginLeft: 6,
-    fontSize: 14,
-    color: '#2C3E50',
-    fontWeight: '600',
-  },
-  chartWrapper: {
-    alignItems: 'center',
-  },
+
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2C3E50',
-    marginBottom: 12,
-    textAlign: 'center',
+    fontSize: typography.headingSm,
+    fontWeight: "700",
+    color: colors.textPrimary,
+    textAlign: "center",
+    marginBottom: spacing.md,
   },
+
+  scrollWrapper: {
+    width: "100%",
+    marginTop: spacing.md,
+  },
+
+  chartCard: {
+    backgroundColor: colors.background,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    ...shadows.medium,
+  },
+
   chart: {
-    borderRadius: 16,
+    borderRadius: radii.md,
   },
+
   message: {
-    fontSize: 16,
-    color: '#555',
-    textAlign: 'center',
+    fontSize: typography.bodyLg,
+    color: colors.textSecondary,
+    textAlign: "center",
   },
 });
 

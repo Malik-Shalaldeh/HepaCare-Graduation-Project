@@ -1,8 +1,6 @@
 // screensAdmin/DoctorAdminStack.jsx
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import theme from '../style/theme';
-
-// الشاشات
 import DoctorsScreen from './DoctorsOperationsScreen';
 import DeleteDoctorScreen from './DeleteDoctors';
 import AddNewDoctorScreen from './AddNewDoctorScreen';
@@ -15,10 +13,10 @@ export default function DoctorAdminStack() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: theme.colors.primary, // لون الهيدر
+          backgroundColor: theme.colors.primary,
         },
         headerTintColor: '#fff',                 // لون النص + السهم
-        headerTitleAlign: 'center',              // العنوان بالنص
+        headerTitleAlign: 'center',         
         headerTitleStyle: {
           fontSize: theme.typography.headingSm,
           fontWeight: '700',
@@ -27,7 +25,6 @@ export default function DoctorAdminStack() {
         headerBackTitleVisible: false,           // يخفي نص العودة في iOS
       }}
     >
-      {/* شاشة العمليات الرئيسية بدون هيدر (عاملها كـ صفحة من جوّا) */}
       <Stack.Screen
         name="DoctorsHome"
         component={DoctorsScreen}

@@ -1,12 +1,9 @@
 // screensAdmin/AdminStack.jsx
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-// الشاشات
 import ChangePasswordScreen from '../Login/restPassword';
 import PrivacyPolicyScreen from '../screensCommon/PolicyScreen';
 import Setting from './Setting';
 import UpdateUserPasswordScreen from './UpdateUserPasswordScreen';
-
 import theme from '../style/theme';
 
 const Stack = createNativeStackNavigator();
@@ -25,6 +22,7 @@ export default function SettingAdminStack() {
           fontSize: theme.typography.headingSm,
           fontWeight: '700',
         },
+        headerBackTitleVisible: false,           // يخفي نص العودة في iOS
       }}
     >
       <Stack.Screen
