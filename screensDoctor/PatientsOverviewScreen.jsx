@@ -1,6 +1,5 @@
 // screensDoctor/PatientsOverviewScreen.jsx
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,13 +16,13 @@ import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../malikEndPoint";
-import theme from "../style/theme";
+import theme from '../style/theme';
 
-const { colors, spacing, radii, shadows, typography } = theme;
 
 const PatientsOverviewScreen = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -31,9 +30,11 @@ const PatientsOverviewScreen = () => {
       try {
         const res = await axios.get(ENDPOINTS.STATS.PATIENTS_BY_CITY);
         setData(res.data || []);
-      } catch (error) {
+      } 
+      catch (error) {
         Alert.alert("خطأ", "تأكد من الاتصال بالإنترنت");
-      } finally {
+      } 
+      finally {
         setLoading(false);
       }
     };
@@ -58,21 +59,23 @@ const PatientsOverviewScreen = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={28} color={colors.primary} />
+          <Ionicons name="arrow-back" size={28} color={theme.colors.primary} />
         </TouchableOpacity>
 
         {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : data.length === 0 ? (
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        ) 
+        : data.length === 0 ? (
           <Text style={styles.message}>لا توجد بيانات مرضى حالياً.</Text>
-        ) : (
+        ) 
+        : (
           <>
             <Text style={styles.title}>توزيع المرضى حسب المحافظات</Text>
 
             <ScrollView
               horizontal
               style={styles.scrollWrapper}
-              contentContainerStyle={{ paddingHorizontal: spacing.md }}
+              contentContainerStyle={{ paddingHorizontal: theme.spacing.md }}
             >
                 <BarChart
                   data={chartData}
@@ -81,8 +84,8 @@ const PatientsOverviewScreen = () => {
                   fromZero
                   showValuesOnTopOfBars
                   chartConfig={{
-                    backgroundGradientFrom: colors.background,
-                    backgroundGradientTo: colors.background,
+                    backgroundGradientFrom: theme.colors.background,
+                    backgroundGradientTo: theme.colors.background,
                     decmalPlaces: 0,
                     color: (opacity = 1) =>
                       `rgba(11, 79, 108, ${opacity})`, 
@@ -101,47 +104,47 @@ const PatientsOverviewScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundLight,
-    paddingTop: spacing.xl,
-    paddingHorizontal: spacing.lg,
+    backgroundColor: theme.colors.backgroundLight,
+    paddingTop: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
     alignItems: "center",
   },
 
   backButton: {
     position: "absolute",
-    top: spacing.lg,
-    left: spacing.lg,
+    top: theme.spacing.lg,
+    left: theme.spacing.lg,
     zIndex: 50,
   },
 
   title: {
-    fontSize: typography.headingSm,
+    fontSize: theme.typography.headingSm,
     fontWeight: "700",
-    color: colors.textPrimary,
+    color: theme.colors.textPrimary,
     textAlign: "center",
-    marginBottom: spacing.md,
+    marginBottom: theme.spacing.md,
   },
 
   scrollWrapper: {
     width: "100%",
-    marginTop: spacing.md,
+    marginTop: theme.spacing.md,
   },
 
   chartCard: {
-    backgroundColor: colors.background,
-    borderRadius: radii.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    ...shadows.medium,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.lg,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
+    ...theme.shadows.medium,
   },
 
   chart: {
-    borderRadius: radii.md,
+    borderRadius: theme.radii.md,
   },
 
   message: {
-    fontSize: typography.bodyLg,
-    color: colors.textSecondary,
+    fontSize: theme.typography.bodyLg,
+    color: theme.colors.textSecondary,
     textAlign: "center",
   },
 });

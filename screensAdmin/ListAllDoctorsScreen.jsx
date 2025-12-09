@@ -7,12 +7,14 @@ import {
   FlatList,
   StyleSheet,
   StatusBar,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import ENDPOINTS from "../malikEndPoint";
+import theme from "../style/theme";
 
-const PRIMARY = "#00b29c";
+const PRIMARY = theme.colors.primary;
 
 export default function AllDoctorsScreen() {
   const [search, setSearch] = useState("");
@@ -24,7 +26,7 @@ export default function AllDoctorsScreen() {
         const res = await axios.get(ENDPOINTS.ADMIN.DOCTORS);
         setDoctors(res.data);
       } catch (err) {
-        console.error("خطأ في جلب الأطباء:", err);
+        Alert.alert("خطأ", "تأكد من اتصالك بالإنترنت");
       }
     };
     fetchDoctors();
@@ -33,18 +35,20 @@ export default function AllDoctorsScreen() {
   const results = doctors.filter((d) => {
     const query = search.trim();
     if (!query) return true;
+
     const nameMatch = d.name && d.name.includes(query);
     const idMatch = d.id && d.id.toString().includes(query);
     const clinicMatch = d.clinic && d.clinic.includes(query);
+
     return nameMatch || idMatch || clinicMatch;
   });
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <View style={[styles.card, theme.shadows.light]}>
       <Ionicons
         name="medkit-outline"
         size={22}
-        color={PRIMARY}
+        color={theme.colors.accent}
         style={styles.cardIcon}
       />
       <View style={styles.infoBox}>
@@ -55,7 +59,7 @@ export default function AllDoctorsScreen() {
         <Text
           style={[
             styles.status,
-            { color: item.active ? "#16A34A" : "#DC2626" },
+            { color: item.active ? theme.colors.success : theme.colors.danger },
           ]}
         >
           {item.active ? "✅ مفعّل" : "⛔ غير مفعّل"}
@@ -73,13 +77,13 @@ export default function AllDoctorsScreen() {
           <Ionicons
             name="search"
             size={18}
-            color="#6B7280"
+            color={theme.colors.textMuted}
             style={{ marginLeft: 6 }}
           />
           <TextInput
             style={styles.input}
             placeholder="ابحث بالاسم أو رقم الهوية أو العيادة"
-            placeholderTextColor="#9AA4AF"
+            placeholderTextColor={theme.colors.textMuted}
             value={search}
             onChangeText={setSearch}
             textAlign="right"
@@ -103,72 +107,69 @@ export default function AllDoctorsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F6FAF9",
+    backgroundColor: theme.colors.backgroundLight,
   },
   screen: {
     flex: 1,
-    padding: 16,
+    padding: theme.spacing.lg,
     alignItems: "center",
   },
   searchRow: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    borderColor: theme.colors.border,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
     width: "90%",
   },
   input: {
     flex: 1,
-    color: "#2C3E50",
-    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.bodyMd,
     textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
   listContainer: {
-    paddingTop: 4,
-    paddingBottom: 16,
-    rowGap: 10,
+    paddingTop: theme.spacing.xs,
+    paddingBottom: theme.spacing.xl,
+    rowGap: theme.spacing.md,
     width: "100%",
     alignItems: "center",
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radii.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    borderColor: theme.colors.border,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
     flexDirection: "row-reverse",
     alignItems: "center",
-    gap: 8,
+    gap: theme.spacing.sm,
     width: "90%",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   cardIcon: { marginLeft: 6 },
   infoBox: { flex: 1, alignItems: "flex-end" },
   name: {
-    fontSize: 15,
+    fontSize: theme.typography.bodyLg,
     fontWeight: "700",
-    color: "#2C3E50",
+    color: theme.colors.textPrimary,
     marginBottom: 2,
     textAlign: "right",
     width: "100%",
   },
   meta: {
-    fontSize: 13,
-    color: "#6B7280",
+    fontSize: theme.typography.bodyMd,
+    color: theme.colors.textSecondary,
     textAlign: "right",
     width: "100%",
   },
   status: {
-    fontSize: 13,
+    fontSize: theme.typography.bodyMd,
     fontWeight: "700",
     marginTop: 4,
     textAlign: "right",
@@ -176,8 +177,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: "center",
-    color: "#6B7280",
-    marginTop: 16,
-    fontSize: 14,
+    color: theme.colors.textMuted,
+    marginTop: theme.spacing.lg,
+    fontSize: theme.typography.bodyMd,
   },
 });

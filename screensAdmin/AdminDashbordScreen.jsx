@@ -40,7 +40,7 @@ export default function AdminHome() {
       {/* كارد شعار التطبيق + التاريخ */}
       <View style={styles.logoCard}>
         <Text style={styles.logoText}>HepaCare</Text>
-        <Text style={styles.logoDate}>{date}</Text>
+        <Text style={{...styles.logoDate , color:'#ffffff'}}>{date}</Text>
       </View>
 
       {/* كارد ترحيب */}

@@ -1,5 +1,5 @@
 // screensAdmin/AddNewDoctorScreen.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,12 @@ import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
 
-export default function AddNewDoctorScreen() {
+export default function AddNewDoctorScreen()
+ {
   const [doctorId, setDoctorId] = useState('');
   const [name, setName] = useState('');
   const [clinicName, setClinicName] = useState('');
   const [phone, setPhone] = useState('');
-  const [saving, setSaving] = useState(false);
 
   const validate = () => {
     if (!doctorId.trim() || !name.trim() || !clinicName.trim() || !phone.trim()) {
@@ -31,7 +31,7 @@ export default function AddNewDoctorScreen() {
     }
     const p = phone.trim();
     if (!(p.length === 10 && p.startsWith('05') && /^\d+$/.test(p))) {
-      Alert.alert('تنبيه', 'رقم الهاتف يجب أن يكون 10 أرقام ويبدأ بـ 05');
+      Alert.alert('تنبيه', 'تاكد من رقم الهاتف المدخل');
       return false;
     }
     return true;
@@ -40,7 +40,6 @@ export default function AddNewDoctorScreen() {
   const onSave = async () => {
     if (!validate()) return;
     try {
-      setSaving(true);
       const res = await axios.post(
         ENDPOINTS.ADMIN.ADD_DOCTOR,
         {
@@ -49,31 +48,22 @@ export default function AddNewDoctorScreen() {
           clinic_name: clinicName.trim(),
           phone: phone.trim(),
         },
-        { headers: { 'Content-Type': 'application/json' } }
       );
 
-      const msg = res.data.message || 'تمت العملية بنجاح';
-      const username = res.data.username || doctorId;
-      const password = res.data.password || doctorId;
-
       Alert.alert(
-        '✅ تم الحفظ بنجاح',
-        `${msg}\n\n👤 اسم المستخدم: ${username}\n🔑 كلمة المرور: ${password}`
+        'تم الحفظ',
+        `${res.data.message }`
       );
 
       setDoctorId('');
       setName('');
       setClinicName('');
       setPhone('');
+
     } catch (e) {
-      const msg =
-        e?.response?.data?.detail ||
-        e?.response?.data?.message ||
-        'تعذر إضافة الطبيب';
+      const msg ='تعذر إضافة الطبيب';
       Alert.alert('خطأ', msg);
-    } finally {
-      setSaving(false);
-    }
+    } 
   };
 
   return (
@@ -124,17 +114,14 @@ export default function AddNewDoctorScreen() {
       <TouchableOpacity
         onPress={onSave}
         activeOpacity={0.9}
-        disabled={saving}
-        style={[styles.saveBtn, saving && { opacity: 0.6 }]}
+        style={styles.saveBtn}
       >
         <Ionicons
           name="save-outline"
           size={18}
           color={theme.colors.buttonPrimaryText}
         />
-        <Text style={styles.saveText}>
-          {saving ? 'جارٍ الحفظ...' : 'حفظ الطبيب'}
-        </Text>
+        <Text style={styles.saveText}> 'حفظ الطبيب'</Text>
       </TouchableOpacity>
     </View>
   );
