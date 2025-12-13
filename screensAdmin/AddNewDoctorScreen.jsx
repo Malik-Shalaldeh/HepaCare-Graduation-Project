@@ -61,8 +61,8 @@ export default function AddNewDoctorScreen()
       setPhone('');
 
     } catch (e) {
-      const msg ='تعذر إضافة الطبيب';
-      Alert.alert('خطأ', msg);
+        const msg = e.response?.data?.detail || 'تعذر إضافة الطبيب'; 
+        Alert.alert('خطأ', msg);
     } 
   };
 

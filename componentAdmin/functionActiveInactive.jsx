@@ -57,8 +57,10 @@ export const handleToggleFn = async (selected, setResults, setSelected, setSearc
 
             setSelected(null);
             setSearch('');
-          } catch {
-            Alert.alert('خطأ', 'تعذر تنفيذ العملية');
+
+          } catch(e) {
+            const msg = e.response?.data?.detail || 'حدث خطأ';
+            Alert.alert('خطأ', msg);
           }
         },
       },

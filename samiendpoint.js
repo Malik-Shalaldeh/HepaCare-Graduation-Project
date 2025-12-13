@@ -3,7 +3,7 @@
 // This makes maintaining URL changes easy and avoids hard-coding strings.
 
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
-const BASE_URL = "https://luminous-possibility-production.up.railway.app";
+const BASE_URL = "http://192.168.1.10:8000";
 const ENDPOINTS = {
   // الاتصال الأساسي
   BASE_URL,

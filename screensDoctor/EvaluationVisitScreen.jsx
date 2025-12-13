@@ -22,7 +22,6 @@ const EvaluationVisitScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { patientId, patientName } = route.params || {};
-
   const [condition, setCondition] = useState('');
   const [adherence, setAdherence] = useState('');
   const [notes, setNotes] = useState('');
@@ -74,7 +73,12 @@ const EvaluationVisitScreen = () => {
       setPsychosocial('');
     } 
     catch (error) {
-      Alert.alert('خطأ', 'تأكد من الاتصال أو البيانات.');
+     if (error.response?.data?.detail) {
+      Alert.alert('خطأ', error.response.data.detail);
+     } 
+     else {
+      Alert.alert('خطأ', 'حدث خطأ غير متوقع، حاول مرة أخرى.');
+    }
     }
   };
 

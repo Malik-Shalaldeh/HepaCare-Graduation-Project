@@ -1,6 +1,7 @@
 // malikEndPoint.js
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
-const BASE_URL = "https://luminous-possibility-production.up.railway.app";
+const BASE_URL = "http://192.168.1.10:8000";
+
 const ENDPOINTS = {
   BASE_URL,
   TEST_RESULTS: {

@@ -37,7 +37,6 @@ export default function TestResultsScreen() {
 
       setFilteredResults(res.data);
     } catch (error) {
-      console.error('Error fetching results:', error);
       Alert.alert(
         'خطأ',
         'فشل في جلب البيانات. تأكد من الاتصال أو من صلاحية الدخول.'
