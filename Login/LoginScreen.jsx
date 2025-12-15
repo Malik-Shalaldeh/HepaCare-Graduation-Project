@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
+import { CommonActions } from '@react-navigation/native';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -34,32 +35,39 @@ export default function LoginScreen({ navigation }) {
         return;
       }
 
+      // حفظ الـ user_id
       await AsyncStorage.setItem('user_id', String(data.id));
 
+      // تنظيف الـ storage حسب الدور
       if (data.role === 'DOCTOR') {
         await AsyncStorage.setItem('doctor_id', String(data.id));
-        await AsyncStorage.setItem('patientId', '');
-      } 
-      else if (data.role === 'PATIENT') {
-        await AsyncStorage.removeItem('doctor_id');
+        await AsyncStorage.removeItem('patientId');
+      } else if (data.role === 'PATIENT') {
         await AsyncStorage.setItem('patientId', String(data.id));
+        await AsyncStorage.removeItem('doctor_id');
+      } else {
+        // لبقية الأدوار
+        await AsyncStorage.removeItem('doctor_id');
+        await AsyncStorage.removeItem('patientId');
       }
 
-      navigation.replace(data.route);
-    } 
-    catch (e) {
+      // التوجيه حسب route اللي جاء من السيرفر
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: data.route }],
+        })
+      );
+    } catch (e) {
       if (e.response) {
         if (e.response.status === 403) {
           Alert.alert('الحساب معطل', 'هذا الحساب معطل، تواصل مع الإدارة.');
-        } 
-        else if (e.response.status === 401) {
+        } else if (e.response.status === 401) {
           Alert.alert('خطأ', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-        } 
-        else {
+        } else {
           Alert.alert('خطأ', 'حدث خطأ في تسجيل الدخول');
         }
-      } 
-      else {
+      } else {
         Alert.alert('خطأ', 'تعذر الاتصال بالخادم');
       }
       setPassword('');
@@ -67,23 +75,12 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View
-      style={styles.container}
-    >
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={theme.colors.primary}
-      />
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary} />
 
       {/* الهيدر */}
-      <View
-        style={styles.header}
-      >
-        <Text
-          style={styles.logo}
-        >
-          HepaCare
-        </Text>
+      <View style={styles.header}>
+        <Text style={styles.logo}>HepaCare</Text>
       </View>
 
       {/* النموذج */}
@@ -139,16 +136,8 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {/* زر الدخول */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          activeOpacity={0.9}
-        >
-          <Text
-            style={styles.buttonText}
-          >
-            دخول
-          </Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin} activeOpacity={0.9}>
+          <Text style={styles.buttonText}>دخول</Text>
         </TouchableOpacity>
       </View>
     </View>
