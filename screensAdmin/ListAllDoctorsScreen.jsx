@@ -23,25 +23,18 @@ export default function AllDoctorsScreen() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const res = await axios.get(ENDPOINTS.ADMIN.DOCTORS);
+        const res = await axios.get(ENDPOINTS.ADMIN.DOCTORS, {
+          params: search ? { q: search } : {},
+        });
         setDoctors(res.data);
       } catch (err) {
         Alert.alert("خطأ", "تأكد من اتصالك بالإنترنت");
       }
     };
+
     fetchDoctors();
-  }, []);
+  }, [search]);
 
-  const results = doctors.filter((d) => {
-    const query = search.trim();
-    if (!query) return true;
-
-    const nameMatch = d.name && d.name.includes(query);
-    const idMatch = d.id && d.id.toString().includes(query);
-    const clinicMatch = d.clinic && d.clinic.includes(query);
-
-    return nameMatch || idMatch || clinicMatch;
-  });
 
   const renderItem = ({ item }) => (
     <View style={[styles.card, theme.shadows.light]}>
@@ -91,7 +84,7 @@ export default function AllDoctorsScreen() {
         </View>
 
         <FlatList
-          data={results}
+          data={doctors}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
