@@ -19,6 +19,8 @@ import EducationalContentScreen from "../screensCommon/EducationalContentScreen"
 import CommonLabsScreen from "../screensCommon/LabsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
+import Logout from '../Login/logout';
+
 
 // استدعاء قيم التصميم الموحد
 import { colors, spacing, typography } from "../style/theme";
@@ -30,28 +32,12 @@ const primary = colors.primary;
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
-  const handleLogout = () => {
-    Alert.alert(
-      "تسجيل الخروج",
-      "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "تسجيل خروج",
-          style: "destructive",
-          onPress: () => navigation.replace("Login"),
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
       <DrawerItem
         label="تسجيل الخروج"
-        onPress={handleLogout}
+        onPress={()=>Logout(navigation)}
         icon={({ size, color }) => (
           <Ionicons name="log-out-outline" size={size} color={color} />
         )}

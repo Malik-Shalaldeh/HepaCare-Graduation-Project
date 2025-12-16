@@ -24,7 +24,7 @@ import ChangePasswordScreen from "../Login/restPassword";
 import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
 import theme from "../style/theme";
 import { useNavigation, getFocusedRouteNameFromRoute } from "@react-navigation/native";
-
+import Logout from '../Login/logout';
 
 function shouldShowTestsHeader(route) 
 {
@@ -36,28 +36,14 @@ function shouldShowTestsHeader(route)
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
-  const handleLogout = () => {
-    Alert.alert(
-      "تسجيل الخروج",
-      "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "تسجيل خروج",
-          onPress: () => navigation.replace("Login"),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
+
 
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
       <DrawerItem
         label="تسجيل الخروج"
-        onPress={handleLogout}
+        onPress={()=>Logout(navigation)}
         icon={({ size, color }) => (
           <Ionicons name="log-out-outline" size={size} color={color} />
         )}

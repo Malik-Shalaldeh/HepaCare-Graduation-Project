@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import theme from '../style/theme';
+import Logout from '../Login/logout'
 
 export default function Setting() {
   const navigation = useNavigation();
@@ -23,21 +24,6 @@ export default function Setting() {
     navigation.navigate('ChangePasswordScreen');
   };
 
-  const Logout = () => {
-    Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        {
-          text: 'تسجيل خروج',
-          onPress: () => navigation.navigate('Login'),
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -83,7 +69,7 @@ export default function Setting() {
 
         <TouchableOpacity
           style={[styles.btn, styles.btnOutline]}
-          onPress={Logout}
+          onPress={()=>Logout(navigation)}
           activeOpacity={0.9}
         >
           <View style={styles.btnContent}>

@@ -7,25 +7,11 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import Logout from '../Login/logout'
 
 export default function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
-  const handleLogout = () => {
-    Alert.alert(
-      "تسجيل الخروج",
-      "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "تسجيل خروج",
-          onPress: () => navigation.replace("Login"),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
 
   return (
     <DrawerContentScrollView {...props}>
@@ -33,7 +19,7 @@ export default function CustomDrawerContent(props) {
 
       <DrawerItem
         label="تسجيل الخروج"
-        onPress={handleLogout}
+        onPress={()=>Logout(navigation)}
         icon={({ size, color }) => (
           <Ionicons name="log-out-outline" size={size} color={color} />
         )}
