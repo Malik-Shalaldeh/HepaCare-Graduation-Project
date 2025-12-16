@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import theme from '../style/theme';
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 const primary = colors.primary;
@@ -18,11 +18,24 @@ const dark = colors.secondary;
 
 export default function LabsStack({ navigation }) {
   return (
-    <ScreenWithDrawer>
-      <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <View style={{ flex: 1 }}>
+
+      {/* خلفية الشرط عشان يظهر اللون */}
+      <View style={{
+        height: Platform.OS === "android" ? StatusBar.currentHeight : 44, // 44 iOS تقريباً
+        backgroundColor: theme.colors.primary
+      }} />
+      
+      {/* StatusBar */}
+      <StatusBar
+        barStyle="light-content"
+        translucent={false}
+        backgroundColor={theme.colors.primary}
+      />
+
+
         <View style={styles.container}>
-          <Text style={styles.title}>المختبرات</Text>
+          <Text style={styles.title}>ادارة سجلات المختبرات</Text>
 
           {/* إضافة مختبر */}
           <TouchableOpacity
@@ -62,8 +75,7 @@ export default function LabsStack({ navigation }) {
             </View>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </ScreenWithDrawer>
+      </View>
   );
 }
 
@@ -80,7 +92,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: dark,
-    fontSize: typography.headingLg,
+    fontSize: theme.typography.headingMd,
     fontFamily: typography.fontFamily,
     fontWeight: "700",
     textAlign: "center",

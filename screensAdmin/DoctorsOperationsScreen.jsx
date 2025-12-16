@@ -7,6 +7,7 @@ import {
   StyleSheet,
   StatusBar,
   Platform,
+  PlatformColor,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -28,8 +29,21 @@ export default function DoctorsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.primary} />
+    <View style={{ flex: 1 }}>
+
+      {/* خلفية الشرط عشان يظهر اللون */}
+      <View style={{
+        height: PlatformColor.OS === "android" ? StatusBar.currentHeight : 44, // 44 iOS تقريباً
+        backgroundColor: theme.colors.primary
+      }} />
+      
+      {/* StatusBar */}
+      <StatusBar
+        barStyle="light-content"
+        translucent={false}
+        backgroundColor={theme.colors.primary}
+      />
+
 
       <View style={styles.container}>
         <Text style={styles.title}>إدارة سجلات الأطباء</Text>
@@ -67,7 +81,7 @@ export default function DoctorsScreen() {
           </View>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

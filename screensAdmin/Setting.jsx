@@ -40,15 +40,24 @@ export default function Setting() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={{ flex: 1 }}>
+
+      {/* خلفية الشرط عشان يظهر اللون */}
+      <View style={{
+        height: Platform.OS === "android" ? StatusBar.currentHeight : 44, // 44 iOS تقريباً
+        backgroundColor: theme.colors.primary
+      }} />
+      
+      {/* StatusBar */}
       <StatusBar
-        backgroundColor={theme.colors.primary}
         barStyle="light-content"
         translucent={false}
+        backgroundColor={theme.colors.primary}
       />
 
+
       <View style={styles.container}>
-        <Text style={styles.title}>الإعدادات</Text>
+        <Text style={styles.title}>إعدادات النظام</Text>
 
         <TouchableOpacity
           style={[styles.btn, styles.btnPrimary]}
@@ -85,7 +94,7 @@ export default function Setting() {
           </View>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
