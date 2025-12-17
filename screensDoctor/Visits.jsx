@@ -1,4 +1,4 @@
-// sami - Visits screen (Malik-style: simple, axios, focus refresh)
+// sami - Visits screen (sami-style: simple, axios, focus refresh)
 
 import React, { useState, useEffect } from "react";
 import {
