@@ -156,10 +156,8 @@ export default function AddPatientStep3Screen() {
       await res.json();
 
       Alert.alert("تم", "تمت إضافة المريض بنجاح.");
-      navigation.navigate("MainTabs", {
-        screen: "المرضى",
-        params: { screen: "Patients" },
-      });
+      navigation.navigate("المرضى");
+      
     } catch (e) {
       console.log("Error saving patient", e);
       Alert.alert("خطأ", "تعذر حفظ المريض. حاول مرة أخرى.");

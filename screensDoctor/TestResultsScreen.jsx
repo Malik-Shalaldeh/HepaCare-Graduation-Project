@@ -52,6 +52,7 @@ export default function TestResultsScreen() {
       </Text>
 
       <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
+      <Text style={styles.test}>🧪 نوع الفحص: {item.type || 'لا يوجد'}</Text>
       <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
       <Text style={styles.evaluation}>📈 التقييم: {item.evaluation}</Text>
       <Text style={styles.note}>💬 ملاحظة الطبيب: {item.doctorNote}</Text>

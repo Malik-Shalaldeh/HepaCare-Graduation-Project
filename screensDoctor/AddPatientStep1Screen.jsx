@@ -1,5 +1,7 @@
 // AddPatientStep1Screen.jsx
-import React, { useRef, useState } from "react";
+import  { useRef, useState } from "react";
+import { validatePatientStep1 } from "../componentDoctor/patientValidation";
+
 import {
   View,
   Text,
@@ -7,13 +9,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
+
 
 export default function AddPatientStep1Screen() {
   const navigation = useNavigation();
@@ -105,15 +107,11 @@ export default function AddPatientStep1Screen() {
   };
 
   const goNext = () => {
-    const { fullName, idNumber, phone, address, dob, gender, clinic } =
-      newPatient;
-    if (
-      ![fullName, idNumber, phone, address, dob, gender, clinic].every(Boolean)
-    ) {
-      return Alert.alert("تحذير", "يرجى تعبئة جميع الحقول قبل المتابعة.");
-    }
+    if (!validatePatientStep1(newPatient)) return;
+
     navigation.navigate("AddPatientStep2", { newPatient });
   };
+
 
   return (
     <KeyboardAvoidingView

@@ -1,11 +1,10 @@
 // navigations/AddPatientStack.jsx
-import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import AddPatientStep1Screen from "../screensDoctor/AddPatientStep1Screen";
 import AddPatientStep2Screen from "../screensDoctor/AddPatientStep2Screen";
 import AddPatientStep3Screen from "../screensDoctor/AddPatientStep3Screen";
 import { colors, typography } from "../style/theme";
+import PatientsStack from "./PatientsStack";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +27,14 @@ export default function AddPatientStack() {
         component={AddPatientStep1Screen}
         options={{ title: "بيانات المريض" }}
       />
+
+          <Stack.Screen
+        name="المرضى"
+        component={PatientsStack}
+        options={{ headerShown:false}}
+      />
+      
+      
       <Stack.Screen
         name="AddPatientStep2"
         component={AddPatientStep2Screen}
