@@ -2,7 +2,8 @@
 import { Platform } from "react-native";
 
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
-const BASE_URL = "http://192.168.1.7:8000"; 
+const BASE_URL = "http://192.168.1.7:8000";
+
 const AbedEndPoint = {
   BASE_URL,
 
@@ -15,16 +16,13 @@ const AbedEndPoint = {
 
   // Lab dashboard
   labDashboardById: (id) => `${BASE_URL}/lab/dashboard/${id}`,
-  // ✔ جديد: نتائج مختبر حسب المريض
   labResultsByPatient: (id) => `${BASE_URL}/lab/results/${id}`,
 
   // Medications (catalog)
   medicationsList: `${BASE_URL}/medications`,
 
   // Patient medications
-  // مجموعة: مع سلاش أخير (يتفادى 307 في GET/POST)
   patientMedsList: `${BASE_URL}/patient-medications/`,
-  // عنصر: بدون سلاش (يتفادى 307 في PUT/DELETE)
   patientMedicationById: (id) => `${BASE_URL}/patient-medications/${id}`,
   patientMedsByPatient: (patientId) =>
     `${BASE_URL}/patient-medications/by-patient/${patientId}`,
@@ -32,9 +30,12 @@ const AbedEndPoint = {
   patientMedsMedications: `${BASE_URL}/patient-medications/medications`,
 
   // Patients
-  patientSearch: `${BASE_URL}/patient/search`,
+  patientCities: `${BASE_URL}/doctor/cities`,
   patientById: (id) => `${BASE_URL}/patient/patients/${id}`,
-  patientCreate: `${BASE_URL}/patient/patients`,
+  patientCreate: `${BASE_URL}/doctor/patients`, // ✅ جديد (مستخدم في Step1)
+
+  // ❌ محذوف لأنه ما عاد في endpoint /patient/search
+  // patientSearch: `${BASE_URL}/patient/search`,
 
   // InputTestResultScreen
   testsList: `${BASE_URL}/tests/list`,

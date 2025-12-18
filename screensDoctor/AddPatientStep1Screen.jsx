@@ -1,5 +1,4 @@
-// AddPatientStep1Screen.jsx
-import  { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { validatePatientStep1 } from "../componentDoctor/patientValidation";
 
 import {
@@ -11,11 +10,12 @@ import {
   ScrollView,
   Platform,
   KeyboardAvoidingView,
+  Modal,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
-
+import AbedEndPoint from "../AbedEndPoint";
 
 export default function AddPatientStep1Screen() {
   const navigation = useNavigation();
@@ -34,11 +34,18 @@ export default function AddPatientStep1Screen() {
   const [showDOBPicker, setShowDOBPicker] = useState(false);
   const [tempDOB, setTempDOB] = useState(new Date());
 
+  // ✅ Cities
+  const [cities, setCities] = useState([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+  const [cityModal, setCityModal] = useState(false);
+
   const [newPatient, setNewPatient] = useState({
     fullName: "",
     idNumber: "",
     phone: "",
-    address: "",
+    address: "", // ✅ نخليها (عشان validatePatientStep1 ما ينكسر)
+    cityId: null, // ✅ جديد
+    cityName: "", // ✅ جديد
     dob: "",
     age: "",
     gender: "",
@@ -48,6 +55,23 @@ export default function AddPatientStep1Screen() {
     medications: [],
     customMedications: [""],
   });
+
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        setCitiesLoading(true);
+        const res = await fetch(AbedEndPoint.patientCities);
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : data.items || [];
+        setCities(list);
+      } catch (e) {
+        console.log("Error loading cities", e);
+      } finally {
+        setCitiesLoading(false);
+      }
+    };
+    loadCities();
+  }, []);
 
   const scrollToInput = (ref) => {
     if (!ref?.current || !scrollRef.current) return;
@@ -88,7 +112,6 @@ export default function AddPatientStep1Screen() {
 
   const handleDOBChange = (event, selectedDate) => {
     if (Platform.OS === "android") {
-      // يمنع اللوب: أي change على أندرويد لازم يسكر الـ picker فوراً
       if (event?.type === "set" && selectedDate) {
         applyDOB(selectedDate);
       }
@@ -112,6 +135,16 @@ export default function AddPatientStep1Screen() {
     navigation.navigate("AddPatientStep2", { newPatient });
   };
 
+  const selectCity = (c) => {
+    setNewPatient((p) => ({
+      ...p,
+      cityId: c.id,
+      cityName: c.name,
+      address: c.name, // ✅ نخليها كمان هون
+    }));
+    setCityModal(false);
+    setFocused(null);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -131,7 +164,10 @@ export default function AddPatientStep1Screen() {
           {/* الاسم */}
           <TextInput
             ref={fullNameRef}
-            style={[styles.input, focused === "fullName" && styles.inputFocused]}
+            style={[
+              styles.input,
+              focused === "fullName" && styles.inputFocused,
+            ]}
             placeholder="الاسم الرباعي"
             placeholderTextColor={colors.textMuted}
             value={newPatient.fullName}
@@ -149,7 +185,10 @@ export default function AddPatientStep1Screen() {
           {/* الهوية */}
           <TextInput
             ref={idNumberRef}
-            style={[styles.input, focused === "idNumber" && styles.inputFocused]}
+            style={[
+              styles.input,
+              focused === "idNumber" && styles.inputFocused,
+            ]}
             placeholder="رقم الهوية"
             placeholderTextColor={colors.textMuted}
             keyboardType="numeric"
@@ -207,25 +246,89 @@ export default function AddPatientStep1Screen() {
             }}
             onBlur={() => setFocused(null)}
             returnKeyType="next"
-            onSubmitEditing={() => addressRef.current?.focus()}
-          />
-
-          {/* العنوان */}
-          <TextInput
-            ref={addressRef}
-            style={[styles.input, focused === "address" && styles.inputFocused]}
-            placeholder="العنوان / المنطقة"
-            placeholderTextColor={colors.textMuted}
-            value={newPatient.address}
-            onChangeText={(t) => setNewPatient({ ...newPatient, address: t })}
-            textAlign="right"
-            onFocus={() => {
+            onSubmitEditing={() => {
               setFocused("address");
               scrollToInput(addressRef);
+              setCityModal(true);
             }}
-            onBlur={() => setFocused(null)}
-            returnKeyType="done"
           />
+
+          {/* العنوان / المدينة */}
+          <TouchableOpacity
+            ref={addressRef}
+            style={[
+              styles.input,
+              styles.dobInput,
+              focused === "address" && styles.inputFocused,
+            ]}
+            onPress={() => {
+              setFocused("address");
+              scrollToInput(addressRef);
+              setCityModal(true);
+            }}
+            activeOpacity={0.85}
+          >
+            <Text
+              style={
+                newPatient.cityName ? styles.dobText : styles.dobPlaceholder
+              }
+            >
+              {newPatient.cityName || "العنوان / المنطقة"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Modal المدن */}
+          <Modal
+            visible={cityModal}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setCityModal(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(0,0,0,0.35)",
+                justifyContent: "flex-end",
+              }}
+            >
+              <View
+                style={[styles.card, { margin: spacing.lg, maxHeight: "70%" }]}
+              >
+                <Text style={styles.sectionTitle}>اختر المدينة</Text>
+
+                <ScrollView keyboardShouldPersistTaps="handled">
+                  {citiesLoading ? (
+                    <Text
+                      style={[
+                        styles.dobPlaceholder,
+                        { textAlign: "center", marginTop: spacing.md },
+                      ]}
+                    >
+                      جاري تحميل المدن...
+                    </Text>
+                  ) : (
+                    cities.map((c) => (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={[styles.input, styles.dobInput]}
+                        onPress={() => selectCity(c)}
+                        activeOpacity={0.85}
+                      >
+                        <Text style={styles.dobText}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+
+                <TouchableOpacity
+                  onPress={() => setCityModal(false)}
+                  style={styles.confirmBtn}
+                >
+                  <Text style={styles.confirmText}>إغلاق</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
 
           {/* تاريخ الميلاد */}
           <TouchableOpacity
@@ -240,7 +343,9 @@ export default function AddPatientStep1Screen() {
             }}
             activeOpacity={0.85}
           >
-            <Text style={newPatient.dob ? styles.dobText : styles.dobPlaceholder}>
+            <Text
+              style={newPatient.dob ? styles.dobText : styles.dobPlaceholder}
+            >
               {newPatient.dob || "اختر تاريخ الميلاد"}
             </Text>
           </TouchableOpacity>
@@ -306,14 +411,8 @@ export default function AddPatientStep1Screen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.backgroundLight,
-  },
-  container: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
+  safe: { flex: 1, backgroundColor: colors.backgroundLight },
+  container: { padding: spacing.lg, paddingBottom: spacing.xxl },
   sectionTitle: {
     fontSize: typography.headingSm,
     fontWeight: "700",
@@ -322,8 +421,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: typography.fontFamily,
   },
-
-  // ✅ كارد مرتب للحقول
   card: {
     backgroundColor: colors.background,
     borderRadius: radii.lg,
@@ -332,7 +429,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...shadows.light,
   },
-
   input: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -348,17 +444,12 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   inputFocused: {
-    borderColor: colors.primary, // نفس ألوان الثيم
+    borderColor: colors.primary,
     borderWidth: 1.5,
     ...shadows.medium,
   },
-  disabledInput: {
-    opacity: 0.85,
-  },
-
-  dobInput: {
-    justifyContent: "center",
-  },
+  disabledInput: { opacity: 0.85 },
+  dobInput: { justifyContent: "center" },
   dobText: {
     color: colors.textPrimary,
     fontFamily: typography.fontFamily,
@@ -369,7 +460,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily,
     fontSize: typography.bodyMd,
   },
-
   label: {
     fontWeight: "600",
     marginBottom: spacing.xs,
@@ -378,10 +468,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily,
     fontSize: typography.bodyMd,
   },
-  row: {
-    flexDirection: "row-reverse",
-    marginBottom: spacing.sm + 6,
-  },
+  row: { flexDirection: "row-reverse", marginBottom: spacing.sm + 6 },
   genderBtn: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
@@ -408,17 +495,13 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily,
     fontSize: typography.bodyMd,
   },
-
   pickerWrap: {
     marginTop: -spacing.xs,
     marginBottom: spacing.md,
     borderRadius: radii.md,
     overflow: "hidden",
   },
-
-  singleBtnWrapper: {
-    marginTop: spacing.lg,
-  },
+  singleBtnWrapper: { marginTop: spacing.lg },
   nextButton: {
     backgroundColor: colors.buttonInfo,
     paddingVertical: spacing.md + 2,

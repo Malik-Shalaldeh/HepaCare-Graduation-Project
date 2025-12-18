@@ -1,4 +1,3 @@
-// AddPatientStep2Screen
 import React, { useState } from "react";
 import {
   View,
@@ -102,10 +101,7 @@ export default function AddPatientStep2Screen() {
             <Switch
               value={(newPatient.diseases || []).includes(disease)}
               onValueChange={() => toggleDisease(disease)}
-              trackColor={{
-                false: colors.border,
-                true: colors.accent,
-              }}
+              trackColor={{ false: colors.border, true: colors.accent }}
               thumbColor={
                 Platform.OS === "android" ? colors.primary : undefined
               }
@@ -140,10 +136,7 @@ export default function AddPatientStep2Screen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.backgroundLight,
-  },
+  safe: { flex: 1, backgroundColor: colors.backgroundLight },
   container: {
     padding: spacing.lg,
     paddingBottom: Platform.OS === "android" ? spacing.xl : spacing.lg,
@@ -183,9 +176,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
     fontFamily: typography.fontFamily,
   },
-  singleBtnWrapper: {
-    marginTop: spacing.lg,
-  },
+  singleBtnWrapper: { marginTop: spacing.lg },
   nextButton: {
     backgroundColor: colors.buttonInfo,
     padding: spacing.md,

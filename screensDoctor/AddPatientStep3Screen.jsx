@@ -1,4 +1,3 @@
-// AddPatientStep3Screen
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -41,7 +40,8 @@ export default function AddPatientStep3Screen() {
       fullName: "",
       idNumber: "",
       phone: "",
-      address: "",
+      cityId: null,
+      cityName: "",
       dob: "",
       age: "",
       gender: "",
@@ -102,11 +102,10 @@ export default function AddPatientStep3Screen() {
   };
 
   const handleSave = async () => {
-    const { fullName, idNumber, phone, address, dob, gender, clinic } =
+    const { fullName, idNumber, phone, dob, gender, clinic, cityId } =
       newPatient;
-    if (
-      ![fullName, idNumber, phone, address, dob, gender, clinic].every(Boolean)
-    ) {
+
+    if (![fullName, idNumber, phone, dob, gender, cityId].every(Boolean)) {
       return Alert.alert("تحذير", "هناك بيانات أساسية ناقصة.");
     }
 
@@ -114,6 +113,7 @@ export default function AddPatientStep3Screen() {
       ...(newPatient.diseases || []),
       ...(newPatient.customDiseases || []).filter(Boolean),
     ];
+
     const finalMedications = [
       ...(newPatient.medications || []),
       ...(newPatient.customMedications || []).filter(Boolean),
@@ -122,21 +122,20 @@ export default function AddPatientStep3Screen() {
     try {
       const docId = doctorId || (await AsyncStorage.getItem("doctor_id"));
       if (!docId) {
-        return Alert.alert(
-          "خطأ",
-          "لا يوجد doctor_id مخزّن. تأكد من الحساب أو أعد تسجيل الدخول."
-        );
+        return Alert.alert("خطأ", "لا يوجد doctor_id مخزّن. أعد تسجيل الدخول.");
       }
 
       const body = {
         full_name: fullName,
-        national_id: idNumber,
+        national_id: idNumber, // ✅ هذا هو username/password في الباك اند
         phone,
-        address,
         birth_date: dob,
-        clinic_name: clinic || "Main Clinic",
-        username: idNumber,
-        password: "1234",
+
+        // OPTIONAL: بس SELECT (بدون INSERT على clinics)
+        clinic_name: clinic || null,
+
+        city_id: cityId,
+
         diseases: finalDiseases,
         medications: finalMedications,
       };
@@ -151,13 +150,15 @@ export default function AddPatientStep3Screen() {
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) throw new Error("save failed");
+      const data = await res.json().catch(() => ({}));
 
-      await res.json();
+      if (!res.ok) {
+        console.log("Save patient error:", data);
+        throw new Error(data?.detail || "save failed");
+      }
 
       Alert.alert("تم", "تمت إضافة المريض بنجاح.");
       navigation.navigate("المرضى");
-      
     } catch (e) {
       console.log("Error saving patient", e);
       Alert.alert("خطأ", "تعذر حفظ المريض. حاول مرة أخرى.");
@@ -189,10 +190,7 @@ export default function AddPatientStep3Screen() {
             <Switch
               value={(newPatient.medications || []).includes(med)}
               onValueChange={() => toggleMedication(med)}
-              trackColor={{
-                false: colors.border,
-                true: colors.accent,
-              }}
+              trackColor={{ false: colors.border, true: colors.accent }}
               thumbColor={
                 Platform.OS === "android" ? colors.primary : undefined
               }
@@ -220,7 +218,10 @@ export default function AddPatientStep3Screen() {
             activeOpacity={0.9}
           >
             {saving ? (
-              <ActivityIndicator size="small" color={colors.buttonSuccessText} />
+              <ActivityIndicator
+                size="small"
+                color={colors.buttonSuccessText}
+              />
             ) : (
               <Text style={styles.saveButtonText}>حفظ المريض</Text>
             )}
@@ -232,10 +233,7 @@ export default function AddPatientStep3Screen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.backgroundLight,
-  },
+  safe: { flex: 1, backgroundColor: colors.backgroundLight },
   container: {
     padding: spacing.lg,
     paddingBottom: Platform.OS === "android" ? spacing.xl : spacing.lg,
@@ -275,9 +273,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
     fontFamily: typography.fontFamily,
   },
-  singleBtnWrapper: {
-    marginTop: spacing.lg,
-  },
+  singleBtnWrapper: { marginTop: spacing.lg },
   saveButton: {
     backgroundColor: colors.buttonSuccess,
     padding: spacing.md,
