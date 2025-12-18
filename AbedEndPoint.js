@@ -1,8 +1,21 @@
 // AbedEndPoint.js
 import { Platform } from "react-native";
 
-//const BASE_URL = "https://luminous-possibility-production.up.railway.app";
-const BASE_URL = "http://192.168.1.7:8000";
+// ✅ غيّر هذا الـ IP ليكون IP جهازك اللي شغال عليه السيرفر (Django/FastAPI/...)
+// مثال: ipconfig -> IPv4 Address
+const DEV_MACHINE_IP = "192.168.1.122";
+
+// ✅ Android Emulator لازم 10.0.2.2 بدل localhost
+const ANDROID_EMULATOR_BASE = "http://10.0.2.2:8000";
+
+// ✅ للأجهزة الفعلية (موبايل على نفس الشبكة)
+const LAN_BASE = `http://${DEV_MACHINE_IP}:8000`;
+
+// ✅ اختر تلقائياً
+// - Android Emulator => 10.0.2.2
+// - غير هيك => IP الشبكة
+const BASE_URL =
+  Platform.OS === "android" ? ANDROID_EMULATOR_BASE : LAN_BASE;
 
 const AbedEndPoint = {
   BASE_URL,
@@ -32,7 +45,7 @@ const AbedEndPoint = {
   // Patients
   patientCities: `${BASE_URL}/doctor/cities`,
   patientById: (id) => `${BASE_URL}/patient/patients/${id}`,
-  patientCreate: `${BASE_URL}/doctor/patients`, // ✅ جديد (مستخدم في Step1)
+  patientCreate: `${BASE_URL}/doctor/patients`, // ✅ مستخدم في Step1
 
   // ❌ محذوف لأنه ما عاد في endpoint /patient/search
   // patientSearch: `${BASE_URL}/patient/search`,

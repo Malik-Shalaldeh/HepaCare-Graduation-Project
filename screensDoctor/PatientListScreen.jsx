@@ -56,7 +56,7 @@ const PatientListScreen = () => {
 
   // load data on focus
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused && patients.length === 0) {
       loadPatients();
     }
   }, [isFocused]);
