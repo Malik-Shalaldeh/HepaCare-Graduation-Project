@@ -12,6 +12,7 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HealthWelcomeScreen from "../screensHealth/HealthWelcomeScreen";
 import HealthRatingsScreen from "../screensHealth/HealthRatingsScreen";
@@ -20,6 +21,7 @@ import CommonLabsScreen from "../screensCommon/LabsScreen";
 import PrivacyPolicyScreen from "../screensCommon/PolicyScreen";
 import ChangePasswordScreen from "../Login/restPassword";
 import Logout from '../Login/logout';
+import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
 
 
 // استدعاء قيم التصميم الموحد
@@ -50,6 +52,12 @@ function CustomDrawerContent(props) {
 const Tab = createBottomTabNavigator();
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(
+    insets.bottom,
+    Platform.OS === "android" ? spacing.md : spacing.sm
+  );
+
   return (
     <Tab.Navigator
       initialRouteName="لوحة التحكم"
@@ -72,11 +80,12 @@ function MainTabs() {
         tabBarActiveTintColor: primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          height: 80,
+          height: 60 + bottomPad,
           backgroundColor: colors.background,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          paddingBottom: Platform.OS === "ios" ? spacing.sm : 4,
+          paddingBottom: bottomPad,
+          paddingTop: spacing.xs,
         },
         tabBarLabelStyle: {
           fontSize: typography.bodySm,
@@ -141,6 +150,16 @@ export default function HealthDrawerNavigator() {
                 size={size}
                 color={color}
               />
+            ),
+          }}
+        />
+
+        <Drawer.Screen
+          name="نظرة عامة"
+          component={PatientsOverviewScreen}
+          options={{
+            drawerIcon: ({ size, color }) => (
+              <Ionicons name="stats-chart-outline" size={size} color={color} />
             ),
           }}
         />

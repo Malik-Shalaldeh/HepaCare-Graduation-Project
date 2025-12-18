@@ -1,13 +1,17 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
+import { useNavigation } from "@react-navigation/native";
+import theme from "../style/theme";
 
-const primary = "#2C3E50";
-const accent = "#2980B9";
-const textColor = "#34495E";
+const primary = theme.colors.primary;
+const accent = theme.colors.accent;
+const textColor = theme.colors.textSecondary;
 
 export default function HealthWelcomeScreen() {
+  const navigation = useNavigation();
+
   const today = new Date();
   const months = [
     "يناير",
@@ -47,12 +51,31 @@ export default function HealthWelcomeScreen() {
           </View>
         </View>
 
+        <TouchableOpacity
+          style={styles.overviewButton}
+          onPress={() =>
+            (navigation.getParent?.() || navigation).navigate("نظرة عامة")
+          }
+          activeOpacity={0.85}
+        >
+          <View style={styles.overviewIconWrapper}>
+            <Ionicons name="stats-chart-outline" size={22} color={primary} />
+          </View>
+
+          <View style={styles.overviewTextWrapper}>
+            <Text style={styles.overviewTitle}>نظرة عامة</Text>
+            <Text style={styles.overviewSubtitle}>
+              عرض توزيع المرضى حسب المحافظة
+            </Text>
+          </View>
+        </TouchableOpacity>
+
         <View style={styles.motivationBox}>
           <Ionicons
             name="shield-checkmark-outline"
             size={50}
-            color="#2ecc71"
-            style={{ marginBottom: 10 }}
+            color={theme.colors.success}
+            style={{ marginBottom: theme.spacing.sm }}
           />
           <Text style={styles.motivationText}>
             دورك أساسي في متابعة جودة الخدمات الصحية وتعزيز رضا المرضى
@@ -66,71 +89,105 @@ export default function HealthWelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 60,
-    backgroundColor: "#F8FAFB",
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.xxl,
+    backgroundColor: theme.colors.backgroundLight,
     alignItems: "center",
   },
   card: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 4,
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.xl,
+    borderRadius: theme.radii.lg,
+    marginBottom: theme.spacing.lg,
+    ...theme.shadows.light,
   },
-  icon: { marginRight: 12 },
+  icon: { marginEnd: theme.spacing.md },
   title: {
-    fontSize: 18,
+    fontSize: theme.typography.headingSm,
     fontWeight: "700",
     color: primary,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
-  subtitle: { fontSize: 14, color: textColor },
+  subtitle: {
+    fontSize: theme.typography.bodyMd,
+    color: textColor,
+    textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
+  },
   header: {
     width: "100%",
-    backgroundColor: accent,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    marginBottom: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radii.md,
+    marginBottom: theme.spacing.xl,
+    ...theme.shadows.medium,
     alignItems: "center",
   },
   headerText: {
-    fontSize: 28,
+    fontSize: theme.typography.headingLg,
     fontWeight: "bold",
-    color: "#fff",
+    color: theme.colors.buttonPrimaryText,
     letterSpacing: 3,
+    fontFamily: theme.typography.fontFamily,
   },
   motivationBox: {
     width: "100%",
-    backgroundColor: "#ffffff",
-    padding: 24,
-    borderRadius: 20,
+    backgroundColor: theme.colors.background,
+    padding: theme.spacing.xl,
+    borderRadius: theme.radii.lg,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
-    marginTop: 10,
+    ...theme.shadows.light,
+    marginTop: theme.spacing.sm,
   },
   motivationText: {
-    fontSize: 16,
+    fontSize: theme.typography.bodyLg,
     fontWeight: "500",
     color: primary,
     textAlign: "center",
-    lineHeight: 24,
+    lineHeight: theme.typography.lineHeightNormal,
+    fontFamily: theme.typography.fontFamily,
+  },
+  overviewButton: {
+    width: "100%",
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    backgroundColor: accent,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radii.md,
+    marginTop: theme.spacing.xs,
+    marginBottom: theme.spacing.lg,
+  },
+  overviewIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.background,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: theme.spacing.sm,
+  },
+  overviewTextWrapper: {
+    flex: 1,
+  },
+  overviewTitle: {
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodyLg,
+    fontWeight: "700",
+    marginBottom: 2,
+    textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
+  },
+  overviewSubtitle: {
+    color: theme.colors.buttonPrimaryText,
+    fontSize: theme.typography.bodySm,
+    textAlign: "right",
+    fontFamily: theme.typography.fontFamily,
   },
 });
