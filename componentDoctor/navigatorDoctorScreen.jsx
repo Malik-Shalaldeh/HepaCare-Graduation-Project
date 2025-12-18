@@ -156,6 +156,7 @@ function NavigatorDoctor() {
           name="إدارة المواعيد"
           component={AppointmentsStack}
           options={{
+            headerShown: false,
             drawerIcon: ({ size, color }) => (
               <Ionicons name="calendar-outline" size={size} color={color} />
             ),
