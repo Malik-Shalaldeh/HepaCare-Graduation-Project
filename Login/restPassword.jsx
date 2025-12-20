@@ -83,25 +83,6 @@ const ChangePasswordScreen = () => {
         backgroundColor={theme.colors.primary}
       />
 
-      {/* زر الرجوع */}
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color={theme.colors.primary}
-        />
-      </TouchableOpacity>
-
-      {/* العنوان */}
-      <Text
-        style={styles.title}
-      >
-        تغيير كلمة المرور
-      </Text>
-
       {/* كلمة المرور الحالية */}
       <Text
         style={styles.label}

@@ -57,28 +57,22 @@ const MedicalIndicatorsScreen = () => {
   };
 
   return (
-    <SafeAreaView
-      style={styles.safeArea}
-    >
+    <SafeAreaView style={styles.safeArea}>
+
       <StatusBar
         backgroundColor={theme.colors.primary}
         barStyle="light-content"
       />
 
       {/* اختيار الفحص (dropdown) */}
-      <View
-        style={styles.dropdownContainer}
-      >
+      <View style={styles.dropdownContainer}>
+
         <TouchableOpacity
           style={styles.dropdownButton}
           onPress={toggleDropdown}
           activeOpacity={0.85}
         >
-          <Text
-            style={styles.dropdownText}
-          >
-            اختر الفحص
-          </Text>
+          <Text style={styles.dropdownText}> اختر الفحص</Text>
           <Ionicons
             name={showDropdown ? 'chevron-up' : 'chevron-down'}
             size={20}
@@ -95,9 +89,7 @@ const MedicalIndicatorsScreen = () => {
                 onPress={() => selectTest(test.key)}
                 activeOpacity={0.85}
               >
-                <Text
-                  style={styles.dropdownItemText}
-                >
+                <Text style={styles.dropdownItemText}>
                   {test.label}
                 </Text>
               </TouchableOpacity>
@@ -128,11 +120,7 @@ const MedicalIndicatorsScreen = () => {
             onPress={analyze}
             activeOpacity={0.9}
           >
-            <Text
-              style={styles.calcText}
-            >
-              احسب
-            </Text>
+            <Text style={styles.calcText}> احسب</Text>
           </TouchableOpacity>
         )}
 

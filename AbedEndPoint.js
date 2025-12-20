@@ -1,7 +1,8 @@
 // AbedEndPoint.js
 //const BASE_URL = "http://10.13.80.148:8000";
 
-const BASE_URL = "http://192.168.1.128:8000";
+const BASE_URL = "http://192.168.1.7:8000";
+
 const AbedEndPoint = {
   BASE_URL,
 

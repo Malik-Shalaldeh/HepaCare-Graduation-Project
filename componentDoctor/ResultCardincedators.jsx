@@ -8,8 +8,8 @@ const cardBg = '#ffffff';
 
 const ResultCard = ({ label, status }) => 
 {
-  const isHigh = status.startsWith('High') || status.includes('❌');
-  const isLow = status.startsWith('Low');
+  const isHigh = status.includes('High') || status.includes('❌');
+  const isLow = status.includes('Low' || 'Less');
 
     let icon;
     let color;

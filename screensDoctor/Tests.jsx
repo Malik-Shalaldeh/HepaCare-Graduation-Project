@@ -20,7 +20,6 @@ const Tests = () => {
           size={24}
           color={theme.colors.textPrimary}
         />
-        <Text style={styles.backText}> رجوع</Text>
       </TouchableOpacity>
 
       {/* زر إدخال نتائج الفحوصات */}
