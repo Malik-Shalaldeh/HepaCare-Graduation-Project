@@ -29,7 +29,7 @@ const AppointmentsStack = () => {
       <Stack.Screen
         name="AppointmentForm"
         component={AppointmentFormScreen}
-        options={{ title: 'موعد' }}
+        options={{ title: 'موعد جديد' }}
       />
     </Stack.Navigator>
   );
