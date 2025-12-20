@@ -11,7 +11,6 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -19,26 +18,30 @@ import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
 
 const ChangePasswordScreen = () => {
-  const navigation = useNavigation();
-  const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
-  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSave = async () => {
-    if (!currentPw || !newPw || !confirmPw) {
-      Alert.alert('⚠️ تنبيه', 'يرجى ملء جميع الحقول.');
+    if (!newPw || !confirmPw) {
+      Alert.alert('⚠️ تنبيه', 'يرجى إدخال كلمة المرور الجديدة وتأكيدها.');
       return;
     }
+
+    if (newPw.length < 6) {
+      Alert.alert('⚠️ تنبيه', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+      return;
+    }
+
     if (newPw !== confirmPw) {
-      Alert.alert('⚠️ خطأ', 'كلمة المرور الجديدة وتكرارها غير متطابقتين.');
+      Alert.alert('⚠️ خطأ', 'كلمة المرور الجديدة وتأكيدها غير متطابقتين.');
       return;
     }
 
     try {
       const user_id = await AsyncStorage.getItem('user_id');
+
       if (!user_id) {
         Alert.alert('⚠️ خطأ', 'لم يتم العثور على رقم المستخدم، يرجى تسجيل الدخول مجددًا.');
         return;
@@ -50,74 +53,38 @@ const ChangePasswordScreen = () => {
         {
           params: {
             user_id,
-            current_password: currentPw,
             new_password: newPw,
           },
         }
       );
 
       if (res.status === 200) {
-        Alert.alert('✅ تم تغيير كلمة المرور بنجاح');
-        setCurrentPw('');
+        Alert.alert('✅ نجاح', 'تم تغيير كلمة المرور بنجاح.');
         setNewPw('');
         setConfirmPw('');
-        setShowCurrent(false);
         setShowNew(false);
         setShowConfirm(false);
       }
     } catch (error) {
-      if(error.response && error.response.data && error.response.data.detail) {
+      if (error.response?.data?.detail) {
         Alert.alert('⚠️ خطأ', error.response.data.detail);
       } else {
-        Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم، تحقق من الشبكة.');
+        Alert.alert('⚠️ خطأ', 'تعذر الاتصال بالخادم.');
       }
     }
   };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={theme.colors.primary}
       />
 
-      {/* كلمة المرور الحالية */}
-      <Text
-        style={styles.label}
-      >
-        كلمة المرور الحالية
-      </Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••"
-          placeholderTextColor={theme.colors.textMuted}
-          secureTextEntry={!showCurrent}
-          value={currentPw}
-          onChangeText={setCurrentPw}
-          textAlign="right"
-          autoCapitalize="none"
-        />
-        <TouchableOpacity
-          onPress={() => setShowCurrent(!showCurrent)}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name={showCurrent ? 'eye-off-outline' : 'eye-outline'}
-            size={24}
-            color={theme.colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.title}>تعيين كلمة مرور جديدة</Text>
 
       {/* كلمة المرور الجديدة */}
-      <Text
-        style={styles.label}
-      >
-        كلمة المرور الجديدة
-      </Text>
+      <Text style={styles.label}>كلمة المرور الجديدة</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -129,10 +96,7 @@ const ChangePasswordScreen = () => {
           textAlign="right"
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          onPress={() => setShowNew(!showNew)}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity onPress={() => setShowNew(!showNew)}>
           <Ionicons
             name={showNew ? 'eye-off-outline' : 'eye-outline'}
             size={24}
@@ -141,12 +105,8 @@ const ChangePasswordScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* تأكيد كلمة المرور الجديدة */}
-      <Text
-        style={styles.label}
-      >
-        تأكيد كلمة المرور الجديدة
-      </Text>
+      {/* تأكيد كلمة المرور */}
+      <Text style={styles.label}>تأكيد كلمة المرور</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -158,10 +118,7 @@ const ChangePasswordScreen = () => {
           textAlign="right"
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          onPress={() => setShowConfirm(!showConfirm)}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
           <Ionicons
             name={showConfirm ? 'eye-off-outline' : 'eye-outline'}
             size={24}
@@ -176,11 +133,7 @@ const ChangePasswordScreen = () => {
         onPress={handleSave}
         activeOpacity={0.9}
       >
-        <Text
-          style={styles.buttonText}
-        >
-          💾 حفظ
-        </Text>
+        <Text style={styles.buttonText}>🔐 حفظ كلمة المرور</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -192,7 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.backgroundLight,
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.lg,
   },
   title: {
     fontSize: theme.typography.headingMd,
@@ -221,7 +173,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.lg,
     marginHorizontal: theme.spacing.md,
-    ...theme.shadows.light,
   },
   input: {
     flex: 1,
@@ -236,9 +187,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     borderRadius: theme.radii.lg,
     alignItems: 'center',
-    marginTop: theme.spacing.sm,
     marginHorizontal: theme.spacing.md,
-    ...theme.shadows.light,
   },
   buttonText: {
     color: theme.colors.buttonPrimaryText,
