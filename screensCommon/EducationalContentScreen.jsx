@@ -6,10 +6,8 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import ScreenWithDrawer from "../screensDoctor/ScreenWithDrawer";
 import {
   colors,
@@ -125,20 +123,9 @@ const getTypeIcon = (type) => {
 };
 
 const EducationalContentScreen = () => {
-  const navigation = useNavigation();
-
   return (
     <ScreenWithDrawer>
       <SafeAreaView style={styles.safeArea}>
-        {/* زر رجوع بنفس أسلوب شاشة المختبرات */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
-
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -204,19 +191,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  // 🔹 نفس فكرة زر الرجوع في واجهة المختبرات:
-  backButton: {
-    position: "absolute",
-    top: spacing.md,
-    left: spacing.lg,            // على الشمال
-    padding: spacing.sm,
-    borderRadius: 25,
-    backgroundColor: colors.background,
-    zIndex: 1,
-    ...shadows.small,
-  },
   section: {
-    marginTop: spacing.xxl * 2,  // عشان ما يتغطى العنوان بالزر
+    marginTop: spacing.lg,
     marginBottom: spacing.xl,
   },
   sectionHeaderContainer: {

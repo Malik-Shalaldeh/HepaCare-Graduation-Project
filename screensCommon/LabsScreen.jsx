@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import axios from "axios";
 import {
   colors,
@@ -57,10 +56,10 @@ const LabsScreen = () => {
 
   const filteredLabs = search.trim()
     ? labs.filter(
-      (lab) =>
-        lab.city &&
-        lab.city.toLowerCase().includes(search.toLowerCase())
-    )
+        (lab) =>
+          lab.city &&
+          lab.city.toLowerCase().includes(search.toLowerCase())
+      )
     : labs;
 
   const renderLabCard = ({ item }) => (
@@ -79,23 +78,6 @@ const LabsScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-            setTimeout(() => {
-              navigation.openDrawer?.();
-            }, 300);
-          }}
-          style={styles.backButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
-
         <TextInput
           style={styles.input}
           placeholder="ابحث باسم المدينة"
@@ -106,17 +88,12 @@ const LabsScreen = () => {
         {loading ? (
           <View style={styles.centerContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>
-              جاري تحميل المختبرات...
-            </Text>
+            <Text style={styles.loadingText}>جاري تحميل المختبرات...</Text>
           </View>
         ) : error ? (
           <View style={styles.centerContainer}>
             <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity
-              onPress={fetchLabs}
-              style={styles.retryButton}
-            >
+            <TouchableOpacity onPress={fetchLabs} style={styles.retryButton}>
               <Text style={styles.retryText}>إعادة المحاولة</Text>
             </TouchableOpacity>
           </View>
@@ -127,9 +104,7 @@ const LabsScreen = () => {
             renderItem={renderLabCard}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>
-                لا يوجد مختبرات مطابقة
-              </Text>
+              <Text style={styles.emptyText}>لا يوجد مختبرات مطابقة</Text>
             }
           />
         )}
@@ -147,22 +122,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.lg,
   },
-  backButton: {
-    position: "absolute",
-    top: spacing.md,
-    left: spacing.lg,
-    padding: spacing.sm,
-    borderRadius: 25,
-    backgroundColor: colors.background,
-    zIndex: 1,
-    ...shadows.small,
-  },
   input: {
     backgroundColor: colors.background,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    marginTop: spacing.xxl * 2,
+    marginTop: spacing.lg,
     marginBottom: spacing.md,
     fontSize: typography.bodyMd,
     borderWidth: 1,
@@ -182,7 +147,6 @@ const styles = StyleSheet.create({
     ...shadows.small,
   },
   labName: {
-    textAlign: "right",
     writingDirection: "rtl",
     fontSize: typography.bodyLg,
     fontWeight: "700",
