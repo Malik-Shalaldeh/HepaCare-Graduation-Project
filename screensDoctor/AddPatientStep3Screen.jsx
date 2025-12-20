@@ -127,13 +127,11 @@ export default function AddPatientStep3Screen() {
 
       const body = {
         full_name: fullName,
-        national_id: idNumber, // ✅ هذا هو username/password في الباك اند
+        national_id: idNumber,
         phone,
         birth_date: dob,
 
-        // OPTIONAL: بس SELECT (بدون INSERT على clinics)
         clinic_name: clinic || null,
-
         city_id: cityId,
 
         diseases: finalDiseases,
@@ -152,7 +150,15 @@ export default function AddPatientStep3Screen() {
 
       const data = await res.json().catch(() => ({}));
 
+      // ✅ تعديل مهم: لو الحساب موجود (409) اعرض رسالة واضحة للمستخدم
       if (!res.ok) {
+        if (res.status === 409) {
+          return Alert.alert(
+            "تنبيه",
+            data?.detail || "الحساب مسجل بالنظام مسبقاً."
+          );
+        }
+
         console.log("Save patient error:", data);
         throw new Error(data?.detail || "save failed");
       }

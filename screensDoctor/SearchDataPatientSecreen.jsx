@@ -31,24 +31,23 @@ export default function DataPatientsListScreen() {
 
   const loadPatientDetails = async (pid, fallbackName) => {
     try {
-      const [detail, labs] = await Promise.all([
-        fetch(AbedEndPoint.patientById(pid)).then((r) => r.json()),
-        fetch(AbedEndPoint.labResultsByPatient(pid))
-          .then((r) => r.json())
-          .catch(() => ({ results: [] })),
-      ]);
+      const detail = await fetch(AbedEndPoint.doctorPatientData(pid)).then(
+        (r) => r.json()
+      );
 
-      const meds = (detail.medications || []).map((m) => ({
-        name: m.brand_name,
+      const meds = (detail.prescribed_medications || []).map((m) => ({
+        name: m.name,
         dosage: m.dose_text,
         frequency: m.frequency_text,
       }));
 
-      const symptoms = (detail.symptoms || []).map((s) => s.name).join("، ");
-      const tests = (labs.results || [])
-        .slice(0, 5)
-        .map((r) => r.test_name)
+      const symptoms = (detail.symptoms || [])
+        .map((s) => s.name)
+        .filter(Boolean)
         .join("، ");
+
+      const otherDiseases = detail?.other_non_hepatitis?.diseases || [];
+      const otherMeds = detail?.other_non_hepatitis?.medications || [];
 
       setSelectedPatient({
         id: String(pid),
@@ -57,7 +56,10 @@ export default function DataPatientsListScreen() {
           fallbackName ||
           "المريض",
         symptoms,
-        tests,
+        // ✅ بديل أهم الفحوصات (حسب طلبك ما عدنا نستخدم فحوصات هنا)
+        // خليته قسمين: أمراض أخرى + أدوية أخرى
+        otherDiseases,
+        otherMeds,
         medications: meds,
       });
     } catch {
@@ -65,7 +67,8 @@ export default function DataPatientsListScreen() {
         id: String(pid),
         name: fallbackName || "المريض",
         symptoms: "",
-        tests: "",
+        otherDiseases: [],
+        otherMeds: [],
         medications: [],
       });
     }
@@ -90,8 +93,9 @@ export default function DataPatientsListScreen() {
     }
 
     try {
+      // ✅ fix: أنت كنت تستخدم patientSearch وهو غير موجود، الصح patientsSearch
       const res = await fetch(
-        `${AbedEndPoint.patientSearch}?q=${encodeURIComponent(q)}`
+        `${AbedEndPoint.patientsSearch}?q=${encodeURIComponent(q)}`
       );
       const data = await res.json();
       setPatients(
@@ -216,6 +220,7 @@ export default function DataPatientsListScreen() {
               </View>
             </View>
 
+            {/* ✅ الأعراض */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
                 <Ionicons
@@ -230,20 +235,67 @@ export default function DataPatientsListScreen() {
               </Text>
             </View>
 
+            {/* ✅ أمراض أخرى (غير التهاب الكبد) */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
                 <Ionicons
-                  name="flask-outline"
+                  name="heart-outline"
                   size={18}
                   color={colors.primary}
                 />
-                <Text style={styles.blockTitle}>أهم الفحوصات</Text>
+                <Text style={styles.blockTitle}>
+                  أمراض أخرى (غير التهاب الكبد)
+                </Text>
               </View>
-              <Text style={styles.blockText}>
-                {selectedPatient.tests || "لا توجد فحوصات مسجلة"}
-              </Text>
+
+              {selectedPatient.otherDiseases.length === 0 ? (
+                <Text style={styles.blockText}>لا يوجد أمراض أخرى مسجلة</Text>
+              ) : (
+                selectedPatient.otherDiseases.map((d, idx) => (
+                  <View key={idx} style={styles.medItem}>
+                    <Ionicons
+                      name="ellipse-outline"
+                      size={8}
+                      color={colors.accent}
+                      style={{ marginLeft: spacing.xs + 2 }}
+                    />
+                    <Text style={styles.medText}>{d}</Text>
+                  </View>
+                ))
+              )}
             </View>
 
+            {/* ✅ أدوية أخرى (غير التهاب الكبد) */}
+            <View style={styles.block}>
+              <View style={styles.blockHeader}>
+                <Ionicons
+                  name="bandage-outline"
+                  size={18}
+                  color={colors.primary}
+                />
+                <Text style={styles.blockTitle}>
+                  أدوية أخرى (غير التهاب الكبد)
+                </Text>
+              </View>
+
+              {selectedPatient.otherMeds.length === 0 ? (
+                <Text style={styles.blockText}>لا يوجد أدوية أخرى مسجلة</Text>
+              ) : (
+                selectedPatient.otherMeds.map((m, idx) => (
+                  <View key={idx} style={styles.medItem}>
+                    <Ionicons
+                      name="ellipse-outline"
+                      size={8}
+                      color={colors.accent}
+                      style={{ marginLeft: spacing.xs + 2 }}
+                    />
+                    <Text style={styles.medText}>{m}</Text>
+                  </View>
+                ))
+              )}
+            </View>
+
+            {/* ✅ الأدوية الموصوفة */}
             <View style={styles.block}>
               <View style={styles.blockHeader}>
                 <Ionicons
@@ -253,8 +305,9 @@ export default function DataPatientsListScreen() {
                 />
                 <Text style={styles.blockTitle}>الأدوية الموصوفة</Text>
               </View>
+
               {selectedPatient.medications.length === 0 ? (
-                <Text style={styles.blockText}>لا يوجد أدوية مسجلة</Text>
+                <Text style={styles.blockText}>لا يوجد أدوية موصوفة</Text>
               ) : (
                 selectedPatient.medications.map((med, index) => (
                   <View key={index} style={styles.medItem}>
@@ -265,7 +318,9 @@ export default function DataPatientsListScreen() {
                       style={{ marginLeft: spacing.xs + 2 }}
                     />
                     <Text style={styles.medText}>
-                      {med.name} - {med.dosage} - {med.frequency}
+                      {med.name}
+                      {med.dosage ? ` - ${med.dosage}` : ""}
+                      {med.frequency ? ` - ${med.frequency}` : ""}
                     </Text>
                   </View>
                 ))
