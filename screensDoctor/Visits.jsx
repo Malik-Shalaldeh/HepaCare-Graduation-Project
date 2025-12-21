@@ -79,14 +79,6 @@ const Visits = () => {
     }
   };
 
-  const filteredPatients = patients.filter(
-    (p) =>
-      (p.name || "")
-        .toLowerCase()
-        .includes(searchText.toLowerCase()) ||
-      String(p.id).includes(searchText)
-  );
-
   const onSearchChange = (text) => {
     setSearchText(text);
 
@@ -138,7 +130,7 @@ const Visits = () => {
               </View>
             ) : (
               <FlatList
-                data={filteredPatients}
+                data={patients}
                 keyExtractor={(item) => String(item.id)}
                 renderItem={({ item }) => (
                   <TouchableOpacity
@@ -149,7 +141,7 @@ const Visits = () => {
                   </TouchableOpacity>
                 )}
                 ListEmptyComponent={
-                  filteredPatients.length === 0 ? (
+                  patients.length === 0 ? (
                     <Text style={styles.noResults}>
                       لا يوجد نتائج مطابقة.
                     </Text>

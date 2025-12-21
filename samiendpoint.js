@@ -15,10 +15,7 @@ const ENDPOINTS = {
   // Authentication
   login: `${BASE_URL}/auth/login`,
   
-  // Messaging
-  sendMessage: `${BASE_URL}/messages`,
-  fetchMessages: `${BASE_URL}/messages`,
-
+  
   // Doctors
   doctors: `${BASE_URL}/doctors`,
 
