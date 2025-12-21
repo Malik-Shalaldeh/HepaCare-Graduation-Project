@@ -12,11 +12,13 @@ import {
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../malikEndPoint";
 import theme from '../style/theme';
+import cityMap from '../componentDoctor/cityMap';
+
 
 
 const PatientsOverviewScreen = () => {
@@ -24,8 +26,12 @@ const PatientsOverviewScreen = () => {
   const [loading, setLoading] = useState(true);
   
   const navigation = useNavigation();
+    const isFocused = useIsFocused(); 
+
 
   useEffect(() => {
+      if (!isFocused) return; // ما ننفذ إلا إذا الشاشة مركزة
+
     const getStats = async () => {
       try {
         const res = await axios.get(ENDPOINTS.STATS.PATIENTS_BY_CITY);
@@ -40,15 +46,13 @@ const PatientsOverviewScreen = () => {
     };
 
     getStats();
-  }, []);
+  }, [isFocused]);
 
   const chartData = {
-    labels: data.map((item) => item.city_name),
+    labels: data.map(item => cityMap[item.city_name] || item.city_name), // تحويل عربي → انجليزي
     datasets: [
-      {
-        data: data.map((item) => item.patients_count),
-      },
-    ],
+      { data: data.map(item => item.patients_count) }
+    ]
   };
 
   return (
@@ -71,29 +75,27 @@ const PatientsOverviewScreen = () => {
         : (
           <>
             <Text style={styles.title}>توزيع المرضى حسب المحافظات</Text>
-
             <ScrollView
               horizontal
               style={styles.scrollWrapper}
               contentContainerStyle={{ paddingHorizontal: theme.spacing.md }}
             >
-                <BarChart
-                  data={chartData}
-                  width={Dimensions.get("window").width - 10}
-                  height={350}
-                  fromZero
-                  showValuesOnTopOfBars
-                  chartConfig={{
-                    backgroundGradientFrom: theme.colors.background,
-                    backgroundGradientTo: theme.colors.background,
-                    decmalPlaces: 0,
-                    color: (opacity = 1) =>
-                      `rgba(11, 79, 108, ${opacity})`, 
-                  }}
-
-                  style={styles.chart}
-                />
+              <BarChart
+                data={chartData}
+                width={Dimensions.get("window").width} 
+                height={350}
+                fromZero
+                showValuesOnTopOfBars
+                chartConfig={{
+                  backgroundGradientFrom: theme.colors.background,
+                  backgroundGradientTo: theme.colors.background,
+                  decimalPlaces: 0,
+                  color: (opacity = 1) => `rgba(11, 79, 108, ${opacity})`,
+                }}
+                style={styles.chart}
+              />
             </ScrollView>
+
           </>
         )}
       </View>

@@ -9,18 +9,7 @@ const Tests = () => {
 
   return (
     <ScreenWithDrawer title={'الفحوصات'}>
-      {/* زر الرجوع */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={theme.colors.textPrimary}
-        />
-      </TouchableOpacity>
+     
 
       {/* زر إدخال نتائج الفحوصات */}
       <TouchableOpacity
@@ -89,19 +78,7 @@ const Tests = () => {
 };
 
 const styles = StyleSheet.create({
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  backText: {
-    marginLeft: theme.spacing.sm,
-    fontSize: theme.typography.bodyLg,
-    color: theme.colors.textPrimary,
-    fontFamily: theme.typography.fontFamily,
-  },
+
   testButton: {
     borderRadius: theme.radii.md,
     paddingVertical: theme.spacing.md,

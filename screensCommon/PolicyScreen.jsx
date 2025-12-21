@@ -59,18 +59,7 @@ const PrivacyPolicyScreen = () => {
       <SafeAreaView
         style={styles.safeArea}
       >
-        {/* زر الرجوع */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color={theme.colors.primary}
-          />
-        </TouchableOpacity>
+       
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -115,11 +104,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.backgroundLight,
   },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.sm,
-  },
+
   scrollContent: {
     paddingBottom: theme.spacing.lg,
   },

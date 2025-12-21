@@ -18,19 +18,27 @@ import ENDPOINTS from '../malikEndPoint';
 import theme from '../style/theme';
 
 const ChangePasswordScreen = () => {
+  const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+
 
   const handleSave = async () => {
+    if (!currentPw || !newPw || !confirmPw) {
+    Alert.alert('⚠️ تنبيه', 'يرجى إدخال كلمة المرور الحالية والجديدة وتأكيدها.');
+    return;
+   }
+
     if (!newPw || !confirmPw) {
       Alert.alert('⚠️ تنبيه', 'يرجى إدخال كلمة المرور الجديدة وتأكيدها.');
       return;
     }
 
-    if (newPw.length < 6) {
-      Alert.alert('⚠️ تنبيه', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+    if (newPw.length < 4) {
+      Alert.alert('⚠️ تنبيه', 'كلمة المرور يجب أن تكون 4 أحرف على الأقل.');
       return;
     }
 
@@ -47,16 +55,17 @@ const ChangePasswordScreen = () => {
         return;
       }
 
-      const res = await axios.post(
-        ENDPOINTS.AUTH.CHANGE_PASSWORD,
-        {},
-        {
-          params: {
-            user_id,
-            new_password: newPw,
-          },
-        }
-      );
+      const res = await axios.post(ENDPOINTS.AUTH.CHANGE_PASSWORD,
+      {},
+      {
+        params: {
+          user_id,
+          current_password: currentPw,
+          new_password: newPw,
+        },
+      }
+    );
+
 
       if (res.status === 200) {
         Alert.alert('✅ نجاح', 'تم تغيير كلمة المرور بنجاح.');
@@ -81,7 +90,28 @@ const ChangePasswordScreen = () => {
         backgroundColor={theme.colors.primary}
       />
 
-      <Text style={styles.title}>تعيين كلمة مرور جديدة</Text>
+      {/* كلمة المرور الحالية */}
+      <Text style={styles.label}>كلمة المرور الحالية</Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="••••••••"
+          placeholderTextColor={theme.colors.textMuted}
+          secureTextEntry={!showCurrent}
+          value={currentPw}
+          onChangeText={setCurrentPw}
+          textAlign="right"
+          autoCapitalize="none"
+        />
+        <TouchableOpacity onPress={() => setShowCurrent(!showCurrent)}>
+          <Ionicons
+            name={showCurrent ? 'eye-off-outline' : 'eye-outline'}
+            size={24}
+            color={theme.colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+
 
       {/* كلمة المرور الجديدة */}
       <Text style={styles.label}>كلمة المرور الجديدة</Text>
