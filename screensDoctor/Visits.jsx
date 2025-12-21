@@ -1,6 +1,6 @@
 // sami - Visits screen (sami-style: simple, axios, focus refresh)
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,8 @@ const Visits = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  // state
+  const debounceRef = useRef(null);
+
   const [searchText, setSearchText] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
@@ -34,7 +35,6 @@ const Visits = () => {
   const [error, setError] = useState(null);
   const [doctorId, setDoctorId] = useState(null);
 
-  // load doctor ID on focus
   useEffect(() => {
     if (isFocused) {
       loadDoctorIdAndPatients();
@@ -87,6 +87,24 @@ const Visits = () => {
       String(p.id).includes(searchText)
   );
 
+  const onSearchChange = (text) => {
+    setSearchText(text);
+
+    clearTimeout(debounceRef.current);
+
+    const q = text.trim();
+    if (!doctorId) return;
+
+    if (q.length === 0) {
+      setPatients([]);
+      return;
+    }
+
+    debounceRef.current = setTimeout(() => {
+      searchPatients(doctorId, q);
+    }, 600);
+  };
+
   return (
     <ScreenWithDrawer title="الزيارات">
       <SafeAreaView
@@ -99,10 +117,7 @@ const Visits = () => {
                 style={styles.searchInput}
                 placeholder="ابحث عن المريض..."
                 value={searchText}
-                onChangeText={(text) => {
-                  setSearchText(text);
-                  searchPatients(doctorId, text);
-                }}
+                onChangeText={onSearchChange}
                 placeholderTextColor={colors.textMuted}
               />
               <Ionicons
