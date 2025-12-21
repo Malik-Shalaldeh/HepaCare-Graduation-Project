@@ -96,7 +96,7 @@ const Visits = () => {
     if (!doctorId) return;
 
     if (q.length === 0) {
-      setPatients([]);
+      searchPatients(doctorId, "");
       return;
     }
 
@@ -137,28 +137,26 @@ const Visits = () => {
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             ) : (
-              searchText.trim().length > 0 && (
-                <FlatList
-                  data={filteredPatients}
-                  keyExtractor={(item) => String(item.id)}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.resultItem}
-                      onPress={() => setSelectedPatient(item)}
-                    >
-                      <Text style={styles.resultText}>{item.name}</Text>
-                    </TouchableOpacity>
-                  )}
-                  ListEmptyComponent={
-                    filteredPatients.length === 0 ? (
-                      <Text style={styles.noResults}>
-                        لا يوجد نتائج مطابقة.
-                      </Text>
-                    ) : null
-                  }
-                  contentContainerStyle={{ paddingBottom: spacing.sm }}
-                />
-              )
+              <FlatList
+                data={filteredPatients}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.resultItem}
+                    onPress={() => setSelectedPatient(item)}
+                  >
+                    <Text style={styles.resultText}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                  filteredPatients.length === 0 ? (
+                    <Text style={styles.noResults}>
+                      لا يوجد نتائج مطابقة.
+                    </Text>
+                  ) : null
+                }
+                contentContainerStyle={{ paddingBottom: spacing.sm }}
+              />
             )}
           </>
         ) : (
@@ -256,17 +254,21 @@ const styles = StyleSheet.create({
     marginLeft: spacing.xs,
   },
   resultItem: {
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderBottomWidth: 0.5,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
+    borderRadius: radii.md,
+    borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.background,
   },
   resultText: {
     textAlign: "right",
-    fontSize: typography.bodyMd,
+    fontSize: typography.bodyMd + 2,
     fontFamily: typography.fontFamily,
     color: colors.textPrimary,
+    fontWeight: "700",
   },
   noResults: {
     textAlign: "center",
