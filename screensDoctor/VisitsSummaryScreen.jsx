@@ -10,7 +10,7 @@ import ScreenWithDrawer from "./ScreenWithDrawer";
 import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
-const AI_URL = "http://192.168.1.128:11434/api/generate";
+
 const AI_MODEL = "Hepa_care_version_17:latest";
 
 const VisitsSummaryScreen = ({ route }) => {
@@ -39,6 +39,11 @@ const VisitsSummaryScreen = ({ route }) => {
       setLoading(true);
       setSummary("");
       setError(null);
+      const ai_respons1 = await axios.get(ENDPOINTS.aiUrl);
+      const AI_URL = ai_respons1.data?.ai_url;
+      if (!AI_URL) {
+        throw new Error("عندك مشكلة مع سيرفر الذكاء");
+      }
 
       const visitsResponse = await axios.get(ENDPOINTS.visitsHistory, {
         params: { patient_id: patientId },

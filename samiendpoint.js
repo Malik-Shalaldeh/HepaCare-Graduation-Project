@@ -18,6 +18,7 @@ const ENDPOINTS = {
   
   // Doctors
   doctors: `${BASE_URL}/doctors`,
+  aiUrl:`${BASE_URL}/config/ai-url`,
 
   // Patients
   patients: `${BASE_URL}/patients`,
