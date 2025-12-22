@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,9 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
+// ✅ عدّل مسار الاستيراد حسب مشروعك
+import AbedEndPoint from "../AbedEndPoint";
+
 export default function InputTestResultScreen() {
   const navigation = useNavigation();
 
@@ -27,45 +30,91 @@ export default function InputTestResultScreen() {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
-  const patientsList = [
-    { id: "1001", name: "أحمد خالد" },
-    { id: "1002", name: "سارة محمود" },
-    { id: "1003", name: "محمد علي" },
-  ];
-  const testsList = [
-    "CBC",
-    "PCR*",
-    "ELISA*",
-    "CHEMISTRY",
-    "COAGULATION",
-    "HBSAG**",
-    "HBSAB**",
-    "HBCAB**",
-  ];
+  // ✅ بدل الداتا الوهمية: جلب من الباك اند
+  const [testsList, setTestsList] = useState([]); // [{id, name, ...}]
+  const [loadingTests, setLoadingTests] = useState(false);
 
   const [searchInput, setSearchInput] = useState("");
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const [selectedTest, setSelectedTest] = useState("");
-  const [file, setFile] = useState(null);
+  // ✅ نخزن id الفحص بدل الاسم
+  const [selectedTest, setSelectedTest] = useState(""); // test_id (string)
+  const [file, setFile] = useState(null); // { uri, name, mimeType }
   const [resultValue, setResultValue] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isNormal, setIsNormal] = useState(true);
   const [note, setNote] = useState("");
 
-  const handlePatientSearch = () => {
-    const results = patientsList.filter(
-      (p) => p.id === searchInput.trim() || p.name.includes(searchInput.trim())
-    );
-    setFilteredPatients(results);
+  // ✅ تحميل الفحوصات مرة واحدة
+  useEffect(() => {
+    const loadTests = async () => {
+      try {
+        setLoadingTests(true);
+        const res = await fetch(AbedEndPoint.labTestsList);
+        if (!res.ok) throw new Error("Failed to load tests");
+        const data = await res.json();
+        setTestsList(Array.isArray(data) ? data : []);
+      } catch (e) {
+        Alert.alert("خطأ", "تعذر تحميل قائمة الفحوصات");
+        setTestsList([]);
+      } finally {
+        setLoadingTests(false);
+      }
+    };
+
+    loadTests();
+  }, []);
+
+  const handlePatientSearch = async () => {
+    try {
+      const q = searchInput.trim();
+      if (!q) {
+        setFilteredPatients([]);
+        return;
+      }
+
+      const url = `${AbedEndPoint.labPatientsSearch}?query=${encodeURIComponent(
+        q
+      )}&take=20`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Search failed");
+      const data = await res.json();
+
+      // الباك اند يرجع: [{patient_id, full_name, ...}]
+      const normalized = (Array.isArray(data) ? data : []).map((x) => ({
+        id: String(x.patient_id),
+        name: x.full_name,
+        national_id: x.national_id ?? null,
+        phone: x.phone ?? null,
+      }));
+
+      setFilteredPatients(normalized);
+    } catch (e) {
+      Alert.alert("خطأ", "تعذر البحث عن المرضى");
+      setFilteredPatients([]);
+    }
   };
 
+  // ✅ FIX: DocumentPicker الجديد (canceled/assets) + القديم
   const pickDocument = async () => {
-    const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-    if (result.type === "success") {
-      setFile(result);
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "*/*",
+      copyToCacheDirectory: true,
+    });
+
+    if (result?.canceled) return;
+
+    const asset = result?.assets?.[0] || result;
+
+    if (asset?.uri) {
+      setFile({
+        uri: asset.uri,
+        name: asset.name || "result.dat",
+        mimeType: asset.mimeType || "application/octet-stream",
+      });
     }
   };
 
@@ -82,25 +131,72 @@ export default function InputTestResultScreen() {
     setNote("");
   };
 
-  const handleSave = () => {
-    Alert.alert(
-      "تم الحفظ",
-      "تم حفظ نتائج الفحص بنجاح",
-      [
-        {
-          text: "عرض النتائج",
-          onPress: () => {
-            resetState();
-            navigation.navigate("TestResultsScreen");
+  const toISODate = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // YYYY-MM-DD
+  };
+
+  const handleSave = async () => {
+    try {
+      if (!selectedPatient) return;
+
+      if (!selectedTest) {
+        Alert.alert("تنبيه", "اختر اسم الفحص أولاً");
+        return;
+      }
+
+      // تجهيز FormData للإرسال للباك اند
+      const form = new FormData();
+      form.append("patient_id", String(selectedPatient.id));
+      form.append("test_id", String(selectedTest));
+      form.append("test_date", toISODate(date));
+      form.append(
+        "result_value",
+        resultValue?.trim() ? resultValue.trim() : ""
+      );
+      form.append("is_normal", isNormal ? "1" : "0");
+      form.append("comments", note || "");
+
+      // ملف اختياري (✅ FIX: يعتمد على file.uri)
+      if (file?.uri) {
+        form.append("file", {
+          uri: file.uri,
+          name: file.name || "result.dat",
+          type: file.mimeType || "application/octet-stream",
+        });
+      }
+
+      const res = await fetch(AbedEndPoint.labTestResults, {
+        method: "POST",
+        body: form,
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(errText || "Save failed");
+      }
+
+      // ✅ اقرأ الرد عشان تتأكد من filePath (Debug)
+      const data = await res.json().catch(() => ({}));
+      console.log("Saved response:", data); // فيه filePath إذا انحفظ
+
+      // ✅ زر واحد فقط: "تم"
+      Alert.alert(
+        "تم",
+        "تم إضافة الفحص بنجاح",
+        [
+          {
+            text: "تم",
+            onPress: resetState,
           },
-        },
-        {
-          text: "حسناً",
-          onPress: resetState,
-        },
-      ],
-      { cancelable: false }
-    );
+        ],
+        { cancelable: false }
+      );
+    } catch (e) {
+      Alert.alert("خطأ", "تعذر حفظ نتيجة الفحص. تأكد من الاتصال بالسيرفر");
+    }
   };
 
   const formatDate = (d) => {
@@ -189,10 +285,20 @@ export default function InputTestResultScreen() {
               <Picker
                 selectedValue={selectedTest}
                 onValueChange={(v) => setSelectedTest(v)}
+                enabled={!loadingTests}
               >
-                <Picker.Item label="-- اختر الفحص --" value="" />
-                {testsList.map((test) => (
-                  <Picker.Item key={test} label={test} value={test} />
+                <Picker.Item
+                  label={
+                    loadingTests ? "جاري تحميل الفحوصات..." : "-- اختر الفحص --"
+                  }
+                  value=""
+                />
+                {testsList.map((t) => (
+                  <Picker.Item
+                    key={String(t.id)}
+                    label={t.name}
+                    value={String(t.id)}
+                  />
                 ))}
               </Picker>
             </View>

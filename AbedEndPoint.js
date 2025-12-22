@@ -5,7 +5,8 @@ const AbedEndPoint = {
   BASE_URL,
 
   // ✅ NEW: Patient data for doctor screen
-  doctorPatientData: (patientId) => `${BASE_URL}/doctor/patient-data/${patientId}`,
+  doctorPatientData: (patientId) =>
+    `${BASE_URL}/doctor/patient-data/${patientId}`,
 
   // Labs (❌ this screen won't use these anymore)
   labsList: `${BASE_URL}/labs`,
@@ -45,6 +46,11 @@ const AbedEndPoint = {
     `${BASE_URL}/health-meds/set-availability?med_id=${encodeURIComponent(
       medId
     )}&available=${available ? 1 : 0}`,
+
+  // ✅ Lab (NEW)
+  labPatientsSearch: `${BASE_URL}/lab/patients/search`,
+  labTestsList: `${BASE_URL}/lab/tests`,
+  labTestResults: `${BASE_URL}/lab/test-results`, // GET + POST (نفس المسار)
 
   // Symptom tracking
   symptomPatients: `${BASE_URL}/symptom-tracking/patients`,

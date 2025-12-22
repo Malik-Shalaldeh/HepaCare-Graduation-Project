@@ -1,5 +1,5 @@
 // screens/InputTestResultScreen.jsx
-import React, { useState, useLayoutEffect, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -27,6 +27,28 @@ function toYMD(d) {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+}
+
+function sanitizeNumberInput(v) {
+  // يسمح فقط بالأرقام والنقطة (ويحوّل الفاصلة لنقطة)
+  // مثال: " 12,50 " -> "12.50"
+  const s = String(v ?? "")
+    .trim()
+    .replace(",", ".")
+    .replace(/[^\d.]/g, "");
+
+  // منع أكثر من نقطة
+  const parts = s.split(".");
+  if (parts.length <= 2) return s;
+  return `${parts[0]}.${parts.slice(1).join("")}`;
+}
+
+function isValidDecimal(v) {
+  if (v === null || v === undefined) return false;
+  const s = String(v).trim();
+  if (s === "") return false;
+  // رقم صحيح أو عشري
+  return /^(\d+(\.\d+)?)$/.test(s);
 }
 
 export default function InputTestResultScreen() {
@@ -152,6 +174,13 @@ export default function InputTestResultScreen() {
     if (!selectedPatient) return Alert.alert("تنبيه", "اختر المريض أولاً");
     if (!selectedTestId) return Alert.alert("تنبيه", "اختر اسم الفحص");
 
+    const cleanedValue = sanitizeNumberInput(resultValue);
+
+    // إذا المستخدم كتب شي بالنتيجة، لازم يكون رقم
+    if (cleanedValue !== "" && !isValidDecimal(cleanedValue)) {
+      return Alert.alert("تنبيه", "الرجاء إدخال قيمة رقمية صحيحة للنتيجة");
+    }
+
     try {
       const form = new FormData();
       form.append("patient_id", String(selectedPatient.id));
@@ -159,8 +188,10 @@ export default function InputTestResultScreen() {
       form.append("test_date", toYMD(date));
       form.append("is_normal", isNormal ? "1" : "0");
       form.append("doctor_id", String(doctorId));
-      if (note) form.append("comments", note);
-      if (resultValue !== "") form.append("result_value", String(resultValue));
+      form.append("comments", note ? String(note) : "");
+
+      // ✅ أرسلها دائمًا (لو فاضية رح تنحفظ NULL بالباك)
+      form.append("result_value", cleanedValue);
 
       if (file && file.uri) {
         form.append("file", {
@@ -172,9 +203,10 @@ export default function InputTestResultScreen() {
 
       const res = await fetch(AbedEndPoint.inputResultSave, {
         method: "POST",
-        headers: { "Content-Type": "multipart/form-data" },
+        // ✅ لا تضع Content-Type هنا (RN يضبط boundary تلقائياً)
         body: form,
       });
+
       if (!res.ok) {
         const txt = await res.text();
         throw new Error(txt || `HTTP ${res.status}`);
@@ -323,9 +355,9 @@ export default function InputTestResultScreen() {
               style={[styles.input, styles.rtlText]}
               placeholder="ادخل قيمة الفحص"
               placeholderTextColor={colors.textMuted}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={resultValue}
-              onChangeText={setResultValue}
+              onChangeText={(v) => setResultValue(sanitizeNumberInput(v))}
               textAlign="right"
             />
 
@@ -357,9 +389,7 @@ export default function InputTestResultScreen() {
                   false: colors.border,
                   true: colors.accent,
                 }}
-                thumbColor={
-                  Platform.OS === "android" ? colors.primary : undefined
-                }
+                thumbColor={Platform.OS === "android" ? colors.primary : undefined}
               />
             </View>
 
@@ -384,6 +414,7 @@ export default function InputTestResultScreen() {
                   حفظ
                 </Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={[styles.searchButton, { backgroundColor: colors.buttonDanger }]}
                 onPress={() => setSelectedPatient(null)}
@@ -405,7 +436,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.backgroundLight,
-    paddingHorizontal: spacing.xl, // قريب من 20
+    paddingHorizontal: spacing.xl,
     paddingTop:
       Platform.OS === "android"
         ? (StatusBar.currentHeight || 0) + spacing.sm
@@ -416,7 +447,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === "android" ? 40 : spacing.lg,
   },
   backButton: {
-    marginBottom: spacing.md + 3, // قريب من 15
+    marginBottom: spacing.md + 3,
   },
   header: {
     fontSize: typography.headingMd,
