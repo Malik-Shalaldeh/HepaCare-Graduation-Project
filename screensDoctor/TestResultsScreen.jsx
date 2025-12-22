@@ -9,8 +9,8 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,7 +20,6 @@ import theme from '../style/theme';
 export default function TestResultsScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
-  const navigation = useNavigation();
 
   const handleSearch = async () => {
     const query = searchInput.trim();
@@ -61,18 +60,13 @@ export default function TestResultsScreen() {
       <TouchableOpacity
         style={[styles.searchButton, styles.fileButton]}
         onPress={() => {
-          if (item.filePath) {
-            const normalizedPath = item.filePath.replace(/\\/g, '/');
-            const directUrl = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/${normalizedPath}`;
-            const encodedUrl = encodeURIComponent(directUrl);
-
-            // افتح PDF داخل Google Viewer
-            navigation.navigate("FileViewer", {
-              fileUrl: `https://docs.google.com/gview?embedded=true&url=${encodedUrl}`
-            });
-          } else {
+          if (!item.fileCode) {
             Alert.alert("تنبيه", "لا يوجد ملف مرفق لهذا الفحص");
+            return;
           }
+
+          const fileUrl = `${ENDPOINTS.TEST_RESULTS.FILE_BASE}/test-results/file/${item.fileCode}`;
+          Linking.openURL(fileUrl);  // يفتح الملف في المتصفح خارج التطبيق
         }}
         activeOpacity={0.8}
       >

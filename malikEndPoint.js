@@ -1,13 +1,14 @@
 // malikEndPoint
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
 //const BASE_URL = "http://10.13.80.148:8000"; 
-const BASE_URL = "http://192.168.1.128:8000";
+const BASE_URL = "http://192.168.1.7:8000";
 
 const ENDPOINTS = {
   BASE_URL,
   TEST_RESULTS: {
     SEARCH: `${BASE_URL}/test-results/`,
     FILE_BASE: BASE_URL,
+
   },
   PATIENT_CHART: {
     GET: `${BASE_URL}/patient-chart/`,
