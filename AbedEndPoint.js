@@ -1,5 +1,5 @@
 // AbedEndPoint.js
-const BASE_URL = "http://192.168.1.128:8000";
+const BASE_URL = "https://protective-intuition-production-5120.up.railway.app";
 
 const AbedEndPoint = {
   BASE_URL,

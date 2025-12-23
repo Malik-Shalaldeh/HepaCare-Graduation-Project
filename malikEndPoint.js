@@ -1,7 +1,7 @@
 // malikEndPoint
 //const BASE_URL = "https://luminous-possibility-production.up.railway.app";
 //const BASE_URL = "http://10.13.80.148:8000"; 
-const BASE_URL = "http://192.168.1.128:8000";
+const BASE_URL = "https://protective-intuition-production-5120.up.railway.app";
 
 const ENDPOINTS = {
   BASE_URL,
