@@ -1,12 +1,10 @@
 // sami
-// جميع التعليقات داخل الكود باللغة العربية فقط.
+
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-/*
-  مكون شارة صغيرة لعرض وسم أو قيمة صغيرة داخل بطاقة.
-*/
+
 export default function Tag({
   text,
   color = "#EEF7F3",

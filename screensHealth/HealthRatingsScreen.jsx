@@ -20,14 +20,12 @@ export default function HealthRatingsScreen() {
 
   const isFocused = useIsFocused();
 
-  // load data on focus
   useEffect(() => {
     if (isFocused) {
       loadRatings();
     }
   }, [isFocused]);
 
-  // API calls
   const getAllRatings = async () => {
     const response = await axios.get(ENDPOINTS.ratingsAll);
     return response.data;
@@ -62,7 +60,6 @@ export default function HealthRatingsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* ✅ بس ملخص فوق بدون عنوان إضافي */}
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>متوسط تقييم التطبيق</Text>
@@ -77,7 +74,7 @@ export default function HealthRatingsScreen() {
         </View>
       </View>
 
-      {/* قائمة التقييمات */}
+    
       <FlatList
         data={items}
         keyExtractor={(it) => String(it.id)}

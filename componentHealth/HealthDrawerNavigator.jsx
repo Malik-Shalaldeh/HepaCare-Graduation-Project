@@ -24,13 +24,12 @@ import Logout from '../Login/logout';
 import PatientsOverviewScreen from "../screensDoctor/PatientsOverviewScreen";
 
 
-// استدعاء قيم التصميم الموحد
 import { colors, spacing, typography } from "../style/theme";
 
-// اللون الأساسي من ملف الـ theme
+
 const primary = colors.primary;
 
-// محتوى مخصص للقائمة الجانبية مع زر تسجيل الخروج
+
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
 
@@ -48,7 +47,6 @@ function CustomDrawerContent(props) {
   );
 }
 
-// تبويبات سفلية بسيطة: لوحة التحكم + التقييمات
 const Tab = createBottomTabNavigator();
 
 function MainTabs() {
@@ -93,7 +91,6 @@ function MainTabs() {
         tabBarHideOnKeyboard: true,
       })}
     >
-      {/* ترتيب الشاشات هنا يجعل لوحة التحكم على اليمين (RTL) والتقييمات على اليسار */}
       <Tab.Screen name="التقييمات" component={HealthRatingsScreen} />
       <Tab.Screen name="لوحة التحكم" component={HealthWelcomeScreen} />
     </Tab.Navigator>
@@ -105,12 +102,11 @@ const Drawer = createDrawerNavigator();
 export default function HealthDrawerNavigator() {
   return (
     <>
-      {/* شريط الحالة بلون التطبيق الموحد */}
       <StatusBar backgroundColor={primary} barStyle="light-content" />
 
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />}
-        initialRouteName="الرئيسية"   // ✅ صارت البداية على شاشة "الرئيسية"
+        initialRouteName="الرئيسية"   
         screenOptions={{
           headerShown: true,
           headerTitleAlign: "center",
@@ -128,12 +124,12 @@ export default function HealthDrawerNavigator() {
           },
         }}
       >
-        {/* ✅ شاشة واحدة فقط تستخدم MainTabs، وبدون هيدر من الـ Drawer */}
+       
         <Drawer.Screen
           name="الرئيسية"
           component={MainTabs}
           options={{
-            headerShown: false, // مهم: عشان ما يطلع هيدر ثاني فوق التابات
+            headerShown: false, 
             drawerIcon: ({ size, color }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),

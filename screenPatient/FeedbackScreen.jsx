@@ -26,7 +26,6 @@ import {
 
 const primary = colors.primary;
 
-// clinic data
 const MOCK_CLINICS = [
   { id: 1, name: "Main Clinic" },
   { id: 2, name: "سعير" },
@@ -37,17 +36,14 @@ const FeedbackScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  // form state
   const [appValue, setAppValue] = useState(0);
   const [comment, setComment] = useState("");
   const [patientId, setPatientId] = useState(null);
   const [patientName, setPatientName] = useState("مريض");
 
-  // clinic info
   const clinicId = 1;
   const clinicName = MOCK_CLINICS.find((c) => c.id === clinicId)?.name || "عيادة الصحة";
 
-  // reset form and load patient data on focus
   useEffect(() => {
     if (isFocused) {
       setAppValue(0);
@@ -69,7 +65,6 @@ const FeedbackScreen = () => {
     }
   };
 
-  // API call
   const submitRating = async ({ patientId, patientName, clinicId, clinicName, appRating, comment }) => {
     const response = await axios.post(ENDPOINTS.ratingsSubmit, {
       patient_id: patientId,
@@ -83,7 +78,6 @@ const FeedbackScreen = () => {
     return response.data;
   };
 
-  // submit form
   const handleSubmit = async () => {
     if (!appValue) {
       Alert.alert("تنبيه", "الرجاء اختيار تقييم للتطبيق");

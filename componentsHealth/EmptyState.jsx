@@ -5,9 +5,6 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-/*
-  مكون لعرض حالة فارغة بشكل لطيف عندما لا توجد بيانات لعرضها.
-*/
 export default function EmptyState({
   icon = "document-text-outline",
   title = "لا توجد بيانات",
