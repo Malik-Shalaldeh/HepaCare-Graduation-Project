@@ -11,7 +11,9 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+      
     },
+    
     "ios": {
       "supportsTablet": true
     },
@@ -23,7 +25,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.malikzeyad.hepacare"
     },
-    "runtimeVersion": "1",
+   "runtimeVersion": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
     },

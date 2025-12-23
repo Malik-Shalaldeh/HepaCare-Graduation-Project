@@ -54,7 +54,7 @@ const EvaluationVisitScreen = () => {
     try {
       await axios.post(ENDPOINTS.VISITS.CREATE, {
         patient_id: patientId,
-        visit_date: new Date().toISOString(),
+        visit_date: new Date().toISOString().split('T')[0] , // "2025-12-23"
         general_state:
           condition === 'جيدة' ? 'GOOD' :
           condition === 'متوسطة' ? 'MEDIUM' : 'BAD',

@@ -82,7 +82,8 @@ const PatientListScreen = () => {
     const name = (patient.name || "").toLowerCase();
     const nationalId = patient.nationalId || "";
     return name.includes(q) || nationalId.includes(searchQuery.trim());
-  });
+  })
+  .slice(0, 5);
 
   const renderPatientItem = ({ item }) => (
     <View style={styles.patientCard}>
