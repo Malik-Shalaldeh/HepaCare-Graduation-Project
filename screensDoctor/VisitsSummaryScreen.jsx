@@ -1,7 +1,7 @@
 // sami - Visits Summary Screen (Malik-style: simple, axios, focus refresh)
 
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform, StatusBar } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
@@ -18,6 +18,7 @@ const VisitsSummaryScreen = ({ route }) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
+  const topInset = (insets?.top ?? 0) || (Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 0);
 
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
@@ -99,7 +100,10 @@ const VisitsSummaryScreen = ({ route }) => {
     <ScreenWithDrawer title="ملخص الزيارات">
       <View style={styles.container}>
         <View style={styles.contentWrapper}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={[styles.backButton, { marginTop: topInset + spacing.sm }]}
+            onPress={() => navigation.goBack()}
+          >
             <Ionicons name="arrow-back" size={22} color={colors.primary} />
           </TouchableOpacity>
 
