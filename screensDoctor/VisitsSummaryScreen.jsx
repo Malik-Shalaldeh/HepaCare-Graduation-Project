@@ -11,7 +11,7 @@ import ENDPOINTS from "../samiendpoint";
 import { colors, spacing, radii, typography, shadows } from "../style/theme";
 
 
-const AI_MODEL = "Hepa_care_version_17:latest";
+const AI_MODEL = "Hepa_care_version_20:latest";
 
 const VisitsSummaryScreen = ({ route }) => {
   const { patientId, patientName } = route.params || {};
