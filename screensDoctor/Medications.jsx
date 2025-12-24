@@ -101,7 +101,10 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: theme.colors.primary,
-    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0,
+    paddingTop:
+          Platform.OS === "android"
+          ? StatusBar.currentHeight || 0
+          : 44,
     paddingBottom: theme.spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
