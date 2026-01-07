@@ -14,6 +14,7 @@ const cityMap = {
   "دير البلح": "Deir al-Balah",
   "خانيونس": "Khan Yunis",
   "رفح": "Rafah",
+  "القدس":"Jerusalem"
 };
 
 export default cityMap;

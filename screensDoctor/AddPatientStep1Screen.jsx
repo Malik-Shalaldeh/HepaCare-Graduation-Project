@@ -21,7 +21,6 @@ export default function AddPatientStep1Screen() {
   const navigation = useNavigation();
 
   const scrollRef = useRef(null);
-
   const fullNameRef = useRef(null);
   const idNumberRef = useRef(null);
   const phoneRef = useRef(null);

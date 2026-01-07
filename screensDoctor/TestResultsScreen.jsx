@@ -49,7 +49,6 @@ export default function TestResultsScreen() {
       <Text style={styles.name}>
         👤 {item.name} (رقم: {item.patientId})
       </Text>
-
       <Text style={styles.test}>🧪 الفحص: {item.test}</Text>
       <Text style={styles.test}>🧪 نوع الفحص: {item.type || 'لا يوجد'}</Text>
       <Text style={styles.result}>📊 النتيجة: {item.result}</Text>
